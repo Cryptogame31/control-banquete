@@ -780,50 +780,6 @@ function setupEventListeners() {
     dateEndInput.addEventListener('input', renderAdminUsers);
   }
 
-  // Submit Login
-  document.getElementById('form-login').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-    try {
-      await login(email, pass);
-    } catch (err) {
-      if (err.message.includes('auth/configuration-not-found') || err.code === 'auth/configuration-not-found') {
-        const confirmMock = confirm(
-          "Error de Firebase: El proveedor de correo y contraseña no está habilitado en tu consola de Firebase.\n\n" +
-          "Para activarlo:\n" +
-          "1. Ve a tu consola de Firebase -> Authentication -> Sign-in Method.\n" +
-          "2. Habilita 'Correo electrónico/contraseña' y guarda los cambios.\n\n" +
-          "¿Deseas activar el MODO SIMULADOR (local) en este momento para probar la aplicación de inmediato?"
-        );
-        if (confirmMock) {
-          localStorage.setItem('controlbanquete_force_mock', 'true');
-          alert("Modo simulador activado. La página se recargará ahora.");
-          window.location.reload();
-        }
-      } else {
-        alert("Error de Inicio de Sesión: " + err.message);
-      }
-    }
-  });
-
-  const btnForgotPassword = document.getElementById('btn-forgot-password');
-  if (btnForgotPassword) {
-    btnForgotPassword.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      if (!email) {
-        alert("Por favor, ingresa tu correo electrónico en el campo superior primero para poder enviarte el enlace de recuperación.");
-        return;
-      }
-      try {
-        await resetPassword(email);
-        alert("Te hemos enviado un correo con instrucciones para restablecer tu contraseña. Revisa tu bandeja de entrada o correo no deseado (spam).");
-      } catch (err) {
-        alert("Error al intentar recuperar la contraseña: " + err.message);
-      }
-    });
-  }
 
   // Logout buttons
   document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
