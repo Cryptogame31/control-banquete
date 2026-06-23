@@ -8,7 +8,7 @@ call npm install
 echo.
 echo [2/3] Generando cliente de base de datos Prisma y aplicando esquema...
 call npx prisma generate
-call npx prisma db push
+call npx prisma db push || echo. && echo [AVISO] No se pudo conectar a una base de datos PostgreSQL local en el puerto 5432. El servidor iniciara, pero algunas funciones requeriran la base de datos local instalada.
 echo.
 echo [3/3] Iniciando servidor Express local...
 echo.

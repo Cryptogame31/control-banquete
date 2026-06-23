@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Iniciar Sesión - Control Banquete</title>
+  <meta name="description" content="Portal de inicio de sesión de Control Banquete para clientes, administradores y personal.">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .brand-header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .brand-title {
+      font-family: var(--font-title);
+      color: var(--accent-gold);
+      font-size: 1.8rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+    .error-alert {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand-header">
+    <div class="brand-logo">
+      <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/>
+        <path d="M12 17v4"/>
+        <path d="M8 21h8"/>
+        <path d="M12 6V3"/>
+        <circle cx="12" cy="9" r="1"/>
+      </svg>
+    </div>
+    <div class="brand-title" id="brand-text">CONTROL BANQUETE</div>
+  </div>
+
+  <div class="login-view-container" style="min-height: auto;">
+    <div class="card login-card" style="margin-top: 0;">
+      <h2 style="font-family: var(--font-title); color: var(--accent-gold); text-align: center; margin-bottom: 2rem; font-size: 1.6rem;">Acceso al Portal</h2>
+      
+      <div class="error-alert" id="error-box"></div>
+
+      <form id="form-login">
+        <div class="form-group" style="margin-bottom: 1.2rem;">
+          <label for="login-email">Correo Electrónico</label>
+          <input type="email" id="login-email" placeholder="correo@ejemplo.com" required style="width: 100%; box-sizing: border-box; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="login-password">Contraseña</label>
+          <input type="password" id="login-password" placeholder="••••••••" required style="width: 100%; box-sizing: border-box; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Ingresar</button>
+      </form>
+      
+      <div class="demo-credentials" id="demo-auth-selector" style="display: none;">
+        <h4 style="font-size: 0.85rem; color: var(--accent-gold); margin-bottom: 0.5rem;">Acceso Rápido Simulador (Demo)</h4>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Selecciona una cuenta de prueba y pulsa ingresar con la contraseña <strong>123456</strong>.</p>
+        <select id="select-demo-user" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; font-size: 0.85rem;">
+          <option value="">-- Selecciona un Rol --</option>
+          <option value="admin@controlbanquete.com">Superadministrador (Control Total)</option>
+          <option value="compras@controlbanquete.com">Compras (Abastecimiento)</option>
+          <option value="cocina@controlbanquete.com">Cocina (Recetas y Producción)</option>
+          <option value="logistica@controlbanquete.com">Logística (Coordinación)</option>
+          <option value="decoracion@controlbanquete.com">Decoración (Montajes)</option>
+          <option value="recreacion@controlbanquete.com">Recreación (Asignaciones)</option>
+          <option value="cliente@controlbanquete.com">Portal Cliente (Sara y Felipe)</option>
+        </select>
+      </div>
+      
+      <button class="btn-secondary" id="btn-back-cotizar" style="width: 100%; margin-top: 1.5rem; height: 40px;">Ir al Cotizador Público</button>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorBox = document.getElementById('error-box');
+      errorBox.style.display = 'none';
+
+      const isMock = localStorage.getItem('controlbanquete_force_mock') === 'true';
+      if (isMock) {
+        try {
+          let name = "Usuario Demo";
+          let role = "cliente";
+          if (email.startsWith('admin')) { role = "superadmin"; name = "Administrador Control"; }
+          else if (email.startsWith('compras')) { role = "compras"; name = "Jefe de Compras"; }
+          else if (email.startsWith('cocina')) { role = "cocina"; name = "Chef Principal"; }
+          else if (email.startsWith('logistica')) { role = "logistica"; name = "Coordinador Logística"; }
+          else if (email.startsWith('decoracion')) { role = "decoracion"; name = "Coordinador Decoración"; }
+          else if (email.startsWith('recreacion')) { role = "recreacion"; name = "Coordinador Recreación"; }
+          else if (email.startsWith('cliente')) { role = "cliente"; name = "Sara y Felipe"; }
+
+          const mockUser = { uid: role + '_user', email, name, role };
+          localStorage.setItem('controlbanquete_current_user', JSON.stringify(mockUser));
+          localStorage.setItem('controlbanquete_token', 'mock_token_' + role);
+          window.location.href = 'index.html';
+        } catch(err) {
+          errorBox.textContent = err.message;
+          errorBox.style.display = 'block';
+        }
+      } else {
+        try {
+          const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.error || 'Credenciales inválidas');
+          }
+          const data = await response.json();
+          localStorage.setItem('controlbanquete_current_user', JSON.stringify(data.user));
+          localStorage.setItem('controlbanquete_token', data.token);
+          window.location.href = 'index.html';
+        } catch (err) {
+          errorBox.textContent = err.message;
+          errorBox.style.display = 'block';
+        }
+      }
+    });
+
+    const selectDemo = document.getElementById('select-demo-user');
+    if (selectDemo) {
+      selectDemo.addEventListener('change', () => {
+        if (selectDemo.value) {
+          document.getElementById('login-email').value = selectDemo.value;
+          document.getElementById('login-password').value = "123456";
+        }
+      });
+    }
+
+    async function loadConfigAndTheme() {
+      const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+      }
+
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const settings = await res.json();
+          applyDynamicTheme({
+            palette: settings.themePalette,
+            font: settings.themeFont,
+            fontSize: settings.themeFontSize
+          });
+          if (settings.businessName) {
+            document.getElementById('brand-text').textContent = settings.businessName.toUpperCase();
+          }
+        }
+      } catch (e) {
+        console.log("No se pudo conectar a la API del servidor para el tema dinámico, usando valores por defecto.");
+      }
+    }
+
+    function applyDynamicTheme(themeSettings) {
+      if (!themeSettings) return;
+      const root = document.documentElement;
+      const isLight = document.body.classList.contains('light-theme');
+      const palettes = isLight ? {
+        gold: { color: '#c59b27', hover: '#a37d1d', glow: 'rgba(197, 155, 39, 0.15)', border: 'rgba(197, 155, 39, 0.12)' },
+        emerald: { color: '#059669', hover: '#047857', glow: 'rgba(5, 150, 105, 0.15)', border: 'rgba(5, 150, 105, 0.12)' },
+        sapphire: { color: '#2563eb', hover: '#1d4ed8', glow: 'rgba(37, 99, 235, 0.15)', border: 'rgba(37, 99, 235, 0.12)' },
+        ruby: { color: '#dc2626', hover: '#b91c1c', glow: 'rgba(220, 38, 38, 0.15)', border: 'rgba(220, 38, 38, 0.12)' },
+        rose: { color: '#db2777', hover: '#be185d', glow: 'rgba(219, 39, 119, 0.15)', border: 'rgba(219, 39, 119, 0.12)' }
+      } : {
+        gold: { color: '#ffcf4b', hover: '#ffe28a', glow: 'rgba(255, 207, 75, 0.25)', border: 'rgba(255, 207, 75, 0.08)' },
+        emerald: { color: '#34d399', hover: '#6ee7b7', glow: 'rgba(52, 211, 153, 0.25)', border: 'rgba(52, 211, 153, 0.08)' },
+        sapphire: { color: '#60a5fa', hover: '#93c5fd', glow: 'rgba(96, 165, 250, 0.25)', border: 'rgba(96, 165, 250, 0.08)' },
+        ruby: { color: '#f87171', hover: '#fca5a5', glow: 'rgba(248, 113, 113, 0.25)', border: 'rgba(248, 113, 113, 0.08)' },
+        rose: { color: '#f472b6', hover: '#f9a8d4', glow: 'rgba(244, 114, 182, 0.25)', border: 'rgba(244, 114, 182, 0.08)' }
+      };
+      
+      const p = palettes[themeSettings.palette] || palettes.gold;
+      root.style.setProperty('--accent-gold', p.color);
+      root.style.setProperty('--accent-gold-hover', p.hover);
+      root.style.setProperty('--accent-gold-glow', p.glow);
+      root.style.setProperty('--border-color', p.border);
+      
+      const fonts = {
+        outfit: "'Outfit', sans-serif",
+        inter: "'Inter', sans-serif",
+        montserrat: "'Montserrat', sans-serif",
+        playfair: "'Playfair Display', Georgia, serif",
+        cormorant: "'Cormorant Garamond', serif"
+      };
+      const fontVal = fonts[themeSettings.font] || fonts.outfit;
+      root.style.setProperty('--font-body', fontVal);
+      if (themeSettings.font === 'playfair' || themeSettings.font === 'cormorant') {
+        root.style.setProperty('--font-title', fontVal);
+      } else {
+        root.style.setProperty('--font-title', "'Playfair Display', Georgia, serif");
+      }
+      root.style.setProperty('--base-font-size', themeSettings.fontSize || '16px');
+    }
+
+    const isMock = localStorage.getItem('controlbanquete_force_mock') === 'true';
+    const demoAuthSelector = document.getElementById('demo-auth-selector');
+    if (isMock && demoAuthSelector) {
+      demoAuthSelector.style.display = 'block';
+    }
+
+    const cachedUser = localStorage.getItem('controlbanquete_current_user');
+    const cachedToken = localStorage.getItem('controlbanquete_token');
+    if (cachedUser && cachedToken) {
+      window.location.href = 'index.html';
+    }
+
+    loadConfigAndTheme();
+
+    document.getElementById('btn-back-cotizar').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>

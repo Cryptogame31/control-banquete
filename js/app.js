@@ -506,8 +506,8 @@ function setupRouting() {
       
       // Seguridad básica de roles
       const user = getCurrentUser();
-      if (!user && targetId !== 'view-cotizar' && targetId !== 'view-login') {
-        navigateTo('view-login');
+      if (!user && targetId !== 'view-cotizar') {
+        window.location.href = 'login.html';
       } else {
         navigateTo(targetId);
       }
@@ -520,7 +520,7 @@ function setupRouting() {
 // ==========================================
 function onViewLoaded(viewId) {
   const user = getCurrentUser();
-  if (!user && viewId !== 'view-cotizar' && viewId !== 'view-login') return;
+  if (!user && viewId !== 'view-cotizar') return;
 
   switch (viewId) {
     case 'view-cotizar':
@@ -563,7 +563,7 @@ function updateNavigation(user) {
   if (user) {
     // Configurar panel de perfil (Escritorio)
     userPanel.style.display = 'block';
-    navLoginBtn.style.display = 'none';
+    if (navLoginBtn) navLoginBtn.style.display = 'none';
     document.getElementById('user-display-name').textContent = user.name;
     document.getElementById('user-display-role').textContent = translateRole(user.role);
     document.getElementById('user-avatar-initials').textContent = user.name.charAt(0).toUpperCase();
@@ -669,7 +669,7 @@ function updateNavigation(user) {
   } else {
     // Modo Público
     userPanel.style.display = 'none';
-    navLoginBtn.style.display = 'block';
+    if (navLoginBtn) navLoginBtn.style.display = 'block';
 
     stopNotificationPolling();
     const bellBtn = document.getElementById('btn-notification-bell');
@@ -717,9 +717,7 @@ function translateRole(role) {
 // DETECTORES DE EVENTOS COMUNES
 // ==========================================
 function setupEventListeners() {
-  // Login de navegación
-  document.getElementById('btn-nav-login').addEventListener('click', () => navigateTo('view-login'));
-  document.getElementById('btn-back-cotizar').addEventListener('click', () => navigateTo('view-cotizar'));
+  // Enlace a login quitado de la navegación del cotizador principal
 
   const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
   const themeToggleBtn = document.getElementById('theme-toggle-btn');

@@ -1,7 +1,8 @@
-const CACHE_NAME = 'controlbanquete-cache-v1';
+const CACHE_NAME = 'controlbanquete-cache-v2';
 const ASSETS = [
   './',
   './index.html',
+  './login.html',
   './css/styles.css?v=2026_v2',
   './js/app.js?v=2026_v2',
   './js/auth.js?v=2026_v2',
