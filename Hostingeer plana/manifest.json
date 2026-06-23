@@ -1,0 +1,29 @@
+{
+  "name": "Casa de Banquetes Sarahy",
+  "short_name": "Sarahy",
+  "description": "Sistema de Gestión Integral - Casa de Banquetes Sarahy",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f111a",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

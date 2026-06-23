@@ -1,0 +1,163 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated-client"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("cliente")
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Quotation {
+  id             String   @id @default(cuid())
+  clientName     String
+  clientEmail    String
+  clientPhone    String
+  eventType      String
+  date           String
+  guests         Int      @default(0)
+  totalValue     Float    @default(0)
+  discount       Float    @default(0)
+  discountLabel  String?
+  status         String   @default("nueva")
+  notes          String?
+  menu           Json?    
+  extraServices  Json?
+  
+  venueId        String?
+  photographyId  String?
+  decorationId   String?
+  cateringId     String?
+  recreationId   String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  clientName     String
+  clientEmail    String
+  clientPhone    String
+  eventType      String
+  date           String
+  time           String?
+  guests         Int      @default(0)
+  totalValue     Float    @default(0)
+  paidAmount     Float    @default(0)
+  balance        Float    @default(0)
+  discount       Float    @default(0)
+  discountLabel  String?
+  status         String   @default("confirmado")
+  notes          String?
+  menu           Json?    
+  extraServices  Json?
+  payments       Json?
+  schedule       Json?
+  
+  clientId       String?
+  venueId        String?
+  photographyId  String?
+  decorationId   String?
+  cateringId     String?
+  recreationId   String?
+  quotationId    String?
+  photoDriveLink String?
+  photoSelectionText String?
+  photoSelectionLocked Boolean @default(false)
+  photoStatus    String? @default("sin_fotografia")
+  allowColorSelection Boolean @default(false)
+  selectedColor  String?
+  selectedColors Json?
+  appointments   Json?
+  completedTasks Json?
+  completedPurchases Json?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  category       String
+  name           String
+  description    String?
+  price          Float
+  image          String?
+  infoUrl        String?
+  active         Boolean  @default(true)
+  allowMultiples Boolean  @default(false)
+  requiresLogistics Boolean @default(false)
+  logisticsNotes String?
+  eventType      String?
+  ingredients    Json?    
+  shoppingList   Json?
+  managementList Json?
+  position       Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Inventory {
+  id             String   @id @default(cuid())
+  category       String
+  name           String
+  unit           String
+  costPerUnit    Float
+  stock          Float    @default(0)
+  minStock       Float    @default(0)
+  supplier       String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Recipe {
+  id             String   @id @default(cuid())
+  productId      String
+  supplies       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Settings {
+  id             String   @id @default("global")
+  companyName    String
+  taxRate        Float    @default(0)
+  currency       String   @default("COP")
+  baseValues     Json?
+  updatedAt      DateTime @updatedAt
+}
+
+model Provider {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  phone       String?
+  email       String?
+  address     String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  type        String   @default("info") // quote, payment, contract, inventory, info
+  read        Boolean  @default(false)
+  role        String?  // null para todos, o 'superadmin', 'compras'
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

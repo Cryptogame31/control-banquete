@@ -1,0 +1,29 @@
+{
+  "name": "control-banquete",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión Integral - Control Banquete",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx -y http-server -p 8080 -c-1",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "firebase-admin": "^14.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "pdfkit": "^0.19.1",
+    "prisma": "^5.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

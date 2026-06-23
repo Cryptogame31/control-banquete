@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: control_banquete_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: control_banquete_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: control_banquete_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    volumes:
+      - ./database_mock:/app/database_mock
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - USE_MOCK_DATA=false
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/control_banquete_db?schema=public
+      
+      # --- Configuración Pública de Firebase (Inyectada dinámicamente al cliente) ---
+      - FIREBASE_API_KEY=AIzaSyCGGBg4xt-k9mhMzzkQMY87bvU4nW1mbXQ
+      - FIREBASE_AUTH_DOMAIN=sarahy-app.firebaseapp.com
+      - FIREBASE_PROJECT_ID=sarahy-app
+      - FIREBASE_STORAGE_BUCKET=sarahy-app.firebasestorage.app
+      - FIREBASE_MESSAGING_SENDER_ID=856452793653
+      - FIREBASE_APP_ID=1:856452793653:web:ca398edaf98ca7f652f87c
+      - FIREBASE_MEASUREMENT_ID=G-0RSZ0NQPWH
+      
+      # --- Credenciales de Firebase Admin (Privado - formato JSON en una sola línea) ---
+      - FIREBASE_SERVICE_ACCOUNT=
+      
+      # --- Integración con Automatizaciones N8N ---
+      - N8N_WEBHOOK_URL=https://n8nok-n8n.uah3tl.easypanel.host/webhook/095df717-d027-44e1-8cfa-f1cc57fe6bff
+      
+    restart: always
+
+volumes:
+  postgres_data:

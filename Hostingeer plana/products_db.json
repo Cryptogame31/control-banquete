@@ -1,0 +1,254 @@
+{
+  "venues": [
+    {
+      "name": "Buenos Aires",
+      "price": 2500000
+    },
+    {
+      "name": "Prado Colonial",
+      "price": 1800000
+    },
+    {
+      "name": "Boston",
+      "price": 2200000
+    },
+    {
+      "name": "Finca La Valencia",
+      "price": 3900000
+    },
+    {
+      "name": "Finca La Duquesa",
+      "price": 5500000
+    }
+  ],
+  "photography": [
+    {
+      "name": "Fotografía Básica",
+      "price": 590000
+    },
+    {
+      "name": "Fotografía Intermedia",
+      "price": 695000
+    },
+    {
+      "name": "Fotografía Full",
+      "price": 850000
+    }
+  ],
+  "decoration": [
+    {
+      "name": "Decoración Básica",
+      "price": 400000
+    },
+    {
+      "name": "Decoración Estándar",
+      "price": 600000
+    },
+    {
+      "name": "Decoración Premium",
+      "price": 1000000
+    }
+  ],
+  "services": {
+    "boda": [
+      {
+        "name": "Granizado 100 porciones",
+        "price": 390000
+      },
+      {
+        "name": "Plataforma 360",
+        "price": 600000
+      },
+      {
+        "name": "Protocolo Novios",
+        "price": 180000
+      },
+      {
+        "name": "Decoracion de Iglesia",
+        "price": 450000
+      },
+      {
+        "name": "Yugo y gallardete ",
+        "price": 100000
+      },
+      {
+        "name": "Proyección video",
+        "price": 180000
+      },
+      {
+        "name": "Mesa de dulces",
+        "price": 170000
+      },
+      {
+        "name": "Papayera",
+        "price": 390000
+      },
+      {
+        "name": "Mariachis",
+        "price": 500000
+      },
+      {
+        "name": "Garrafa aguardiente",
+        "price": 120000
+      },
+      {
+        "name": "Garrafa ron",
+        "price": 140000
+      },
+      {
+        "name": "Caja Pilsen/Águila",
+        "price": 90000
+      },
+      {
+        "name": "Caja TeKate",
+        "price": 70000
+      }
+    ],
+    "grados_otros": [
+      {
+        "name": "Granizado 100 porciones",
+        "price": 390000
+      },
+      {
+        "name": "Plataforma 360",
+        "price": 600000
+      },
+      {
+        "name": "Recreacion ",
+        "price": 200000
+      },
+      {
+        "name": "Proyección video",
+        "price": 180000
+      },
+      {
+        "name": "Mesa de dulces",
+        "price": 170000
+      },
+      {
+        "name": "Papayera",
+        "price": 390000
+      },
+      {
+        "name": "Mariachis",
+        "price": 500000
+      },
+      {
+        "name": "Garrafa aguardiente",
+        "price": 120000
+      },
+      {
+        "name": "Garrafa ron",
+        "price": 140000
+      },
+      {
+        "name": "Caja Pilsen/Águila",
+        "price": 90000
+      },
+      {
+        "name": "Caja Tecate",
+        "price": 70000
+      }
+    ],
+    "comuniones": [
+      {
+        "name": "Granizado 100 porciones",
+        "price": 390000
+      },
+      {
+        "name": "Plataforma 360",
+        "price": 600000
+      },
+      {
+        "name": "Recreacionistas",
+        "price": 200000
+      },
+      {
+        "name": "Proyección video",
+        "price": 180000
+      },
+      {
+        "name": "Mesa de dulces",
+        "price": 170000
+      },
+      {
+        "name": "Papayera",
+        "price": 390000
+      },
+      {
+        "name": "Mariachis",
+        "price": 500000
+      },
+      {
+        "name": "Garrafa aguardiente",
+        "price": 120000
+      },
+      {
+        "name": "Garrafa ron",
+        "price": 140000
+      },
+      {
+        "name": "Caja Pilsen/Águila",
+        "price": 90000
+      },
+      {
+        "name": "Caja Tecate",
+        "price": 70000
+      }
+    ],
+    "quinces": [
+      {
+        "name": "Granizado 100 porciones",
+        "price": 390000
+      },
+      {
+        "name": "Plataforma 360",
+        "price": 600000
+      },
+      {
+        "name": "Protocolo quinceañera",
+        "price": 180000
+      },
+      {
+        "name": "2 edecanes",
+        "price": 200000
+      },
+      {
+        "name": "4 edecanes",
+        "price": 390000
+      },
+      {
+        "name": "Proyección video",
+        "price": 180000
+      },
+      {
+        "name": "Mesa de dulces",
+        "price": 170000
+      },
+      {
+        "name": "Papayera",
+        "price": 390000
+      },
+      {
+        "name": "Mariachis",
+        "price": 500000
+      },
+      {
+        "name": "Garrafa aguardiente",
+        "price": 120000
+      },
+      {
+        "name": "Garrafa ron",
+        "price": 140000
+      },
+      {
+        "name": "Caja Pilsen/Águila",
+        "price": 90000
+      },
+      {
+        "name": "Caja Tecate",
+        "price": 70000
+      }
+    ]
+  }
+}

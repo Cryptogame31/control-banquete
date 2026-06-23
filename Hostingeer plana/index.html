@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Casa de Banquetes Sarahy - Sistema de Gestión Integral</title>
+  <meta name="description" content="Plataforma de administración para Casa de Banquetes Sarahy. Cotizaciones públicas, Portal del Cliente y gestión administrativa.">
+  
+  <script>
+    window.addEventListener('error', (event) => {
+      alert("Global Error: " + event.message + "\nSource: " + event.filename + ":" + event.lineno);
+    });
+    window.addEventListener('unhandledrejection', (event) => {
+      alert("Unhandled Promise Rejection: " + event.reason);
+    });
+  </script>
+
+  <!-- PWA & Mobile Web App Settings -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f111a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sarahy">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  
+  <link rel="stylesheet" href="css/styles.css?v=2026_v2">
+</head>
+<body>
+  
+  <!-- MOBILE TOP BAR (Only visible on mobile) -->
+  <header class="mobile-header" id="main-mobile-header">
+    <div class="mobile-logo-group">
+      <div id="brand-mobile-logo-wrapper" style="display: flex; align-items: center; justify-content: center;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/>
+          <path d="M12 17v4"/>
+          <path d="M8 21h8"/>
+          <path d="M12 6V3"/>
+          <circle cx="12" cy="9" r="1"/>
+        </svg>
+      </div>
+      <span class="mobile-logo-text" id="brand-mobile-title">SARAHY</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <button id="theme-toggle-mobile-btn" style="background: none; border: none; color: var(--text-primary); cursor: pointer; padding: 0.5rem; display: flex; align-items: center; justify-content: center;" title="Cambiar Tema">
+        <span class="theme-icon-light" style="display: none;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </span>
+        <span class="theme-icon-dark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </span>
+      </button>
+      <div class="mobile-user-actions" id="mobile-user-actions-btn" style="display: none;">
+        <div class="mobile-user-badge" id="mobile-user-badge-initials">U</div>
+      </div>
+    </div>
+  </header>
+
+  <div id="app-container">
+    
+    <!-- SIDEBAR (Escritorio) -->
+    <aside class="sidebar" id="main-sidebar">
+      <div class="logo-container">
+        <!-- SVG elegante de un cáliz/corona/copa en dorado -->
+        <div id="brand-logo-wrapper" style="display: flex; align-items: center; justify-content: center; min-height: 60px;">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/>
+            <path d="M12 17v4"/>
+            <path d="M8 21h8"/>
+            <path d="M12 6V3"/>
+            <circle cx="12" cy="9" r="1"/>
+          </svg>
+        </div>
+        <h1 class="logo-title" id="brand-sidebar-title">SARAHY</h1>
+        <span class="logo-subtitle" id="brand-sidebar-subtitle">Casa de Banquetes</span>
+      </div>
+      
+      <nav>
+        <ul class="nav-links" id="sidebar-nav-links">
+          <!-- Links dinámicos se cargarán por JS -->
+        </ul>
+      </nav>
+      
+      <!-- Theme toggle container -->
+      <div class="theme-toggle-container" style="padding: 0 1.5rem; margin-bottom: 1rem;">
+        <button id="theme-toggle-btn" class="theme-toggle-btn" title="Cambiar Tema" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0.6rem; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;">
+          <span class="theme-icon-light" style="display: none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </span>
+          <span class="theme-icon-dark">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </span>
+          <span class="theme-toggle-text">Modo Día</span>
+        </button>
+      </div>
+
+      <div class="user-profile-panel" id="sidebar-user-panel" style="display: none;">
+        <div class="user-profile-info">
+          <div class="user-avatar" id="user-avatar-initials">U</div>
+          <div class="user-details">
+            <span class="user-name" id="user-display-name">Usuario</span>
+            <span class="user-role" id="user-display-role">Rol</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; width: 100%; margin-top: 0.5rem;">
+          <button class="btn-secondary" id="btn-change-password-sidebar" style="flex: 1; padding: 0.4rem; font-size: 0.75rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Contraseña
+          </button>
+          <button class="btn-logout" id="btn-logout-sidebar" style="flex: 1.2; padding: 0.4rem; font-size: 0.75rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE NAVIGATION BAR -->
+    <nav class="mobile-nav" id="main-mobile-nav">
+      <!-- Links cargados dinámicamente -->
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content" id="main-content-area">
+      
+      <!-- ========================================== -->
+      <!-- VISTA: COTIZADOR (PÚBLICO) -->
+      <!-- ========================================== -->
+      <section id="view-cotizar" class="view-section active">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Cotizador de <span>Eventos</span></h2>
+            <p class="page-subtitle">Solicita un presupuesto en minutos estimando el valor de tu evento soñado.</p>
+          </div>
+          <div>
+            <button class="btn-accent" id="btn-nav-login">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Soy Cliente / Empleado
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-2-1" id="cotizador-layout">
+          <!-- Formulario del Cotizador -->
+          <div class="card" style="padding-top: 1rem;">
+            <form id="form-cotizador">
+              <h3 style="margin-bottom: 1.5rem; color: var(--accent-gold); font-family: var(--font-title); font-size: 1.4rem;">1. Datos de Contacto</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="cot-nombre">Nombre Completo</label>
+                  <input type="text" id="cot-nombre" placeholder="Ej: Sarahy Giraldo" required>
+                </div>
+                <div class="form-group">
+                  <label for="cot-email">Correo Electrónico</label>
+                  <input type="email" id="cot-email" placeholder="nombre@correo.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="cot-telefono">Teléfono / WhatsApp</label>
+                  <input type="text" id="cot-telefono" placeholder="Ej: 3163048505" required>
+                </div>
+              </div>
+
+              <h3 style="margin: 2rem 0 1.5rem 0; color: var(--accent-gold); font-family: var(--font-title); font-size: 1.4rem;">2. Detalles del Evento</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="cot-tipo">Tipo de Evento</label>
+                  <select id="cot-tipo" required>
+                    <option value="boda">Boda (Matrimonio)</option>
+                    <option value="quinces">Fiesta de Quinces</option>
+                    <option value="grados_otros">Cumpleaños, Grados u Otros</option>
+                    <option value="comuniones">Primera Comunión</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="cot-fecha">Fecha Deseada</label>
+                  <input type="date" id="cot-fecha" required>
+                </div>
+                <div class="form-group">
+                  <label for="cot-invitados">Número de Invitados</label>
+                  <input type="number" id="cot-invitados" min="10" max="500" value="80" required>
+                  <div id="cot-catering-desc" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; line-height: 1.3;"></div>
+                </div>
+              </div>
+
+              <h3 style="margin: 2rem 0 1.5rem 0; color: var(--accent-gold); font-family: var(--font-title); font-size: 1.4rem;">3. Salón Requerido</h3>
+              <div class="products-selector-grid" id="cot-venues-grid">
+                <!-- Se inyecta por JS -->
+              </div>
+
+              <h3 style="margin: 2rem 0 1.5rem 0; color: var(--accent-gold); font-family: var(--font-title); font-size: 1.4rem;">4. Fotografía y Decoración</h3>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="cot-foto">Paquete de Fotografía</label>
+                  <select id="cot-foto">
+                    <!-- Se inyecta por JS -->
+                  </select>
+                  <div id="cot-foto-descripcion" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3; min-height: 1.5rem;"></div>
+                </div>
+                <div class="form-group">
+                  <label for="cot-deco">Estilo de Decoración</label>
+                  <select id="cot-deco">
+                    <!-- Se inyecta por JS -->
+                  </select>
+                  <div id="cot-deco-descripcion" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3; min-height: 1.5rem;"></div>
+                </div>
+              </div>
+
+              <h3 style="margin: 2rem 0 1.5rem 0; color: var(--accent-gold); font-family: var(--font-title); font-size: 1.4rem;">5. Servicios Adicionales</h3>
+              <div class="products-selector-grid" id="cot-services-grid">
+                <!-- Se inyecta por JS de acuerdo al tipo de fiesta -->
+              </div>
+
+              <div style="margin-top: 2.5rem; text-align: right;">
+                <button type="submit" class="btn-primary" id="btn-submit-cotizacion">
+                  Solicitar Cotización Oficial
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Live Summary Panel -->
+          <div class="cotizacion-summary-panel">
+            <h3 class="summary-header">Resumen Estimado</h3>
+            <div id="cot-summary-breakdown">
+              <!-- Se inyecta en tiempo real por JS -->
+            </div>
+            <button class="btn-accent" id="btn-descargar-cotizacion" style="width: 100%; margin-top: 1.5rem; justify-content: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar Cotización (PDF)
+            </button>
+          </div>
+        </div>
+
+        <!-- Herramienta de Disponibilidad de Salones -->
+        <div class="card" style="margin-top: 2.5rem;" id="check-availability-card">
+          <h3 style="color: var(--accent-gold); font-family: var(--font-title); font-size: 1.6rem; margin-bottom: 0.5rem;">🔍 Consultar Disponibilidad de Salones</h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Ingresa la fecha deseada para tu evento y consulta de inmediato qué salones tenemos disponibles.</p>
+          
+          <div class="form-grid" style="align-items: flex-end; max-width: 600px; margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label for="check-avail-date">Selecciona la Fecha</label>
+              <input type="date" id="check-avail-date" required>
+            </div>
+            <div>
+              <button type="button" class="btn-primary" id="btn-check-availability" style="height: 46px;">Consultar Fecha</button>
+            </div>
+          </div>
+
+          <div id="availability-results" style="display: none; margin-top: 1.5rem;">
+            <!-- Inyectado por JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: LOGIN (AUTENTICACIÓN) -->
+      <!-- ========================================== -->
+      <section id="view-login" class="view-section">
+        <div class="login-view-container">
+          <div class="card login-card">
+            <h2 style="font-family: var(--font-title); color: var(--accent-gold); text-align: center; margin-bottom: 2rem; font-size: 1.8rem;">Iniciar Sesión</h2>
+            <form id="form-login">
+              <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="login-email">Correo Electrónico</label>
+                <input type="email" id="login-email" placeholder="correo@ejemplo.com" required>
+              </div>
+              <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn-primary" style="width: 100%;">Ingresar</button>
+            </form>
+            
+            <div class="demo-credentials" id="demo-auth-selector" style="display: none;">
+              <h4 style="font-size: 0.85rem; color: var(--accent-gold); margin-bottom: 0.5rem;">Acceso Rápido Simulador (Demo)</h4>
+              <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Selecciona una cuenta de prueba y pulsa ingresar con la contraseña <strong>123456</strong>.</p>
+              <select id="select-demo-user">
+                <option value="admin@sarahy.com">Superadministrador (Control Total)</option>
+                <option value="compras@sarahy.com">Compras (Abastecimiento)</option>
+                <option value="cocina@sarahy.com">Cocina (Recetas y Producción)</option>
+                <option value="logistica@sarahy.com">Logística (Coordinación)</option>
+                <option value="decoracion@sarahy.com">Decoración (Montajes)</option>
+                <option value="recreacion@sarahy.com">Recreación (Asignaciones)</option>
+                <option value="cliente@sarahy.com">Portal Cliente (Sarah y Felipe)</option>
+              </select>
+            </div>
+            
+            <button class="btn-secondary" id="btn-back-cotizar" style="width: 100%; margin-top: 1rem;">Volver al Cotizador</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: SOY CLIENTE (PRIVADO) -->
+      <!-- ========================================== -->
+      <section id="view-cliente" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Mi <span>Evento</span></h2>
+            <p class="page-subtitle" id="client-event-name">Información de tu reserva y organización.</p>
+          </div>
+          <div class="flex-gap" id="client-event-selector-container" style="display:none;">
+            <label for="client-event-select" style="align-self: center;">Ver Evento:</label>
+            <select id="client-event-select" style="width: auto;">
+              <!-- Cargado dinámicamente si tiene múltiples eventos -->
+            </select>
+          </div>
+        </div>
+
+        <!-- COUNTDOWN TIMER BANNER -->
+        <div id="client-countdown-banner" class="card" style="display: none; margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(15, 17, 26, 0.4)); border: 1px solid rgba(212, 175, 55, 0.2); padding: 1rem 1.5rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <span style="font-size: 2.2rem; line-height: 1;">⏳</span>
+            <div>
+              <h4 style="margin: 0; font-family: var(--font-title); color: var(--accent-gold); font-size: 1.1rem;">Cuenta Regresiva para tu Evento</h4>
+              <p style="margin: 0; font-size: 0.8rem; color: var(--text-secondary);" id="client-countdown-event-date">Cargando fecha...</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.75rem; align-items: center;" id="countdown-timer-container">
+            <div style="text-align: center; min-width: 60px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+              <span id="timer-days" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-gold); display: block;">00</span>
+              <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); display: block;">Días</span>
+            </div>
+            <div style="text-align: center; min-width: 60px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+              <span id="timer-hours" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-gold); display: block;">00</span>
+              <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); display: block;">Horas</span>
+            </div>
+            <div style="text-align: center; min-width: 60px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+              <span id="timer-minutes" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-gold); display: block;">00</span>
+              <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); display: block;">Minutos</span>
+            </div>
+            <div style="text-align: center; min-width: 60px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 8px;">
+              <span id="timer-seconds" style="font-size: 1.4rem; font-weight: 700; color: var(--accent-gold); display: block;">00</span>
+              <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--text-secondary); display: block;">Segundos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-container">
+          <button class="tab-btn active" data-tab="client-info">Mi Reserva</button>
+          <button class="tab-btn" data-tab="client-guests">Lista de Invitados</button>
+          <button class="tab-btn" data-tab="client-menu">Selección de Menú</button>
+          <button class="tab-btn" data-tab="client-cronograma">Cronograma</button>
+          <button class="tab-btn" data-tab="client-docs">Documentos y Pagos</button>
+          <button class="tab-btn" data-tab="client-photography">Fotografía</button>
+        </div>
+
+        <!-- CLIENT TAB: INFO -->
+        <div id="client-info" class="tab-content active" style="display: block;">
+          <div class="dashboard-grid">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-label">Fecha</span>
+                <span class="metric-value" id="c-info-fecha">-</span>
+              </div>
+              <div class="metric-icon">📅</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-label">Hora de Inicio</span>
+                <span class="metric-value" id="c-info-hora">-</span>
+              </div>
+              <div class="metric-icon">⏰</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-label">Salón Asignado</span>
+                <span class="metric-value" id="c-info-salon">-</span>
+              </div>
+              <div class="metric-icon">🏛️</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">Resumen Técnico del Evento</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+              <div>
+                <strong style="color: var(--text-secondary);">Número de Invitados:</strong>
+                <p id="c-info-invitados" style="font-size: 1.2rem; font-weight: 600; margin-top: 0.25rem;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Fotografía:</strong>
+                <p id="c-info-fotografia" style="font-size: 1.2rem; font-weight: 600; margin-top: 0.25rem;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Decoración:</strong>
+                <p id="c-info-decoracion" style="font-size: 1.2rem; font-weight: 600; margin-top: 0.25rem;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Estado de Firma de Contrato:</strong>
+                <p id="c-info-firma-status" style="margin-top: 0.5rem;"><span class="badge badge-pendiente_pago">No Firmado</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card de Citas y Ensayos Programados -->
+          <div class="card" id="client-citas-card" style="margin-top: 1.5rem; display: none;">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.2rem; font-size: 1.5rem;">📅 Citas y Ensayos Programados</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+              A continuación se presentan las citas coordinadas con la administración para los preparativos de tu evento (ensayos, degustaciones, etc.).
+            </p>
+            <div id="client-citas-lista-container" style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Se inyecta por JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT TAB: GUESTS -->
+        <div id="client-guests" class="tab-content" style="display: none;">
+          <div class="guest-counter-widget">
+            <div>
+              <div class="guest-stat-num" id="cg-total">0</div>
+              <div class="guest-stat-label">Total Invitados</div>
+            </div>
+            <div>
+              <div class="guest-stat-num confirmed" id="cg-confirmados">0</div>
+              <div class="guest-stat-label">Confirmados</div>
+            </div>
+            <div>
+              <div class="guest-stat-num" style="color: var(--warning);" id="cg-pendientes">0</div>
+              <div class="guest-stat-label">Pendientes</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="flex-between" style="margin-bottom: 1.5rem;">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.4rem;">Mis Invitados</h3>
+              <button class="btn-primary" id="btn-agregar-invitado">+ Nuevo Invitado</button>
+            </div>
+
+            <!-- Form Add Guest (Toggleable) -->
+            <div id="form-invitado-container" style="display: none; margin-bottom: 1.5rem; padding: 1.5rem; background: var(--bg-tertiary); border-radius: 8px;">
+              <div class="form-grid">
+                <input type="hidden" id="guest-index">
+                <div class="form-group">
+                  <label for="guest-name">Nombre del Invitado</label>
+                  <input type="text" id="guest-name" placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group" style="justify-content: center;">
+                  <label class="checkbox-label" style="margin-top: 1.5rem;">
+                    <input type="checkbox" id="guest-confirmed"> Asistencia Confirmada
+                  </label>
+                </div>
+              </div>
+              <div class="flex-gap" style="justify-content: flex-end;">
+                <button class="btn-secondary" id="btn-cancelar-invitado">Cancelar</button>
+                <button class="btn-primary" id="btn-guardar-invitado">Guardar</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Asistencia</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="client-guests-list">
+                  <!-- Inyectado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT TAB: MENU -->
+        <div id="client-menu" class="tab-content" style="display: none;">
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">Selección del Menú del Banquete</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Elige las opciones que deseas ofrecer en tu evento. Esta selección se utilizará para calcular las compras necesarias.</p>
+
+            <!-- CONTENEDOR DE AVISO DE TIEMPO LÍMITE -->
+            <div id="client-menu-limit-warning" style="margin-bottom: 1.5rem; padding: 1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500;"></div>
+
+            <form id="form-menu-seleccion">
+              <div class="form-grid" id="client-menu-fields-grid">
+                <!-- Se inyecta dinámicamente desde js/app.js -->
+              </div>
+
+              <div style="text-align: right; margin-top: 1.5rem;">
+                <button type="submit" class="btn-primary" id="btn-save-menu">Guardar Selección de Menú</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- CLIENT TAB: CRONOGRAMA -->
+        <div id="client-cronograma" class="tab-content" style="display: none;">
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">Cronograma del Día del Evento</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Revisa las actividades planificadas para tu gran día. Puedes marcar o revisar la programación detallada de actividades.</p>
+
+            <div class="timeline-list" id="client-timeline-list">
+              <!-- Cargado dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT TAB: DOCUMENTS & PAYMENTS -->
+        <div id="client-docs" class="tab-content" style="display: none;">
+          <div class="dashboard-grid">
+            <div class="metric-card" style="border: 1px solid rgba(212, 175, 55, 0.3);">
+              <div class="metric-info">
+                <span class="metric-label">Valor Total Contrato</span>
+                <span class="metric-value" id="cd-total-value">$0 COP</span>
+              </div>
+              <div class="metric-icon">💰</div>
+            </div>
+            <div class="metric-card" style="border: 1px solid rgba(56, 161, 105, 0.3);">
+              <div class="metric-info">
+                <span class="metric-label">Abonos Realizados</span>
+                <span class="metric-value" style="color: var(--success);" id="cd-abonos">$0 COP</span>
+              </div>
+              <div class="metric-icon">💵</div>
+            </div>
+            <div class="metric-card" style="border: 1px solid rgba(229, 62, 62, 0.3);">
+              <div class="metric-info">
+                <span class="metric-label">Saldo Pendiente</span>
+                <span class="metric-value" style="color: var(--danger);" id="cd-saldo">$0 COP</span>
+              </div>
+              <div class="metric-icon">⏳</div>
+            </div>
+          </div>
+
+          <div class="grid-1-1">
+            <!-- Contrato y Firma -->
+            <div class="card">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1rem; font-size: 1.4rem;">Contrato Legal</h3>
+              <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Para confirmar definitivamente el evento, debes firmar digitalmente el acuerdo y realizar tus abonos correspondientes.</p>
+              
+              <div id="contrato-texto-container" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; font-size: 0.85rem; height: 180px; overflow-y: scroll; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;">
+                <h4 style="text-align: center; margin-bottom: 1rem;">CONTRATO DE PRESTACIÓN DE SERVICIOS - BANQUETES SARAHY</h4>
+                <p>Entre los suscritos a saber, por una parte <strong>CASA DE BANQUETES SARAHY</strong> y por otra parte el cliente cuyos datos constan en la cotización inicial, se conviene celebrar el presente acuerdo para la realización del evento social según las especificaciones indicadas.</p>
+                <br>
+                <p><strong>PRIMERO - OBJETO:</strong> La Casa de Banquetes Sarahy se compromete a prestar los servicios de catering, menaje, meseros y logística en el salón especificado.</p>
+                <p><strong>SEGUNDO - PRECIO:</strong> El valor acordado se cancelará en abonos sucesivos, debiendo estar saldo el 100% como mínimo 8 días antes del evento.</p>
+                <p><strong>TERCERO - CANCELACIONES:</strong> En caso de fuerza mayor se buscará aplazar la fecha. De no realizarse el evento, el anticipo de reserva no es reembolsable.</p>
+              </div>
+
+              <div id="firma-digital-seccion">
+                <!-- Estado si no está firmado -->
+                <div id="firma-pendiente-box">
+                  <span class="badge badge-pendiente_pago" style="margin-bottom: 1rem;">PENDIENTE DE FIRMA</span>
+                  <button class="btn-primary" id="btn-abrir-firma" style="display: block; width: 100%;">Firmar Contrato Digitalmente</button>
+                </div>
+                <!-- Estado si ya está firmado -->
+                <div id="firma-realizada-box" style="display: none;">
+                  <span class="badge badge-confirmada" style="margin-bottom: 1rem;">FIRMADO DIGITALMENTE</span>
+                  <div style="background: white; padding: 10px; display: inline-block; border-radius: 8px; margin-top: 0.5rem;">
+                    <img id="img-signature-saved" src="" alt="Firma digital" style="max-height: 80px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Historial de Pagos -->
+            <div class="card">
+              <div class="flex-between" style="margin-bottom: 1.5rem;">
+                <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.4rem;">Historial de Pagos</h3>
+                <!-- Los clientes solo ven, administradores cargan abonos -->
+                <span class="badge badge-confirmada" id="c-info-estado-pagos">Al Día</span>
+              </div>
+              
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Valor</th>
+                      <th>Tipo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="client-payments-list">
+                    <!-- Inyectado dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLIENT TAB: PHOTOGRAPHY -->
+        <div id="client-photography" class="tab-content" style="display: none;">
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">📸 Gestión de Fotografía Post-Evento</h3>
+            
+            <div id="photo-countdown-container" style="display: none; margin-bottom: 2rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 8px; text-align: center;">
+              <h4 style="color: var(--accent-gold); margin-bottom: 0.75rem; font-size: 1.1rem;">Tu enlace de descarga estará disponible en:</h4>
+              <div style="display: flex; gap: 0.75rem; justify-content: center; align-items: center;" id="photo-countdown-timer">
+                <!-- Days, Hours, Minutes, Seconds boxes -->
+              </div>
+            </div>
+
+            <div id="photo-link-container" style="display: none; text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+              <div id="photo-link-icon" style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+              <h4 id="photo-link-header" style="color: var(--accent-gold); font-size: 1.3rem; margin-bottom: 1rem;">¡Tus fotos están listas!</h4>
+              <p id="photo-link-description" style="color: var(--text-secondary); margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto;">Puedes acceder a tu álbum digital en Google Drive para visualizar y descargar todas las fotografías oficiales del evento haciendo clic en el siguiente enlace.</p>
+              <a href="#" id="btn-client-photo-drive" target="_blank" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; text-decoration: none; padding: 0.75rem 2rem; font-weight: 600;">
+                Acceder al Álbum (Drive)
+              </a>
+              <p id="client-photo-no-link-msg" style="display: none; color: var(--warning); font-size: 0.9rem; margin-top: 0.5rem; font-weight: 500;">
+                ⚠️ El enlace está en proceso de carga por nuestro equipo de fotógrafos. Estará disponible muy pronto.
+              </p>
+            </div>
+
+            <!-- Contenedor para que el cliente envíe su selección de fotos -->
+            <div id="photo-selection-container" style="display: none; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
+              <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem; font-family: var(--font-title); font-size: 1.15rem;">Enviar Selección de Fotos</h4>
+              <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.85rem;">Escribe aquí el listado de las fotos que deseas seleccionar (códigos, números o nombres) o tus comentarios para el equipo de retoque y edición.</p>
+              <textarea id="client-photo-selection-text" rows="4" placeholder="Ej: Foto 102, Foto 105, Foto 203 (retoque de luz)..." style="width: 100%; box-sizing: border-box; resize: vertical; padding: 0.5rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; margin-bottom: 1rem;"></textarea>
+              <div class="flex-gap" style="justify-content: flex-end; flex-wrap: wrap;">
+                <button type="button" class="btn-primary" id="btn-client-save-photo-selection">Guardar Selección</button>
+                <button type="button" class="btn-accent" id="btn-client-send-photo-admin-wa" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.908.533 3.768 1.547 5.393L2.016 22l4.759-1.22c1.554.848 3.3 1.295 5.225 1.295 5.523 0 10.004-4.48 10.004-10.004C22.004 6.48 17.523 2 12.004 2zm.004 18.008c-1.684 0-3.268-.456-4.64-1.296l-.332-.2-.276.168-2.812.72.736-2.696.184-.288-.228-.36a7.934 7.934 0 0 1-1.124-4.053c0-4.408 3.592-8 8-8s8 3.592 8 8-3.592 8-8 8zm4.368-6c-.24-.12-1.416-.696-1.632-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06a6.568 6.568 0 0 1-1.92-1.184c-.74-.66-1.236-1.472-1.38-1.716-.14-.24-.016-.368.104-.488.108-.108.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.192-.468-.388-.408-.54-.416-.14-.004-.3-.004-.46-.004-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.692 2.584 4.1 3.624.572.248 1.02.396 1.368.508.576.184 1.1.16 1.516.1.464-.068 1.416-.58 1.62-1.116.2-.54.2-.996.14-1.116-.06-.12-.22-.18-.46-.3z"/>
+                  </svg>
+                  Enviar a Administración (WA)
+                </button>
+                <button type="button" class="btn-accent" id="btn-client-send-photo-photographer-wa" style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: #38a169;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.908.533 3.768 1.547 5.393L2.016 22l4.759-1.22c1.554.848 3.3 1.295 5.225 1.295 5.523 0 10.004-4.48 10.004-10.004C22.004 6.48 17.523 2 12.004 2zm.004 18.008c-1.684 0-3.268-.456-4.64-1.296l-.332-.2-.276.168-2.812.72.736-2.696.184-.288-.228-.36a7.934 7.934 0 0 1-1.124-4.053c0-4.408 3.592-8 8-8s8 3.592 8 8-3.592 8-8 8zm4.368-6c-.24-.12-1.416-.696-1.632-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06a6.568 6.568 0 0 1-1.92-1.184c-.74-.66-1.236-1.472-1.38-1.716-.14-.24-.016-.368.104-.488.108-.108.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.192-.468-.388-.408-.54-.416-.14-.004-.3-.004-.46-.004-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.692 2.584 4.1 3.624.572.248 1.02.396 1.368.508.576.184 1.1.16 1.516.1.464-.068 1.416-.58 1.62-1.116.2-.54.2-.996.14-1.116-.06-.12-.22-.18-.46-.3z"/>
+                  </svg>
+                  Enviar a Fotógrafo (WA)
+                </button>
+              </div>
+            </div>
+
+            <div id="photo-instructions-container" style="background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-top: 1.5rem;">
+              <h4 style="color: var(--accent-gold); margin-bottom: 0.75rem; font-family: var(--font-title); font-size: 1.15rem;">Instrucciones del Proceso</h4>
+              <div id="client-photo-instructions-text" style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; white-space: pre-line;">
+                <!-- Loaded dynamically from settings -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: EMPLEADOS / ADMINISTRACIÓN -->
+      <!-- ========================================== -->
+      <section id="view-admin" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Panel de <span>Administración</span></h2>
+            <p class="page-subtitle">Superadministración general de clientes, reservas, precios y base de datos.</p>
+          </div>
+          <div class="flex-gap">
+            <button class="btn-primary" id="btn-admin-crear-usuario">+ Crear Usuario</button>
+            <button class="btn-accent" id="btn-admin-crear-evento">+ Crear Evento</button>
+          </div>
+        </div>
+
+        <div class="tab-container">
+          <button class="tab-btn active" data-tab="admin-calendar">Calendario Central</button>
+          <button class="tab-btn" data-tab="admin-quotes">Cotizaciones Recibidas</button>
+          <button class="tab-btn" data-tab="admin-events">Gestión de Eventos</button>
+          <button class="tab-btn" data-tab="admin-products">Catálogo de Servicios y Tarifas</button>
+          <button class="tab-btn" data-tab="admin-settings">Valores Base de Operación</button>
+          <button class="tab-btn" data-tab="admin-users">Usuarios del Sistema</button>
+        </div>
+
+        <!-- ADMIN TAB: CALENDAR -->
+        <div id="admin-calendar" class="tab-content active" style="display: block;">
+          <div class="calendar-wrapper">
+            <div class="calendar-header">
+              <button class="btn-secondary" id="cal-prev-month">&lt; Anterior</button>
+              <h3 id="cal-month-title" style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.5rem;">Junio 2026</h3>
+              <button class="btn-secondary" id="cal-next-month">Siguiente &gt;</button>
+            </div>
+            
+            <div class="calendar-scroll-container">
+              <div class="calendar-grid" id="calendar-grid-container">
+                <!-- Inyectado por JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB: QUOTES -->
+        <div id="admin-quotes" class="tab-content" style="display: none;">
+          <div class="card">
+            <div style="margin-bottom: 1.5rem;">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.6rem; margin: 0;">Cotizaciones Recibidas</h3>
+            </div>
+            
+            <!-- Barra de Filtros Premium -->
+            <div class="filter-bar-premium" style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; align-items: center;">
+              <!-- Buscador de Cliente -->
+              <div style="flex: 1; min-width: 200px; display: flex; align-items: center; gap: 0.5rem; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.2rem 0.8rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="admin-quotes-search" placeholder="Buscar cliente, email o teléfono..." style="border: none; background: transparent; color: var(--text-primary); font-size: 0.85rem; width: 100%; outline: none; padding: 0.4rem 0;">
+              </div>
+              
+              <!-- Filtro por Tipo de Evento -->
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap;">Evento:</label>
+                <select id="admin-quotes-filter-event-type" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 160px;">
+                  <option value="all">Todos</option>
+                  <option value="boda">Boda (Matrimonio)</option>
+                  <option value="quinces">Fiesta de Quinces</option>
+                  <option value="comuniones">Primera Comunión</option>
+                  <option value="grados_otros">Cumpleaños, Grados...</option>
+                </select>
+              </div>
+              
+              <!-- Filtro por Fecha de Cotización -->
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary); white-space: nowrap;">Fecha:</label>
+                <select id="admin-quotes-filter-date-mode" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 160px;">
+                  <option value="all">Cualquier fecha</option>
+                  <option value="today">Hoy</option>
+                  <option value="last7">Últimos 7 días</option>
+                  <option value="last30">Últimos 30 días</option>
+                  <option value="custom">Rango personalizado...</option>
+                </select>
+              </div>
+              
+              <!-- Inputs de fecha de rango personalizado -->
+              <div id="admin-quotes-date-range-inputs" style="display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap; background: rgba(0,0,0,0.2); padding: 0.3rem 0.6rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                <label for="admin-quotes-date-start" style="font-size: 0.75rem; color: var(--text-secondary);">Desde:</label>
+                <input type="date" id="admin-quotes-date-start" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+                <label for="admin-quotes-date-end" style="font-size: 0.75rem; color: var(--text-secondary);">Hasta:</label>
+                <input type="date" id="admin-quotes-date-end" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Evento</th>
+                    <th>Fecha</th>
+                    <th>Invitados</th>
+                    <th>Presupuesto</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-quotes-list">
+                  <!-- Inyectado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB: EVENTS -->
+        <div id="admin-events" class="tab-content" style="display: none;">
+          <div class="card">
+            <div class="flex-between" style="flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.5rem; margin: 0;">Eventos Agendados</h3>
+              <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
+                <!-- Buscador de Evento o Cliente -->
+                <input type="text" id="admin-events-search" placeholder="Buscar evento o cliente..." style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 200px;">
+                <!-- Filtro por Fecha de Evento -->
+                <select id="admin-events-filter-date-mode" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 180px;">
+                  <option value="all">Todas las fechas</option>
+                  <option value="last30">Últimos 30 días</option>
+                  <option value="next30">Próximos 30 días</option>
+                  <option value="custom">Rango personalizado...</option>
+                </select>
+                <!-- Filtro por Estado de Fotografía -->
+                <select id="admin-events-filter-photo-status" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 200px;">
+                  <option value="all">Todos los estados de foto</option>
+                  <option value="sin_fotografia">Sin fotografía</option>
+                  <option value="pendiente_fiesta">Pendiente fiesta</option>
+                  <option value="link_por_enviar">Link por enviar</option>
+                  <option value="pendiente_listado">Pendiente listado de fotos</option>
+                  <option value="fotos_recibidas">Fotos recibidas</option>
+                  <option value="en_produccion">En producción</option>
+                  <option value="por_recoger">Por recoger</option>
+                  <option value="entregado">Entregado</option>
+                </select>
+                <!-- Inputs de fecha de rango personalizado -->
+                <div id="admin-events-date-range-inputs" style="display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <label for="admin-events-date-start" style="font-size: 0.8rem; color: var(--text-secondary);">Desde:</label>
+                  <input type="date" id="admin-events-date-start" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+                  <label for="admin-events-date-end" style="font-size: 0.8rem; color: var(--text-secondary);">Hasta:</label>
+                  <input type="date" id="admin-events-date-end" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Evento / Cliente</th>
+                    <th>Fecha</th>
+                    <th>Invitados</th>
+                    <th>Total</th>
+                    <th>Pendiente</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-events-list">
+                  <!-- Inyectado dinámicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB: PRODUCTS (Catálogo de Servicios y Tarifas) -->
+        <div id="admin-products" class="tab-content" style="display: none;">
+          <!-- Catálogo de Productos y Precios -->
+          <div class="card">
+            <div class="flex-between" style="margin-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem; align-items: center;">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.4rem; margin: 0;">Catálogo de Servicios y Tarifas</h3>
+              <div class="flex-gap" style="align-items: center;">
+                <!-- Filtro de Categoría para el Catálogo -->
+                <select id="admin-catalog-filter" style="padding: 0.45rem 0.75rem; font-size: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 180px; height: 34px;">
+                  <option value="all">Todas las categorías</option>
+                  <option value="main">Tarifas Principales</option>
+                  <option value="menu">Platos del Menú ($0 COP)</option>
+                  <option value="venue">Salones</option>
+                  <option value="photography">Fotografía</option>
+                  <option value="decoration">Decoración</option>
+                  <option value="service">Servicios Adicionales</option>
+                </select>
+                <button class="btn-primary" id="btn-admin-crear-producto" style="height: 34px; padding: 0.45rem 1rem; font-size: 0.8rem;">+ Nuevo Producto</button>
+              </div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.4;">
+              Aquí puedes gestionar todos los conceptos: salones, paquetes de fotos, estilos de decoración, servicios extra y las opciones de platos de comida (cócteles, arroces, carnes, ensaladas, postres, líquidos, tortas y pasabocas) que los clientes podrán elegir en su menú.
+            </p>
+
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Detalle Fiesta</th>
+                    <th>Precio (COP)</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-products-list">
+                  <!-- Inyectado por JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB: BASE SETTINGS (Valores Base de Operación) -->
+        <div id="admin-settings" class="tab-content" style="display: none;">
+          <!-- Valores Base Config -->
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.4rem;">Valores Base de Operación</h3>
+            <form id="form-base-settings">
+              <!-- Todos los valores base son ahora dinámicos y administrables -->
+              <div style="margin-bottom: 1.5rem;">
+                <div id="settings-custom-container" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                  <!-- Inyectado dinámicamente por JS -->
+                </div>
+                <button type="button" class="btn-secondary" id="btn-setting-agregar-custom" style="padding: 0.45rem 1rem; font-size: 0.8rem; width: 100%;">+ Agregar Parámetro Base</button>
+              </div>
+
+              <!-- Instrucciones globales de entrega de fotografía -->
+              <div class="form-group" style="margin-bottom: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.2rem;">
+                <label for="setting-photo-instructions">Instrucciones de Entrega de Fotografía (Global)</label>
+                <textarea id="setting-photo-instructions" rows="4" placeholder="Ej: Las fotografías del evento serán cargadas en un álbum digital de Google Drive en un plazo máximo de 10 días calendario..." style="width: 100%; box-sizing: border-box; resize: vertical; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;"></textarea>
+              </div>
+
+              <!-- Configuración de Marca y Contrato Legal -->
+              <div class="form-group" style="margin-bottom: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.2rem;">
+                <h4 style="color: var(--accent-gold); font-size: 1rem; margin: 0 0 1rem 0; font-family: var(--font-title);">Configuración de Marca y Contrato (Global)</h4>
+                
+                <div style="margin-bottom: 1rem;">
+                  <label for="setting-business-name">Nombre de la Empresa</label>
+                  <input type="text" id="setting-business-name" placeholder="Ej: Sarahy" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                  <label for="setting-business-subtitle">Subtítulo o Eslogan</label>
+                  <input type="text" id="setting-business-subtitle" placeholder="Ej: Casa de Banquetes" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="setting-business-logo-url">URL de Imagen del Logo</label>
+                  <input type="text" id="setting-business-logo-url" placeholder="Ej: https://tusitio.com/logo.png (dejar vacío para usar logo dorado por defecto)" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                  <label for="setting-contract-text">Texto del Contrato Legal (HTML permitido)</label>
+                  <textarea id="setting-contract-text" rows="6" placeholder="Escribe aquí las cláusulas del contrato..." style="width: 100%; box-sizing: border-box; resize: vertical; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;"></textarea>
+                </div>
+
+                <!-- Configuración de Colores de Mantelería -->
+                <div style="margin-bottom: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1.2rem;">
+                  <h4 style="color: var(--accent-gold); font-size: 1rem; margin: 0 0 0.5rem 0; font-family: var(--font-title);">Colores de Mantelería Disponibles (Global)</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Define la lista de colores que los clientes podrán escoger si se les habilita la opción.</p>
+                  <div id="settings-colors-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem;">
+                    <!-- Chips inyectados por JS -->
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="setting-new-color" placeholder="Ej: Azul Rey, Oro, Verde..." style="flex-grow: 1; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                    <button type="button" class="btn-primary" id="btn-setting-add-color" style="padding: 0.45rem 1rem; font-size: 0.85rem; height: 34px;">Agregar</button>
+                  </div>
+                <!-- Configuración Estética (Colores, Letra y Tamaño) -->
+                <div class="form-group" style="margin-bottom: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1.2rem;">
+                  <h4 style="color: var(--accent-gold); font-size: 1rem; margin: 0 0 1rem 0; font-family: var(--font-title);">Personalización Estética (SaaS Theme)</h4>
+                  
+                  <div style="margin-bottom: 1rem;">
+                    <label for="setting-theme-palette">Paleta de Colores de la App</label>
+                    <select id="setting-theme-palette" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                      <option value="gold">Oro & Slate (Predeterminado - Premium)</option>
+                      <option value="emerald">Esmeralda & Obsidian (Verde Elegante)</option>
+                      <option value="sapphire">Zafiro & Dark Blue (Azul Real)</option>
+                      <option value="ruby">Rubí & Slate (Rojo Cabernet)</option>
+                      <option value="rose">Rosa Satinado & Charcoal (Romántico)</option>
+                    </select>
+                  </div>
+
+                  <div style="margin-bottom: 1rem;">
+                    <label for="setting-theme-font">Tipo de Letra (Tipografía Principal)</label>
+                    <select id="setting-theme-font" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                      <option value="outfit">Outfit (Predeterminado - Sans-Serif Moderno)</option>
+                      <option value="inter">Inter (Sleek - Minimalista)</option>
+                      <option value="montserrat">Montserrat (Industrial - Fuerte)</option>
+                      <option value="playfair">Playfair Display (Clásico - Serif Elegante)</option>
+                      <option value="cormorant">Cormorant Garamond (Elegancia Lujosa)</option>
+                    </select>
+                  </div>
+
+                  <div style="margin-bottom: 1.5rem;">
+                    <label for="setting-theme-font-size">Tamaño de la Letra Base</label>
+                    <select id="setting-theme-font-size" style="width: 100%; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                      <option value="14px">Pequeño (14px)</option>
+                      <option value="16px">Normal (16px - Predeterminado)</option>
+                      <option value="18px">Grande (18px)</option>
+                      <option value="20px">Muy Grande (20px)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary" style="width: 100%;">Actualizar Valores Base</button>
+              <div style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
+                <h4 style="font-size: 0.9rem; color: var(--danger); margin-bottom: 0.5rem;">Mantenimiento y Pruebas</h4>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                  Si deseas re-sembrar y restaurar los valores iniciales de la base de datos (salones, recetas, el evento demo de Sara y Felipe, etc.) puedes presionar el siguiente botón.
+                </p>
+                <button type="button" class="btn-logout" id="btn-admin-reseed-db" style="width: 100%; border-color: rgba(229,62,62,0.4); color: #fc8181;">
+                  Restaurar Semilla DB (Reset)
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ADMIN TAB: USERS -->
+        <div id="admin-users" class="tab-content" style="display: none;">
+          <div class="card" id="admin-users-card">
+            <div class="flex-between" style="flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.5rem; margin: 0;">Usuarios y Clientes en la Plataforma</h3>
+              <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
+                <input type="text" id="admin-users-search" placeholder="Buscar usuario o correo..." style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 200px;">
+                <select id="admin-users-filter-role" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 160px;">
+                  <option value="all">Todos los Roles</option>
+                  <option value="superadmin">Superadministrador</option>
+                  <option value="cliente">Clientes</option>
+                  <option value="compras">Compras</option>
+                  <option value="cocina">Cocina</option>
+                  <option value="logistica">Logística</option>
+                  <option value="decoracion">Decoración</option>
+                  <option value="recreacion">Recreación</option>
+                </select>
+                
+                <!-- Filtro de Fecha de Evento -->
+                <select id="admin-users-filter-date-mode" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 180px;">
+                  <option value="all">Todas las fechas</option>
+                  <option value="last30">Últimos 30 días</option>
+                  <option value="next30">Próximos 30 días</option>
+                  <option value="custom">Rango personalizado...</option>
+                </select>
+                
+                <!-- Inputs de fecha de rango personalizado -->
+                <div id="admin-users-date-range-inputs" style="display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <label for="admin-users-date-start" style="font-size: 0.8rem; color: var(--text-secondary);">Desde:</label>
+                  <input type="date" id="admin-users-date-start" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+                  <label for="admin-users-date-end" style="font-size: 0.8rem; color: var(--text-secondary);">Hasta:</label>
+                  <input type="date" id="admin-users-date-end" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
+                </div>
+              </div>
+            </div>
+
+            <!-- Tabla General de Usuarios -->
+            <div class="table-responsive" id="admin-users-table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Teléfono</th>
+                    <th>Estado Foto</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-list">
+                  <!-- Inyectado por JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Listado Agrupado de Clientes por Franja Horaria -->
+            <div id="admin-users-grouped-container" style="display: none; margin-top: 1.5rem;">
+              <!-- Inyectado dinámicamente -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: COMPRAS (PRIVADO - ROL COMPRAS/ADMIN) -->
+      <!-- ========================================== -->
+      <section id="view-compras" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Gestión de <span>Compras</span></h2>
+            <p class="page-subtitle">Cálculo automatizado de insumos, stock del inventario y órdenes de abastecimiento.</p>
+          </div>
+          <div>
+            <button class="btn-primary" id="btn-compras-nuevo-item">+ Nuevo Insumo</button>
+          </div>
+        </div>
+
+        <div class="tab-container">
+          <button class="tab-btn active" data-tab="compras-autolist">Automatización de Compras</button>
+          <button class="tab-btn" data-tab="compras-inventario">Control de Inventario</button>
+        </div>
+
+        <!-- COMPRAS TAB: AUTOLIST -->
+        <div id="compras-autolist" class="tab-content active" style="display: block;">
+          <div class="card" style="margin-bottom: 2rem;">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1rem; font-size: 1.4rem;">Cálculo Automático por Evento</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Selecciona un evento agendado para calcular la lista de compras requeridas para el menú seleccionado, comparando de forma automática con las existencias actuales de inventario.</p>
+            
+            <div class="form-grid" style="align-items: flex-end;">
+              <div class="form-group">
+                <label for="compras-select-evento">Seleccionar Evento</label>
+                <select id="compras-select-evento">
+                  <option value="">Selecciona un evento...</option>
+                  <!-- Inyectado por JS -->
+                </select>
+              </div>
+              <div>
+                <button class="btn-primary" id="btn-compras-calcular" style="height: 46px;">Calcular Lista de Compras</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="compras-resultados-container" style="display: none;">
+            <div class="flex-between" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+              <div>
+                <h4 id="compras-menu-nombre" style="font-size: 1.2rem; color: var(--accent-gold);">Menú del Evento: -</h4>
+                <p id="compras-evento-invitados" style="font-size: 0.9rem; color: var(--text-secondary);">Asistentes: - invitados</p>
+              </div>
+              <button class="btn-accent" id="btn-compras-imprimir">Imprimir Lista de Compras</button>
+            </div>
+
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ingrediente</th>
+                    <th>Cantidad Requerida</th>
+                    <th>Existencia en Inventario</th>
+                    <th>Diferencia a Comprar</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="compras-calculo-tbody">
+                  <!-- Inyectado por JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPRAS TAB: INVENTARIO -->
+        <div id="compras-inventario" class="tab-content" style="display: none;">
+          <!-- Alertas de Faltantes -->
+          <div id="inventory-alerts-container" style="margin-bottom: 1.5rem;">
+            <!-- Alertas dinámicas se muestran aquí -->
+          </div>
+
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">Control de Existencias</h3>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Insumo</th>
+                    <th>Cantidad Actual</th>
+                    <th>Mínimo Requerido</th>
+                    <th>Categoría</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="compras-inventario-tbody">
+                  <!-- Inyectado por JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: COCINA (PRIVADO - ROL COCINA/ADMIN) -->
+      <!-- ========================================== -->
+      <section id="view-cocina" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Recetario <span>Maestro</span></h2>
+            <p class="page-subtitle">Consulta de recetas base y escalado de producción para cocina de eventos.</p>
+          </div>
+          <div>
+            <button class="btn-primary" id="btn-cocina-crear-receta">+ Nueva Receta</button>
+          </div>
+        </div>
+
+        <div class="grid-1-2">
+          <!-- Listado de recetas -->
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.4rem;">Recetas Base</h3>
+            <div class="nav-links" id="cocina-recetas-lista" style="gap: 0.5rem;">
+              <!-- Se inyectan botones para ver recetas por JS -->
+            </div>
+          </div>
+
+          <!-- Detalle de receta y calculadora de escalado -->
+          <div class="card" id="cocina-receta-detalle" style="display: none;">
+            <input type="hidden" id="cocina-receta-id">
+            <div class="flex-between" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+              <h3 id="cocina-receta-titulo" style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.6rem;">Selecciona una receta</h3>
+              <div class="flex-gap">
+                <button class="btn-secondary" id="btn-cocina-editar-receta">Editar</button>
+                <button class="btn-logout" id="btn-cocina-eliminar-receta" style="padding:0.4rem 1rem;">Eliminar</button>
+              </div>
+            </div>
+
+            <!-- Calculadora de Escalado de Cocina -->
+            <div style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: 8px; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between;">
+              <div class="form-group" style="flex-grow: 1; max-width: 300px;">
+                <label for="cocina-escalar-invitados">Escalar para (N° Invitados):</label>
+                <input type="number" id="cocina-escalar-invitados" min="1" value="50">
+              </div>
+              <div style="text-align: right;">
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">Receta original para:</span>
+                <p style="font-size: 1.2rem; font-weight: 700; color: var(--accent-gold);" id="cocina-base-invitados">50 personas</p>
+              </div>
+            </div>
+
+            <h4 style="color: var(--accent-gold); margin-bottom: 0.75rem;">Ingredientes Escalados</h4>
+            <div class="table-responsive" style="margin-bottom: 2rem;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ingrediente</th>
+                    <th>Cantidad Base</th>
+                    <th>Cantidad Escalada</th>
+                    <th>Unidad</th>
+                  </tr>
+                </thead>
+                <tbody id="cocina-ingredientes-tbody">
+                  <!-- JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem;">Procedimiento de Preparación</h4>
+            <div id="cocina-procedimiento-texto" style="white-space: pre-wrap; background: var(--bg-tertiary); padding: 1.5rem; border-radius: 8px; font-size: 0.95rem;">
+              -
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- VISTA: OPERACIONES (LOGÍSTICA, DECORACIÓN, RECREACIÓN) -->
+      <!-- ========================================== -->
+      <section id="view-operativo" class="view-section">
+        <div class="page-header">
+          <div>
+            <h2 class="page-title">Portal de <span id="op-rol-titulo">Operaciones</span></h2>
+            <p class="page-subtitle" id="op-rol-subtitulo">Consulta de requerimientos operativos, montajes y asignaciones.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1rem; font-size: 1.4rem;">Filtro de Reservas</h3>
+          <div class="form-group" style="max-width: 400px;">
+            <label for="op-select-evento">Seleccionar Evento Agendado</label>
+            <select id="op-select-evento">
+              <option value="">Cargando eventos...</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="op-detalles-evento-container" class="grid-1-1" style="display: none;">
+          <!-- Detalles Generales -->
+          <div class="card">
+            <h3 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.5rem;">Ficha Operativa del Evento</h3>
+            <div class="grid-1-1" style="gap: 1.5rem; margin-bottom: 1.5rem;">
+              <div>
+                <strong style="color: var(--text-secondary);">Salón:</strong>
+                <p id="op-info-salon" style="font-size: 1.1rem; font-weight: 600;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Fecha:</strong>
+                <p id="op-info-fecha" style="font-size: 1.1rem; font-weight: 600;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Hora:</strong>
+                <p id="op-info-hora" style="font-size: 1.1rem; font-weight: 600;">-</p>
+              </div>
+              <div>
+                <strong style="color: var(--text-secondary);">Invitados:</strong>
+                <p id="op-info-invitados" style="font-size: 1.1rem; font-weight: 600;">-</p>
+              </div>
+            </div>
+            
+            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
+              <strong style="color: var(--text-secondary);">Servicios Especiales Contratados:</strong>
+              <ul id="op-info-servicios" style="margin-top: 0.5rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.25rem;">
+                <!-- JS -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Requerimientos Específicos por Rol -->
+          <div class="card" id="op-requerimientos-especificos">
+            <!-- Se inyecta según el rol activo -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: DETALLES Y FIRMA DIGITAL -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-firma-contrato">
+    <div class="modal-content">
+      <button class="modal-close" id="btn-cerrar-modal-firma">&times;</button>
+      <h2 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1rem; font-size: 1.8rem;">Firma del Contrato de Reserva</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Dibuja tu firma en el lienzo utilizando tu mouse o dedo (en pantallas táctiles). Esta firma se estampará en el contrato.</p>
+      
+      <div class="signature-container">
+        <canvas id="signature-canvas" width="600" height="250"></canvas>
+        <div class="signature-buttons">
+          <button class="btn-secondary" id="btn-limpiar-firma">Limpiar Lienzo</button>
+          <button class="btn-primary" id="btn-guardar-firma-contrato">Estampar Firma y Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CREAR/EDITAR USUARIOS (ADMIN) -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-admin-usuario">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close" id="btn-cerrar-modal-usuario">&times;</button>
+      <h2 id="modal-usuario-titulo" style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.6rem;">Nuevo Usuario</h2>
+      <form id="form-admin-usuario">
+        <input type="hidden" id="user-edit-uid">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="u-nombre">Nombre Completo</label>
+          <input type="text" id="u-nombre" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="u-email">Correo Electrónico</label>
+          <input type="email" id="u-email" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;" id="u-pass-container">
+          <label for="u-password">Contraseña (Mín. 6 caracteres)</label>
+          <input type="password" id="u-password" placeholder="Para cuentas nuevas" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="u-rol">Rol / Permiso</label>
+          <select id="u-rol" required>
+            <option value="cliente">Cliente (Acceso a "Mi Evento")</option>
+            <option value="superadmin">Superadministrador (Control Total)</option>
+            <option value="compras">Compras (Abastecimiento)</option>
+            <option value="cocina">Cocina (Chef de Recetas)</option>
+            <option value="logistica">Logística (Operación)</option>
+            <option value="decoracion">Decoración (Montajes)</option>
+            <option value="recreacion">Recreación (Recreadores)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="u-telefono">Teléfono / Celular</label>
+          <input type="text" id="u-telefono">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Guardar Usuario</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CREAR/EDITAR PRODUCTOS (ADMIN) -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-admin-producto">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close" id="btn-cerrar-modal-producto">&times;</button>
+      <h2 id="modal-producto-titulo" style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.6rem;">Nuevo Producto / Servicio</h2>
+      <form id="form-admin-producto">
+        <input type="hidden" id="prod-edit-id">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="p-nombre">Nombre de Tarifa / Insumo</label>
+          <input type="text" id="p-nombre" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="p-categoria">Categoría</label>
+          <select id="p-categoria" required>
+            <option value="venue">Salón de Recepciones</option>
+            <option value="photography">Paquete de Fotografía</option>
+            <option value="decoration">Paquete de Decoración</option>
+            <option value="service">Servicio Especial (Adicional)</option>
+            <option value="coctel">Cóctel (Menú)</option>
+            <option value="arroz">Arroz (Menú)</option>
+            <option value="carne">Carne (Menú)</option>
+            <option value="ensalada">Ensalada (Menú)</option>
+            <option value="postre">Postre (Menú)</option>
+            <option value="liquido">Líquido (Menú)</option>
+            <option value="torta">Torta (Menú)</option>
+            <option value="pasabocas">Pasabocas (Menú)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 1rem; display: none;" id="p-event-type-container">
+          <label for="p-event-type">Tipo de Fiesta Asocidada</label>
+          <select id="p-event-type">
+            <option value="boda">Bodas</option>
+            <option value="quinces">Quinceañeras</option>
+            <option value="grados_otros">Cumpleaños y Grados</option>
+            <option value="comuniones">Primeras Comuniones</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="p-precio">Precio Unitario / Total (COP)</label>
+          <input type="number" id="p-precio" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="p-descripcion">Descripción del Servicio</label>
+          <textarea id="p-descripcion" rows="3" placeholder="Descripción opcional del servicio..."></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="p-info-url">Enlace de "Más Información" (URL)</label>
+          <input type="url" id="p-info-url" placeholder="https://ejemplo.com/detalles">
+        </div>
+        
+        <!-- Lista de Compras Asociada al Producto -->
+        <h3 style="color: var(--accent-gold); font-size: 1.1rem; margin: 1.5rem 0 0.5rem 0; font-family: var(--font-title);">Insumos de Compra Asociados</h3>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.3;">
+          Define los insumos que deben comprarse automáticamente cuando se contrate este servicio. Marca "x Persona" para escalar con el número de invitados.
+        </p>
+        <div id="prod-shopping-list-container" style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <div id="prod-shopping-list-items" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+            <!-- Inyectado dinámicamente por JS -->
+          </div>
+          <button type="button" class="btn-secondary" id="btn-prod-agregar-insumo" style="padding: 0.4rem 1rem; font-size: 0.8rem;">+ Agregar Insumo</button>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Guardar Producto</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: CAMBIAR CONTRASEÑA -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-cambiar-contrasena" style="display: none;">
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="modal-close" id="btn-cerrar-modal-contrasena">&times;</button>
+      <h2 style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.6rem;">Cambiar Contraseña</h2>
+      <form id="form-cambiar-contrasena">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="ch-new-password">Nueva Contraseña</label>
+          <input type="password" id="ch-new-password" required minlength="6" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="ch-confirm-password">Confirmar Nueva Contraseña</label>
+          <input type="password" id="ch-confirm-password" required minlength="6" placeholder="Repite la nueva contraseña">
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Actualizar Contraseña</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL: GESTIONAR EVENTO COMPLETO (ADMIN) -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-admin-evento">
+    <div class="modal-content">
+      <button class="modal-close" id="btn-cerrar-modal-evento">&times;</button>
+      <h2 id="modal-evento-titulo" style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.8rem;">Crear Nuevo Evento</h2>
+      <form id="form-admin-evento">
+        <input type="hidden" id="event-edit-id">
+        <input type="hidden" id="event-quotation-id">
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="ev-cliente">Cliente Propietario</label>
+            <select id="ev-cliente" required>
+              <option value="">Selecciona un cliente...</option>
+              <!-- JS -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-tipo">Tipo de Evento</label>
+            <select id="ev-tipo" required>
+              <option value="boda">Boda (Matrimonio)</option>
+              <option value="quinces">Fiesta de Quinces</option>
+              <option value="grados_otros">Cumpleaños, Grados u Otros</option>
+              <option value="comuniones">Primera Comunión</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-salon">Salón Asignado</label>
+            <select id="ev-salon" required>
+              <!-- JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="ev-fecha">Fecha Programada</label>
+            <input type="date" id="ev-fecha" required>
+          </div>
+          <div class="form-group">
+            <label for="ev-hora">Hora de Inicio</label>
+            <input type="time" id="ev-hora" value="16:00" required>
+          </div>
+          <div class="form-group">
+            <label for="ev-invitados">Cantidad de Invitados</label>
+            <input type="number" id="ev-invitados" min="10" required>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="ev-foto">Plan de Fotografía</label>
+            <select id="ev-foto">
+              <!-- JS -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-deco">Estilo de Decoración</label>
+            <select id="ev-deco">
+              <!-- JS -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-total">Valor Total del Contrato (COP)</label>
+            <input type="number" id="ev-total" required>
+          </div>
+          <div class="form-group">
+            <label for="ev-status">Estado del Evento</label>
+            <select id="ev-status" required>
+              <option value="confirmado">Confirmado</option>
+              <option value="realizado">Realizado (Evento Ejecutado)</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ev-photo-status">Estado de Fotografía</label>
+            <select id="ev-photo-status" required>
+              <option value="sin_fotografia">Sin fotografía</option>
+              <option value="pendiente_fiesta">Pendiente fiesta</option>
+              <option value="link_por_enviar">Link por enviar</option>
+              <option value="pendiente_listado">Pendiente listado de fotos</option>
+              <option value="fotos_recibidas">Fotos recibidas</option>
+              <option value="en_produccion">En producción</option>
+              <option value="por_recoger">Por recoger</option>
+              <option value="entregado">Entregado</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label for="ev-photo-drive">Enlace Álbum de Fotos (Google Drive)</label>
+            <input type="url" id="ev-photo-drive" placeholder="Ej: https://drive.google.com/drive/folders/...">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+              <label for="ev-photo-selection">Listado de Fotos Seleccionadas por el Cliente (Solo Lectura)</label>
+              <button type="button" id="btn-admin-receive-photos" class="btn-accent" style="padding: 0.35rem 0.8rem; font-size: 0.75rem; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; height: 32px; background: linear-gradient(135deg, var(--success) 0%, #2f855a 100%); border: none;">
+                📥 Marcar como Recibido
+              </button>
+            </div>
+            <textarea id="ev-photo-selection" rows="3" placeholder="El cliente aún no ha enviado su selección de fotos..." readonly style="width: 100%; box-sizing: border-box; resize: vertical; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-secondary); font-family: inherit; cursor: not-allowed;"></textarea>
+            <input type="hidden" id="ev-photo-selection-locked" value="false">
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem; background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <h4 style="color: var(--accent-gold); font-size: 0.95rem; margin: 0 0 0.5rem 0; font-family: var(--font-title);">Opciones Habilitadas para el Cliente</h4>
+            <label class="checkbox-label" style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; margin: 0;">
+              <input type="checkbox" id="ev-allow-color-selection"> Habilitar Selección de Color de Mantelería
+            </label>
+          </div>
+        </div>
+
+        <h3 style="color: var(--accent-gold); font-size: 1.2rem; margin: 1.5rem 0 0.75rem 0;">Servicios Especiales Contratados</h3>
+        <div id="ev-servicios-lista-checklist" class="products-selector-grid" style="margin-bottom: 1.5rem;">
+          <!-- Se inyecta dinámicamente -->
+        </div>
+
+        <h3 style="color: var(--accent-gold); font-size: 1.2rem; margin: 1.5rem 0 0.75rem 0;">Cronograma (Coordinación Logística)</h3>
+        <div id="ev-cronograma-container" style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <div class="flex-between" style="margin-bottom: 0.5rem;">
+            <span>Actividades Planificadas</span>
+            <button type="button" class="btn-primary" id="btn-ev-agregar-actividad" style="padding: 0.4rem 1rem; font-size: 0.8rem;">+ Agregar Actividad</button>
+          </div>
+          <div id="ev-cronograma-lista" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <!-- JS -->
+          </div>
+        </div>
+
+        <h3 style="color: var(--accent-gold); font-size: 1.2rem; margin: 1.5rem 0 0.75rem 0;">Abonos y Pagos Realizados</h3>
+        <div id="ev-abonos-container" style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <div class="flex-between" style="margin-bottom: 0.5rem;">
+            <span>Abono Registrado</span>
+            <button type="button" class="btn-primary" id="btn-ev-agregar-abono" style="padding: 0.4rem 1rem; font-size: 0.8rem;">+ Agregar Abono</button>
+          </div>
+          <div id="ev-abonos-lista" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <!-- JS -->
+          </div>
+        </div>
+
+        <h3 style="color: var(--accent-gold); font-size: 1.2rem; margin: 1.5rem 0 0.75rem 0;">Citas y Ensayos Programados</h3>
+        <div id="ev-citas-container" style="background: var(--bg-tertiary); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <div class="flex-between" style="margin-bottom: 0.5rem;">
+            <span>Citas Programadas</span>
+            <button type="button" class="btn-primary" id="btn-ev-agregar-cita" style="padding: 0.4rem 1rem; font-size: 0.8rem;">+ Agregar Cita</button>
+          </div>
+          <div id="ev-citas-lista" style="display:flex; flex-direction:column; gap:0.5rem;">
+            <!-- JS -->
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;">Guardar Registro de Evento</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: RECETAS (COCINA) -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-cocina-receta">
+    <div class="modal-content">
+      <button class="modal-close" id="btn-cerrar-modal-receta">&times;</button>
+      <h2 id="modal-receta-titulo" style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.6rem;">Nueva Receta</h2>
+      <form id="form-cocina-receta">
+        <input type="hidden" id="rec-edit-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="rec-nombre">Nombre de la Receta</label>
+            <input type="text" id="rec-nombre" required>
+          </div>
+          <div class="form-group">
+            <label for="rec-categoria">Categoría del Menú</label>
+            <select id="rec-categoria" required>
+              <option value="coctel">Cóctel</option>
+              <option value="arroz">Arroz</option>
+              <option value="carne">Carne</option>
+              <option value="ensalada">Ensalada</option>
+              <option value="postre">Postre</option>
+              <option value="liquido">Líquido / Bebida</option>
+              <option value="torta">Torta</option>
+              <option value="pasabocas">Pasabocas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="rec-base-invitados">Cantidad Base de Personas</label>
+            <input type="number" id="rec-base-invitados" value="50" min="1" required>
+          </div>
+        </div>
+
+        <h3 style="color: var(--accent-gold); font-size: 1.2rem; margin: 1.5rem 0 0.5rem 0;">Ingredientes</h3>
+        <div id="rec-ingredientes-container" style="background: var(--bg-tertiary); padding: 1.2rem; border-radius: 8px; margin-bottom: 1.5rem;">
+          <div id="rec-ingredientes-lista" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+            <!-- Inyectado por JS -->
+          </div>
+          <button type="button" class="btn-secondary" id="btn-rec-agregar-ingrediente" style="padding: 0.4rem 1rem; font-size: 0.8rem;">+ Agregar Ingrediente</button>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label for="rec-procedimiento">Procedimiento de Preparación</label>
+          <textarea id="rec-procedimiento" rows="5" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%;">Guardar Receta</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: INVENTARIO (COMPRAS) -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="modal-compras-item">
+    <div class="modal-content" style="max-width: 500px;">
+      <button class="modal-close" id="btn-cerrar-modal-item">&times;</button>
+      <h2 id="modal-item-titulo" style="font-family: var(--font-title); color: var(--accent-gold); margin-bottom: 1.5rem; font-size: 1.6rem;">Nuevo Insumo de Inventario</h2>
+      <form id="form-compras-item">
+        <input type="hidden" id="item-edit-id">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="i-nombre">Nombre del Insumo / Elemento</label>
+          <input type="text" id="i-nombre" required>
+        </div>
+        <div class="form-grid" style="margin-bottom: 1rem;">
+          <div class="form-group">
+            <label for="i-cantidad">Cantidad Actual</label>
+            <input type="number" id="i-cantidad" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="i-unidad">Unidad de Medida</label>
+            <input type="text" id="i-unidad" placeholder="Ej: kg, litros, un" required>
+          </div>
+        </div>
+        <div class="form-grid" style="margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label for="i-categoria">Categoría</label>
+            <select id="i-categoria" required>
+              <option value="alimentos">Alimentos</option>
+              <option value="bebidas">Bebidas</option>
+              <option value="decoracion">Decoración</option>
+              <option value="insumos">Insumos (Mesas, menaje, etc.)</option>
+              <option value="recreacion">Recreación</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="i-minimo">Existencia Mínima (Alerta)</label>
+            <input type="number" id="i-minimo" step="0.01" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%;">Guardar en Inventario</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- BOTÓN FLOTANTE DE WHATSAPP (Solo público) -->
+  <a href="#" id="floating-whatsapp-btn" class="whatsapp-btn" target="_blank" style="display: none;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.004 2C6.48 2 2 6.48 2 12.004c0 1.908.533 3.768 1.547 5.393L2.016 22l4.759-1.22c1.554.848 3.3 1.295 5.225 1.295 5.523 0 10.004-4.48 10.004-10.004C22.004 6.48 17.523 2 12.004 2zm.004 18.008c-1.684 0-3.268-.456-4.64-1.296l-.332-.2-.276.168-2.812.72.736-2.696.184-.288-.228-.36a7.934 7.934 0 0 1-1.124-4.053c0-4.408 3.592-8 8-8s8 3.592 8 8-3.592 8-8 8zm4.368-6c-.24-.12-1.416-.696-1.632-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06a6.568 6.568 0 0 1-1.92-1.184c-.74-.66-1.236-1.472-1.38-1.716-.14-.24-.016-.368.104-.488.108-.108.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.192-.468-.388-.408-.54-.416-.14-.004-.3-.004-.46-.004-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.692 2.584 4.1 3.624.572.248 1.02.396 1.368.508.576.184 1.1.16 1.516.1.464-.068 1.416-.58 1.62-1.116.2-.54.2-.996.14-1.116-.06-.12-.22-.18-.46-.3z"/>
+    </svg>
+  </a>
+
+  <!-- BANNER DE INSTALACIÓN PWA -->
+  <div id="pwa-install-banner" class="pwa-banner" style="display: none;">
+    <div class="pwa-banner-content">
+      <span>📲 Instala la app de <strong id="install-banner-app-name">Sarahy</strong> en tu pantalla de inicio para una experiencia más rápida y fluida.</span>
+      <div class="pwa-banner-buttons">
+        <button id="btn-pwa-install-action" class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px;">Instalar</button>
+        <button id="btn-pwa-close-banner" class="btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem; border: none; background: transparent; border-radius: 8px;">Quizás luego</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORE SCRIPTS -->
+  <script type="module" src="js/app.js?v=2026_v2"></script>
+
+</body>
+</html>

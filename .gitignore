@@ -1,0 +1,12 @@
+node_modules/
+database_mock/
+.env
+*.zip
+*.rar
+.DS_Store
+Thumbs.db
+.gemini/
+c:/Users/USER/.gemini/
+
+/generated/prisma
+generated-client/

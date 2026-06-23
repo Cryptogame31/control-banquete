@@ -1,0 +1,3 @@
+# Configuración de Nixpacks para asegurar dependencias de Prisma
+[phases.setup]
+nixPkgs = ["openssl"]
