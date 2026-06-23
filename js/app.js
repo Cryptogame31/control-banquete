@@ -725,10 +725,10 @@ function setupEventListeners() {
   
   if (savedTheme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
-    updateThemeIcons('light');
+    updateThemeToggleButtons('light');
   } else {
     document.documentElement.removeAttribute('data-theme');
-    updateThemeIcons('dark');
+    updateThemeToggleButtons('dark');
   }
 
   if (themeToggleBtn) {
@@ -737,11 +737,11 @@ function setupEventListeners() {
       if (activeTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         localStorage.setItem('controlbanquete_theme', 'light');
-        updateThemeIcons('light');
+        updateThemeToggleButtons('light');
       } else {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('controlbanquete_theme', 'dark');
-        updateThemeIcons('dark');
+        updateThemeToggleButtons('dark');
       }
     });
   }

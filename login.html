@@ -223,6 +223,13 @@
       root.style.setProperty('--base-font-size', themeSettings.fontSize || '16px');
     }
 
+    // Interceptar el parámetro 'demo' para activar el simulador si viene en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('demo')) {
+      const isDemo = urlParams.get('demo') === 'true';
+      localStorage.setItem('controlbanquete_force_mock', isDemo ? 'true' : 'false');
+    }
+
     const isMock = localStorage.getItem('controlbanquete_force_mock') === 'true';
     const demoAuthSelector = document.getElementById('demo-auth-selector');
     if (isMock && demoAuthSelector) {
