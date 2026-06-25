@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Políticas Legales — Control Banquete</title>
+  <meta name="description" content="Política de Privacidad, Términos de Servicio, Política de Cancelación y Reembolso, y eliminación de datos de Control Banquete.">
+  <link rel="canonical" href="https://controlbanquete.app/legal">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #07070f; --bg2: #0f0f1c; --bg3: #161626;
+      --text: #f0f0f5; --text2: #8888bb; --text3: #5555aa;
+      --gold: #ffcf4b; --border: rgba(255,207,75,0.12); --border2: rgba(255,255,255,0.07);
+      --green: #34d399; --red: #f87171; --blue: #60a5fa;
+      --radius: 16px;
+    }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .bg-mesh { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 600px 400px at 70% 0%, rgba(255,207,75,0.04), transparent),
+                  radial-gradient(ellipse 400px 400px at 0% 100%, rgba(96,165,250,0.03), transparent); }
+
+    /* ── HEADER ── */
+    .header { position: sticky; top: 0; z-index: 50; background: rgba(7,7,15,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border2); }
+    .header-inner { max-width: 880px; margin: 0 auto; padding: 0.9rem 1.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--gold); }
+    .back-btn { font-size: 0.85rem; color: var(--text2); text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 8px; border: 1px solid var(--border2); transition: color 0.2s; }
+    .back-btn:hover { color: var(--text); }
+
+    /* ── TOC ── */
+    .page { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; padding: 3rem 1.5rem 6rem; }
+    .hero { text-align: center; margin-bottom: 3rem; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,207,75,0.1); border: 1px solid var(--border); border-radius: 100px;
+      color: var(--gold); font-size: 0.82rem; font-weight: 600; padding: 0.4rem 1rem; margin-bottom: 1.25rem; }
+    .hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.75rem; }
+    .hero p { font-size: 0.95rem; color: var(--text2); line-height: 1.7; max-width: 600px; margin: 0 auto; }
+    .last-update { display: inline-block; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text3); }
+
+    /* Nav pills */
+    .toc { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-bottom: 3rem; }
+    .toc-pill { padding: 0.45rem 1rem; border-radius: 100px; background: var(--bg2);
+      border: 1px solid var(--border2); font-size: 0.82rem; color: var(--text2);
+      text-decoration: none; transition: all 0.2s; }
+    .toc-pill:hover { background: rgba(255,207,75,0.08); border-color: var(--border); color: var(--gold); }
+
+    /* ── SECTION ── */
+    .legal-section { background: var(--bg2); border: 1px solid var(--border2); border-radius: 20px;
+      padding: 2.5rem; margin-bottom: 1.5rem; }
+    .legal-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.6rem; color: var(--text); }
+    .legal-section h3 { font-size: 1rem; font-weight: 700; margin: 1.5rem 0 0.6rem; color: var(--text); }
+    .legal-section p { font-size: 0.92rem; color: var(--text2); line-height: 1.8; margin-bottom: 0.9rem; }
+    .legal-section ul { padding-left: 1.5rem; margin-bottom: 1rem; }
+    .legal-section li { font-size: 0.9rem; color: var(--text2); line-height: 1.8; margin-bottom: 0.3rem; }
+    .legal-section li strong { color: var(--text); }
+    .info-box { background: rgba(255,207,75,0.06); border: 1px solid var(--border); border-radius: 12px;
+      padding: 1rem 1.25rem; font-size: 0.88rem; color: #fde68a; margin-bottom: 1rem; line-height: 1.7; }
+    .green-box { background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.2); border-radius: 12px;
+      padding: 1rem 1.25rem; font-size: 0.88rem; color: #6ee7b7; margin-bottom: 1rem; line-height: 1.7; }
+    .red-box { background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.2); border-radius: 12px;
+      padding: 1rem 1.25rem; font-size: 0.88rem; color: #fca5a5; margin-bottom: 1rem; line-height: 1.7; }
+
+    /* Contact */
+    .contact-card { background: var(--bg3); border: 1px solid var(--border2); border-radius: 14px;
+      padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .contact-row { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--text2); }
+    .contact-row strong { color: var(--text); min-width: 100px; }
+    .contact-row a { color: var(--blue); text-decoration: none; }
+    .contact-row a:hover { text-decoration: underline; }
+
+    /* Delete account */
+    .delete-steps { counter-reset: step; }
+    .delete-step { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    .step-num { min-width: 32px; height: 32px; border-radius: 50%; background: rgba(248,113,113,0.12);
+      border: 1px solid rgba(248,113,113,0.3); color: var(--red); font-size: 0.85rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-text { font-size: 0.9rem; color: var(--text2); line-height: 1.7; padding-top: 0.25rem; }
+    .step-text strong { color: var(--text); }
+
+    /* Footer */
+    .legal-footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border2); }
+    .legal-footer p { font-size: 0.82rem; color: var(--text3); margin-bottom: 0.35rem; }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-top: 0.75rem; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.82rem; color: var(--text2); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--gold); }
+
+    @media(max-width: 600px) {
+      .hero h1 { font-size: 1.6rem; }
+      .legal-section { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <a class="brand" href="index.html">
+      <span style="font-size:1.3rem;">🍽️</span>
+      <span class="brand-name">CONTROL BANQUETE</span>
+    </a>
+    <a class="back-btn" href="javascript:history.back()">← Volver</a>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">⚖️ Documentos Legales</div>
+    <h1>Políticas y Términos de Control Banquete</h1>
+    <p>Documentos legales requeridos para el uso de nuestra aplicación móvil y servicios en línea. Última actualización:</p>
+    <span class="last-update">📅 Junio 2026 · Versión 1.0</span>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <a class="toc-pill" href="#privacy">🔒 Privacidad</a>
+    <a class="toc-pill" href="#terms">📄 Términos</a>
+    <a class="toc-pill" href="#cancellation">↩ Cancelación</a>
+    <a class="toc-pill" href="#billing">💳 Facturación</a>
+    <a class="toc-pill" href="#data-deletion">🗑️ Eliminar datos</a>
+    <a class="toc-pill" href="#contact">📬 Contacto</a>
+  </div>
+
+  <!-- 1. PRIVACIDAD -->
+  <div class="legal-section" id="privacy">
+    <h2>🔒 Política de Privacidad</h2>
+    <div class="info-box">Esta política describe cómo Control Banquete recopila, usa y protege tu información personal.</div>
+
+    <h3>1.1 Información que recopilamos</h3>
+    <ul>
+      <li><strong>Información de cuenta:</strong> nombre, correo electrónico, nombre de empresa y contraseña al registrarte.</li>
+      <li><strong>Datos de negocio:</strong> eventos, cotizaciones, clientes, inventario y proveedores que ingresas en la plataforma.</li>
+      <li><strong>Datos de pago:</strong> gestionados íntegramente por Google Play. No almacenamos datos de tarjeta.</li>
+      <li><strong>Datos de uso:</strong> registros de acceso, navegación dentro de la app para mejorar el servicio.</li>
+    </ul>
+
+    <h3>1.2 Cómo usamos tu información</h3>
+    <ul>
+      <li>Proveer y mantener los servicios de gestión de banquetes.</li>
+      <li>Enviar notificaciones importantes sobre tu cuenta y suscripción.</li>
+      <li>Mejorar la experiencia de usuario y las funcionalidades de la app.</li>
+      <li>Cumplir obligaciones legales aplicables.</li>
+    </ul>
+
+    <h3>1.3 Aislamiento de datos (Multi-Tenant)</h3>
+    <div class="green-box">✅ <strong>Garantía de aislamiento total:</strong> La información de tu negocio es 100% privada. Ningún otro usuario, empresa o negocio registrado en Control Banquete puede ver, acceder o modificar tus datos. Cada cuenta opera en un espacio completamente aislado.</div>
+
+    <h3>1.4 Compartición de datos</h3>
+    <p>No vendemos, alquilamos ni compartimos tu información personal con terceros, excepto:</p>
+    <ul>
+      <li><strong>Google Play Billing:</strong> para procesar pagos de suscripción (sujeto a la Política de Privacidad de Google).</li>
+      <li><strong>Requerimientos legales:</strong> si la ley lo exige o una autoridad competente lo ordena.</li>
+    </ul>
+
+    <h3>1.5 Seguridad</h3>
+    <p>Las contraseñas se almacenan encriptadas con bcrypt. Las comunicaciones se realizan mediante HTTPS. Realizamos auditorías de seguridad periódicas.</p>
+
+    <h3>1.6 Retención de datos</h3>
+    <p>Mantenemos tus datos mientras tu cuenta esté activa. Tras eliminar tu cuenta, los datos se borran permanentemente en un plazo máximo de 30 días.</p>
+
+    <h3>1.7 Tus derechos</h3>
+    <ul>
+      <li>Acceder, corregir o eliminar tu información personal.</li>
+      <li>Exportar tus datos en formato legible.</li>
+      <li>Revocar el consentimiento en cualquier momento.</li>
+      <li>Presentar una queja ante la autoridad de protección de datos de tu país.</li>
+    </ul>
+  </div>
+
+  <!-- 2. TÉRMINOS -->
+  <div class="legal-section" id="terms">
+    <h2>📄 Términos de Servicio</h2>
+
+    <h3>2.1 Aceptación</h3>
+    <p>Al registrarte en Control Banquete o usar nuestra aplicación, aceptas estos Términos de Servicio en su totalidad. Si no estás de acuerdo, no uses el servicio.</p>
+
+    <h3>2.2 Descripción del servicio</h3>
+    <p>Control Banquete es una plataforma de gestión para empresas de banquetes y eventos que incluye: administración de eventos, cotizaciones, clientes, inventario, equipo de trabajo, generación de PDF y cotizador público.</p>
+
+    <h3>2.3 Período de prueba gratuita</h3>
+    <div class="green-box">🎁 Cada nueva cuenta incluye <strong>3 días de prueba gratuita</strong> con acceso completo a todas las funciones. No se requiere tarjeta de crédito para iniciar la prueba.</div>
+
+    <h3>2.4 Uso aceptable</h3>
+    <p>Te comprometes a usar el servicio únicamente para gestionar un negocio legítimo de banquetes o eventos. Está prohibido:</p>
+    <ul>
+      <li>Intentar acceder a datos de otras cuentas.</li>
+      <li>Realizar ingeniería inversa o extraer el código de la aplicación.</li>
+      <li>Usar el servicio para actividades ilegales o fraudulentas.</li>
+      <li>Sobrecargar deliberadamente la infraestructura del servicio.</li>
+    </ul>
+
+    <h3>2.5 Propiedad intelectual</h3>
+    <p>El software, diseño e interfaces de Control Banquete son propiedad exclusiva del desarrollador. Los datos que ingresas son de tu propiedad.</p>
+
+    <h3>2.6 Limitación de responsabilidad</h3>
+    <p>Control Banquete se provee "tal como está". No somos responsables de pérdidas indirectas, de datos, o de lucro cesante derivadas del uso del servicio.</p>
+
+    <h3>2.7 Modificaciones al servicio</h3>
+    <p>Nos reservamos el derecho de modificar funcionalidades, precios o estos términos con previo aviso de al menos 15 días por correo electrónico.</p>
+
+    <h3>2.8 Terminación</h3>
+    <p>Podemos suspender o terminar cuentas que violen estos términos. Tú puedes cancelar tu cuenta en cualquier momento desde la configuración de la app.</p>
+  </div>
+
+  <!-- 3. CANCELACIÓN -->
+  <div class="legal-section" id="cancellation">
+    <h2>↩ Política de Cancelación y Reembolso</h2>
+    <div class="info-box">Esta política es requerida por Google Play Store para aplicaciones con compras en la aplicación.</div>
+
+    <h3>3.1 Cancelación de suscripción</h3>
+    <p>Puedes cancelar tu suscripción en cualquier momento:</p>
+    <ul>
+      <li><strong>Desde la app:</strong> ve a <em>Configuración → Mi Suscripción → Cancelar suscripción</em>.</li>
+      <li><strong>Desde Google Play:</strong> abre Google Play Store → tu foto de perfil → Pagos y suscripciones → Suscripciones → Control Banquete → Cancelar.</li>
+    </ul>
+    <div class="green-box">✅ Al cancelar, mantienes acceso completo hasta el final del período pagado. No se realizan cobros adicionales.</div>
+
+    <h3>3.2 Efecto de la cancelación</h3>
+    <ul>
+      <li>Tu suscripción no se renueva al terminar el período actual.</li>
+      <li>Tus datos se conservan durante 30 días tras la expiración por si decides reactivar.</li>
+      <li>Después de 30 días sin renovar, los datos pueden ser eliminados.</li>
+    </ul>
+
+    <h3>3.3 Política de reembolso</h3>
+    <ul>
+      <li><strong>Dentro de los primeros 7 días:</strong> reembolso completo garantizado sin preguntas.</li>
+      <li><strong>Entre 7 y 30 días:</strong> evaluación caso a caso. Contáctanos en <a href="mailto:soporte@controlbanquete.app" style="color:var(--blue)">soporte@controlbanquete.app</a>.</li>
+      <li><strong>Después de 30 días:</strong> no se aplican reembolsos, excepto en caso de falla técnica grave imputable al servicio.</li>
+    </ul>
+    <div class="red-box">⚠️ Los reembolsos de compras realizadas en Google Play deben solicitarse a través de <a href="https://play.google.com/store/account/subscriptions" style="color:var(--red)">Google Play → Soporte de pagos</a>. Google gestiona el proceso de reembolso según sus propias políticas.</div>
+
+    <h3>3.4 Cómo solicitar un reembolso</h3>
+    <p>Envía un correo a <strong>soporte@controlbanquete.app</strong> con el asunto "Solicitud de reembolso" incluyendo:</p>
+    <ul>
+      <li>Correo de tu cuenta registrada</li>
+      <li>Fecha de la compra</li>
+      <li>Motivo de la solicitud</li>
+    </ul>
+    <p>Respondemos en un plazo máximo de 3 días hábiles.</p>
+  </div>
+
+  <!-- 4. FACTURACIÓN -->
+  <div class="legal-section" id="billing">
+    <h2>💳 Información de Facturación y Suscripciones</h2>
+
+    <h3>4.1 Planes disponibles</h3>
+    <ul>
+      <li><strong>Plan Mensual — $10.00 USD/mes:</strong> acceso completo, se renueva cada mes.</li>
+      <li><strong>Plan Trimestral — $35.00 USD/trimestre:</strong> equivale a $11.67/mes, se renueva cada 3 meses.</li>
+      <li><strong>Plan Anual — $95.00 USD/año:</strong> equivale a $7.92/mes, el mejor valor, se renueva cada año.</li>
+    </ul>
+
+    <h3>4.2 Renovación automática</h3>
+    <p>Las suscripciones se renuevan automáticamente al final de cada período mediante Google Play Billing. Recibirás una notificación de Google 3 días antes de la renovación.</p>
+
+    <h3>4.3 Cambio de plan</h3>
+    <p>Puedes cambiar de plan en cualquier momento desde Google Play. El cambio se aplica al inicio del siguiente período de facturación.</p>
+
+    <h3>4.4 Pagos seguros</h3>
+    <div class="green-box">🔒 Todos los pagos son procesados por <strong>Google Play Billing</strong>. Control Banquete nunca almacena datos de tarjeta de crédito o débito. Las transacciones están protegidas por la infraestructura de seguridad de Google.</div>
+
+    <h3>4.5 Precios</h3>
+    <p>Los precios están expresados en USD. Google Play puede convertirlos a tu moneda local según la tasa de cambio vigente al momento de la compra.</p>
+  </div>
+
+  <!-- 5. ELIMINACIÓN DE DATOS -->
+  <div class="legal-section" id="data-deletion">
+    <h2>🗑️ Eliminación de Cuenta y Datos</h2>
+    <div class="info-box">Requerido por Google Play Store: debes poder eliminar tu cuenta y datos desde la aplicación.</div>
+
+    <h3>5.1 Cómo eliminar tu cuenta</h3>
+    <div class="delete-steps">
+      <div class="delete-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Inicia sesión en Control Banquete con tu cuenta de SuperAdmin.</div>
+      </div>
+      <div class="delete-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Ve a <strong>Configuración → Mi Cuenta → Zona de Peligro</strong>.</div>
+      </div>
+      <div class="delete-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Selecciona <strong>"Eliminar cuenta permanentemente"</strong> y confirma.</div>
+      </div>
+      <div class="delete-step">
+        <div class="step-num">4</div>
+        <div class="step-text">Alternativamente, envía un correo a <strong>soporte@controlbanquete.app</strong> con asunto "Eliminar mi cuenta" desde el correo registrado.</div>
+      </div>
+    </div>
+
+    <h3>5.2 Qué se elimina</h3>
+    <div class="red-box">⚠️ La eliminación de cuenta es <strong>permanente e irreversible</strong>. Se eliminarán todos tus datos:</div>
+    <ul>
+      <li>Información de tu empresa y perfil de usuario</li>
+      <li>Todos los eventos y cotizaciones registradas</li>
+      <li>Base de datos de clientes y proveedores</li>
+      <li>Inventario y recetario</li>
+      <li>Historial de notificaciones y configuración</li>
+      <li>Todos los usuarios de tu equipo</li>
+    </ul>
+
+    <h3>5.3 Plazo de eliminación</h3>
+    <p>Los datos se eliminan en un plazo máximo de <strong>30 días</strong> desde la solicitud. Durante ese período puedes cancelar la solicitud contactando a soporte.</p>
+
+    <h3>5.4 Datos que pueden retenerse</h3>
+    <p>Por obligaciones legales o fiscales, podemos retener ciertos registros de transacciones durante el período requerido por la ley (generalmente 5 años), sin que esto incluya datos personales identificables más allá de lo estrictamente necesario.</p>
+  </div>
+
+  <!-- CONTACTO -->
+  <div class="legal-section" id="contact">
+    <h2>📬 Contacto y Soporte</h2>
+    <p>Para cualquier consulta sobre estas políticas o solicitudes relacionadas con tus datos:</p>
+    <div class="contact-card">
+      <div class="contact-row"><strong>Email soporte:</strong> <a href="mailto:soporte@controlbanquete.app">soporte@controlbanquete.app</a></div>
+      <div class="contact-row"><strong>Email legal:</strong> <a href="mailto:legal@controlbanquete.app">legal@controlbanquete.app</a></div>
+      <div class="contact-row"><strong>Respuesta:</strong> 3 días hábiles máximo</div>
+      <div class="contact-row"><strong>Idiomas:</strong> Español, English, Português, Français</div>
+    </div>
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--text3);">
+      Control Banquete — Aplicación de gestión de banquetes y eventos.<br>
+      Versión de políticas: 1.0 · Vigente desde Junio 2026.
+    </p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="legal-footer">
+    <p>© 2026 Control Banquete. Todos los derechos reservados.</p>
+    <p>Esta aplicación cumple con las políticas de Google Play Store.</p>
+    <div class="footer-links">
+      <a href="index.html">🏠 Panel Principal</a>
+      <a href="register.html">📝 Crear Cuenta</a>
+      <a href="subscription.html">💳 Mi Suscripción</a>
+      <a href="mailto:soporte@controlbanquete.app">📬 Contacto</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

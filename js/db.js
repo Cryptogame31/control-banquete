@@ -24,7 +24,8 @@ async function apiCall(url, method = 'GET', body = null) {
     options.body = JSON.stringify(body);
   }
   
-  const response = await fetch(url, options);
+  const apiBase = window.location.protocol === 'file:' ? 'http://localhost:8080' : '';
+  const response = await fetch(apiBase + url, options);
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error || `API responded with ${response.status}`);
@@ -121,11 +122,16 @@ export async function deleteInventoryItem(itemId) {
 
 // --- USUARIOS ---
 export async function getUsers() {
-  return await apiCall('/api/users');
+  const users = await apiCall('/api/users');
+  // Normalizar: el servidor devuelve 'id', el frontend usa 'uid'
+  return users.map(u => ({ ...u, uid: u.uid || u.id }));
 }
 
 export async function saveUser(user) {
-  return await apiCall('/api/users', 'POST', user);
+  // Normalizar: enviar 'id' al servidor (acepta tanto uid como id)
+  const payload = { ...user, id: user.id || user.uid };
+  if (payload.uid && !payload.id) payload.id = payload.uid;
+  return await apiCall('/api/users', 'POST', payload);
 }
 
 export async function deleteUser(uid) {
@@ -170,4 +176,29 @@ export async function markNotificationRead(id) {
 
 export async function markAllNotificationsRead() {
   return await apiCall('/api/notifications/read-all', 'POST');
+}
+
+// --- SUSCRIPCIÓN ---
+export async function getSubscriptionStatus() {
+  return await apiCall('/api/subscription/status');
+}
+
+export async function activateSubscription(plan, purchaseToken) {
+  return await apiCall('/api/subscription/activate', 'POST', { plan, purchaseToken });
+}
+
+export async function restoreSubscription(purchaseToken) {
+  return await apiCall('/api/subscription/restore', 'POST', { purchaseToken });
+}
+
+// --- REGISTRO ---
+export async function registerAccount(email, password, name, businessName) {
+  const res = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, name, businessName })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error al registrar');
+  return data;
 }

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Crear Cuenta — Control Banquete</title>
+  <script src="js/i18n.js" defer></script>
+  <meta name="description" content="Crea tu cuenta gratuita de Control Banquete y administra tu negocio de banquetes con 3 días de prueba sin tarjeta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #ffcf4b;
+      --gold-dark: #d4a017;
+      --gold-glow: rgba(255, 207, 75, 0.25);
+      --bg: #0a0a0f;
+      --bg2: #12121a;
+      --bg3: #1a1a26;
+      --text: #f0f0f5;
+      --text2: #8888aa;
+      --border: rgba(255,207,75,0.15);
+      --danger: #f87171;
+      --success: #34d399;
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ── Fondo animado ── */
+    .bg-orbs {
+      position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 0;
+    }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); animation: floatOrb 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 400px; height: 400px; background: rgba(255,207,75,0.06); top: -100px; right: -100px; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: rgba(139,92,246,0.06); bottom: -50px; left: -80px; animation-delay: -7s; }
+    .orb-3 { width: 200px; height: 200px; background: rgba(255,207,75,0.04); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -14s; }
+    @keyframes floatOrb { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-20px) scale(1.05); } 66% { transform: translate(-20px,30px) scale(0.95); } }
+
+    /* ── Layout ── */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem 1rem 3rem;
+    }
+
+    /* ── Header ── */
+    .brand {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 2.5rem; margin-top: 0.5rem;
+    }
+    .brand-icon { width: 40px; height: 40px; }
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; color: var(--gold); letter-spacing: 1px;
+    }
+
+    /* ── Trial badge ── */
+    .trial-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(255,207,75,0.15), rgba(255,207,75,0.05));
+      border: 1px solid rgba(255,207,75,0.3);
+      border-radius: 100px; padding: 0.4rem 1rem;
+      font-size: 0.8rem; font-weight: 600; color: var(--gold);
+      margin-bottom: 1.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{box-shadow: 0 0 0 0 rgba(255,207,75,0.15);} 50%{box-shadow: 0 0 20px 4px rgba(255,207,75,0.15);} }
+
+    /* ── Card ── */
+    .card {
+      width: 100%; max-width: 440px;
+      background: rgba(26,26,38,0.95);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.75rem 2.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 60px rgba(255,207,75,0.03);
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem; color: var(--text);
+      margin-bottom: 0.4rem; line-height: 1.2;
+    }
+    .card-subtitle { font-size: 0.9rem; color: var(--text2); margin-bottom: 1.75rem; }
+
+    /* ── Features mini ── */
+    .features-mini {
+      display: flex; flex-direction: column; gap: 0.4rem;
+      margin-bottom: 1.75rem;
+    }
+    .feature-row {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.82rem; color: var(--text2);
+    }
+    .feature-row .check { color: var(--gold); font-size: 0.9rem; font-weight: 700; }
+
+    /* ── Form ── */
+    .form-group { margin-bottom: 1.1rem; }
+    label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--text2); margin-bottom: 0.4rem; }
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%);
+      font-size: 1rem; color: var(--text2); pointer-events: none;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%; padding: 0.8rem 0.9rem 0.8rem 2.5rem;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    input:focus { border-color: rgba(255,207,75,0.5); box-shadow: 0 0 0 3px rgba(255,207,75,0.08); }
+    input::placeholder { color: rgba(136,136,170,0.5); }
+
+    /* ── Submit button ── */
+    .btn-register {
+      width: 100%; padding: 0.95rem;
+      background: linear-gradient(135deg, #ffcf4b, #f59e0b);
+      border: none; border-radius: 12px;
+      color: #0a0a0f; font-family: 'Outfit', sans-serif;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      margin-top: 0.5rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .btn-register:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(255,207,75,0.35); }
+    .btn-register:active { transform: translateY(0); }
+    .btn-register:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ── Footer link ── */
+    .link-login {
+      text-align: center; margin-top: 1.5rem;
+      font-size: 0.85rem; color: var(--text2);
+    }
+    .link-login a { color: var(--gold); text-decoration: none; font-weight: 600; }
+    .link-login a:hover { text-decoration: underline; }
+
+    /* ── Error ── */
+    .error-box {
+      background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+      color: var(--danger); border-radius: 10px; padding: 0.75rem 1rem;
+      font-size: 0.85rem; margin-bottom: 1.25rem; display: none;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px; background: var(--border); margin: 1.5rem 0;
+    }
+
+    /* ── Legal ── */
+    .legal {
+      text-align: center; font-size: 0.72rem; color: var(--text2); margin-top: 1.25rem;
+      line-height: 1.6;
+    }
+    .legal a { color: rgba(255,207,75,0.7); text-decoration: none; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 18px; height: 18px; border: 2px solid rgba(0,0,0,0.2);
+      border-top-color: #0a0a0f; border-radius: 50%; animation: spin 0.7s linear infinite; display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Features bottom ── */
+    .features-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;
+      margin-top: 2rem; width: 100%; max-width: 440px;
+    }
+    .feat-card {
+      background: rgba(26,26,38,0.7); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem;
+    }
+    .feat-icon { font-size: 1.4rem; margin-bottom: 0.4rem; }
+    .feat-title { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .feat-desc { font-size: 0.72rem; color: var(--text2); margin-top: 0.2rem; line-height: 1.4; }
+
+    @media (max-width: 480px) {
+      .card { padding: 1.5rem 1.25rem 2rem; }
+      .card-title { font-size: 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="page">
+    <div class="brand">
+      <svg class="brand-icon" viewBox="0 0 24 24" fill="none" stroke="#ffcf4b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/>
+        <path d="M12 17v4"/><path d="M8 21h8"/>
+        <circle cx="12" cy="9" r="1"/>
+      </svg>
+      <span class="brand-name">CONTROL BANQUETE</span>
+    </div>
+
+    <div class="trial-badge" data-i18n="reg.trial_badge">
+      ✨ 3 días gratis · Sin tarjeta de crédito
+    </div>
+
+    <div class="card">
+      <h1 class="card-title" data-i18n="reg.title">Crea tu negocio</h1>
+      <p class="card-subtitle" data-i18n="reg.subtitle">Administra eventos, cotizaciones y equipo desde un solo lugar</p>
+
+      <div class="features-mini">
+        <div class="feature-row"><span class="check">✓</span> Cotizaciones y eventos ilimitados durante la prueba</div>
+        <div class="feature-row"><span class="check">✓</span> Panel para todo tu equipo (cocina, compras, logística)</div>
+        <div class="feature-row"><span class="check">✓</span> Tus datos son 100% privados y exclusivos de tu negocio</div>
+      </div>
+
+      <div class="error-box" id="error-box"></div>
+
+      <form id="form-register">
+        <div class="form-group">
+          <label for="reg-business">Nombre de tu Empresa</label>
+          <div class="input-wrap">
+            <span class="input-icon">🏢</span>
+            <input type="text" id="reg-business" placeholder="Ej: Banquetes La Perla" required autocomplete="organization">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-name">Tu Nombre Completo</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-name" placeholder="Nombre y apellido" required autocomplete="name">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">Correo Electrónico</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉️</span>
+            <input type="email" id="reg-email" placeholder="tu@empresa.com" required autocomplete="email">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-password">Contraseña</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-confirm">Confirmar Contraseña</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-confirm" placeholder="Repite tu contraseña" required autocomplete="new-password">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-register" id="btn-register">
+          <div class="spinner" id="spinner"></div>
+          <span id="btn-text">Empezar prueba gratuita →</span>
+        </button>
+      </form>
+
+      <div class="link-login">
+        ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+      </div>
+
+      <div class="divider"></div>
+      <p class="legal">
+        Al registrarte aceptas nuestros <a href="#">Términos de Servicio</a> y <a href="#">Política de Privacidad</a>.<br>
+        Cancelación disponible en cualquier momento.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">Calendario de Eventos</div>
+        <div class="feat-desc">Visualiza todos tus eventos y pagos en un calendario mensual</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Cotizador Inteligente</div>
+        <div class="feat-desc">Genera cotizaciones profesionales en segundos con PDF</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">👥</div>
+        <div class="feat-title">Portal de Equipo</div>
+        <div class="feat-desc">Cocina, compras, logística y más, cada uno con su panel</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Control Total</div>
+        <div class="feat-desc">Inventario, recetario, proveedores y estadísticas</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Redirigir si ya hay sesión
+    if (localStorage.getItem('controlbanquete_current_user') && localStorage.getItem('controlbanquete_token')) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('form-register').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const businessName = document.getElementById('reg-business').value.trim();
+      const name         = document.getElementById('reg-name').value.trim();
+      const email        = document.getElementById('reg-email').value.trim();
+      const password     = document.getElementById('reg-password').value;
+      const confirm      = document.getElementById('reg-confirm').value;
+      const errorBox     = document.getElementById('error-box');
+      const btn          = document.getElementById('btn-register');
+      const spinner      = document.getElementById('spinner');
+      const btnText      = document.getElementById('btn-text');
+
+      errorBox.style.display = 'none';
+
+      if (password !== confirm) {
+        errorBox.textContent = 'Las contraseñas no coinciden';
+        errorBox.style.display = 'block';
+        return;
+      }
+      if (password.length < 6) {
+        errorBox.textContent = 'La contraseña debe tener al menos 6 caracteres';
+        errorBox.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      btnText.textContent = 'Creando cuenta...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name, businessName })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Error al crear la cuenta');
+
+        localStorage.setItem('controlbanquete_current_user', JSON.stringify(data.user));
+        localStorage.setItem('controlbanquete_token', data.token);
+        localStorage.removeItem('controlbanquete_force_mock');
+
+        // Mostrar éxito y redirigir
+        btnText.textContent = window.i18n ? window.i18n.t('reg.success') : '✓ ¡Cuenta creada!';
+        spinner.style.display = 'none';
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnText.textContent = window.i18n ? window.i18n.t('reg.submit') : 'Empezar prueba gratuita →';
+      }
+    });
+  </script>
+</body>
+</html>

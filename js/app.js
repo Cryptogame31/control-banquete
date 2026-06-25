@@ -1,9 +1,9 @@
 // Controlador Principal del Sistema de Gestión Integral Control Banquete
 window.addEventListener('error', (event) => {
-  alert("Global Error: " + event.message + " in " + event.filename + ":" + event.lineno);
+  console.error("Global Error: " + event.message + " in " + event.filename + ":" + event.lineno);
 });
 window.addEventListener('unhandledrejection', (event) => {
-  alert("Unhandled Promise Rejection: " + event.reason);
+  console.error("Unhandled Promise Rejection: " + event.reason);
 });
 import { onAuthChange, login, logout, registerNewUser, getCurrentUser, changeUserPassword, resetPassword } from './auth.js';
 import * as DB from './db.js?v=2026_v2';
@@ -101,6 +101,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (user) {
       currentRole = user.role;
       currentUserId = user.uid;
+
+      // ── Verificar suscripción (solo superadmin es el titular del tenant) ──
+      if (currentRole === 'superadmin') {
+        try {
+          const subStatus = await DB.getSubscriptionStatus();
+          if (subStatus.status === 'expired') {
+            window.location.href = 'subscription.html';
+            return;
+          }
+          // Mostrar banner de trial si quedan ≤ 2 días
+          if (subStatus.status === 'trial') {
+            showTrialBanner(subStatus.daysLeft);
+          }
+        } catch(e) {
+          console.warn('No se pudo verificar suscripción:', e);
+        }
+      }
+
       // Redirigir según el rol
       if (currentRole === 'cliente') {
         navigateTo('view-cliente');
@@ -117,21 +135,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
       currentRole = null;
       currentUserId = null;
-      if (countdownInterval) {
-        clearInterval(countdownInterval);
-        countdownInterval = null;
-      }
-      if (photoCountdownInterval) {
-        clearInterval(photoCountdownInterval);
-        photoCountdownInterval = null;
-      }
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+      if (photoCountdownInterval) { clearInterval(photoCountdownInterval); photoCountdownInterval = null; }
       stopNotificationPolling();
       const countdownBanner = document.getElementById('client-countdown-banner');
       if (countdownBanner) countdownBanner.style.display = 'none';
+      hideTrialBanner();
       navigateTo('view-cotizar');
     }
   });
 });
+
+// ── Banner de prueba gratuita ──
+function showTrialBanner(daysLeft) {
+  let banner = document.getElementById('trial-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'trial-banner';
+    banner.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: linear-gradient(90deg, #1a1200, #2a1e00, #1a1200);
+      border-bottom: 1px solid rgba(255,207,75,0.3);
+      padding: 0.6rem 1rem;
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      font-family: var(--font-body, 'Outfit', sans-serif);
+      font-size: 0.82rem; color: #ffcf4b;
+      animation: slideDown 0.3s ease;
+    `;
+    document.body.style.paddingTop = '44px';
+    document.body.prepend(banner);
+  }
+  banner.innerHTML = `
+    <span>⏳ <strong>${daysLeft} día${daysLeft !== 1 ? 's' : ''}</strong> restante${daysLeft !== 1 ? 's' : ''} de prueba gratuita</span>
+    <a href="subscription.html" style="background: #ffcf4b; color: #0a0a0f; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 100px; text-decoration: none; font-size: 0.78rem; white-space: nowrap;">
+      Ver planes →
+    </a>
+  `;
+}
+
+function hideTrialBanner() {
+  const banner = document.getElementById('trial-banner');
+  if (banner) { banner.remove(); document.body.style.paddingTop = ''; }
+}
 
 function initTheme() {
   const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
@@ -780,17 +825,27 @@ function setupEventListeners() {
     dateEndInput.addEventListener('input', renderAdminUsers);
   }
 
+  // Poblar links de cotizador y portal de clientes
+  setupAdminLinks();
 
   // Logout buttons
-  document.getElementById('btn-logout-sidebar').addEventListener('click', async () => {
-    await logout();
-  });
+  const btnLogoutSidebar = document.getElementById('btn-logout-sidebar');
+  if (btnLogoutSidebar) {
+    btnLogoutSidebar.addEventListener('click', async () => {
+      await logout();
+    });
+  }
 
-  // Autologin dropdown demo helper
-  document.getElementById('select-demo-user').addEventListener('change', (e) => {
-    document.getElementById('login-email').value = e.target.value;
-    document.getElementById('login-password').value = "123456";
-  });
+  // Autologin dropdown demo helper (solo en index.html si existiera)
+  const selectDemoUser = document.getElementById('select-demo-user');
+  if (selectDemoUser) {
+    selectDemoUser.addEventListener('change', (e) => {
+      const emailEl = document.getElementById('login-email');
+      const passEl  = document.getElementById('login-password');
+      if (emailEl) emailEl.value = e.target.value;
+      if (passEl)  passEl.value  = '123456';
+    });
+  }
 
   // Tabs de navegación interna de vistas (Cliente, Admin, etc.)
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -827,6 +882,7 @@ function setupEventListeners() {
 
   // Cotizador Live Calculate
   const cotForm = document.getElementById('form-cotizador');
+  if (!cotForm) return;
   cotForm.addEventListener('input', calculateLiveCotizacion);
   document.getElementById('cot-tipo').addEventListener('change', () => {
     populateCotizadorServices();
@@ -3610,6 +3666,45 @@ function addCustomSettingRow(label = '', value = '', type = 'fixed') {
   });
 
   container.appendChild(div);
+}
+
+// ── Links de Cotizador y Portal ──
+function setupAdminLinks() {
+  const user = JSON.parse(localStorage.getItem('controlbanquete_current_user') || '{}');
+  const tenantId = user.tenantId || user.uid || '';
+  if (!tenantId) return;
+
+  const base = window.location.origin;
+  const cotizadorLink = `${base}/cotizar.html?t=${tenantId}`;
+  const portalLink    = `${base}/login.html`;
+
+  const cotInput    = document.getElementById('cotizador-link-input');
+  const portalInput = document.getElementById('portal-link-input');
+  if (cotInput)    cotInput.value    = cotizadorLink;
+  if (portalInput) portalInput.value = portalLink;
+}
+
+function copyCotizadorLink() {
+  const input = document.getElementById('cotizador-link-input');
+  if (!input) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    const btn = document.getElementById('btn-copy-link');
+    if (btn) { btn.textContent = '✓ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
+  }).catch(() => { input.select(); document.execCommand('copy'); });
+}
+
+function copyPortalLink() {
+  const input = document.getElementById('portal-link-input');
+  if (!input) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    const btn = document.getElementById('btn-copy-portal');
+    if (btn) { btn.textContent = '✓ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
+  }).catch(() => { input.select(); document.execCommand('copy'); });
+}
+
+function openCotizadorPreview() {
+  const input = document.getElementById('cotizador-link-input');
+  if (input && input.value !== 'Cargando...') window.open(input.value, '_blank');
 }
 
 // 5. Gestión de Usuarios

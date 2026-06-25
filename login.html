@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Iniciar Sesión - Control Banquete</title>
+  <script src="js/i18n.js" defer></script>
   <meta name="description" content="Portal de inicio de sesión de Control Banquete para clientes, administradores y personal.">
   <link rel="stylesheet" href="css/styles.css">
   <style>
@@ -75,12 +76,12 @@
           <label for="login-password">Contraseña</label>
           <input type="password" id="login-password" placeholder="••••••••" required style="width: 100%; box-sizing: border-box; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
         </div>
-        <button type="submit" class="btn-primary" style="width: 100%; height: 46px;">Ingresar</button>
+        <button type="submit" class="btn-primary" id="btn-login-submit" style="width: 100%; height: 46px;">Ingresar</button>
       </form>
       
       <div class="demo-credentials" id="demo-auth-selector" style="display: none;">
         <h4 style="font-size: 0.85rem; color: var(--accent-gold); margin-bottom: 0.5rem;">Acceso Rápido Simulador (Demo)</h4>
-        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Selecciona una cuenta de prueba y pulsa ingresar con la contraseña <strong>123456</strong>.</p>
+        <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Selecciona una cuenta de prueba (contraseña: <strong>123456</strong>).</p>
         <select id="select-demo-user" style="width: 100%; box-sizing: border-box; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit; font-size: 0.85rem;">
           <option value="">-- Selecciona un Rol --</option>
           <option value="admin@controlbanquete.com">Superadministrador (Control Total)</option>
@@ -94,159 +95,94 @@
       </div>
       
       <button class="btn-secondary" id="btn-back-cotizar" style="width: 100%; margin-top: 1.5rem; height: 40px;">Ir al Cotizador Público</button>
+      <div style="text-align:center; margin-top: 1.25rem;">
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">¿No tienes cuenta? </span>
+        <a href="register.html" style="font-size: 0.85rem; color: var(--accent-gold); font-weight: 600; text-decoration: none;">Crear cuenta gratis →</a>
+      </div>
     </div>
   </div>
 
   <script>
-    document.getElementById('form-login').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
-      const errorBox = document.getElementById('error-box');
-      errorBox.style.display = 'none';
-
-      const isMock = localStorage.getItem('controlbanquete_force_mock') === 'true';
-      if (isMock) {
-        try {
-          let name = "Usuario Demo";
-          let role = "cliente";
-          if (email.startsWith('admin')) { role = "superadmin"; name = "Administrador Control"; }
-          else if (email.startsWith('compras')) { role = "compras"; name = "Jefe de Compras"; }
-          else if (email.startsWith('cocina')) { role = "cocina"; name = "Chef Principal"; }
-          else if (email.startsWith('logistica')) { role = "logistica"; name = "Coordinador Logística"; }
-          else if (email.startsWith('decoracion')) { role = "decoracion"; name = "Coordinador Decoración"; }
-          else if (email.startsWith('recreacion')) { role = "recreacion"; name = "Coordinador Recreación"; }
-          else if (email.startsWith('cliente')) { role = "cliente"; name = "Sara y Felipe"; }
-
-          const mockUser = { uid: role + '_user', email, name, role };
-          localStorage.setItem('controlbanquete_current_user', JSON.stringify(mockUser));
-          localStorage.setItem('controlbanquete_token', 'mock_token_' + role);
-          window.location.href = 'index.html';
-        } catch(err) {
-          errorBox.textContent = err.message;
-          errorBox.style.display = 'block';
-        }
-      } else {
-        try {
-          const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-          });
-          if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || 'Credenciales inválidas');
-          }
-          const data = await response.json();
-          localStorage.setItem('controlbanquete_current_user', JSON.stringify(data.user));
-          localStorage.setItem('controlbanquete_token', data.token);
-          window.location.href = 'index.html';
-        } catch (err) {
-          errorBox.textContent = err.message;
-          errorBox.style.display = 'block';
-        }
-      }
-    });
-
-    const selectDemo = document.getElementById('select-demo-user');
-    if (selectDemo) {
-      selectDemo.addEventListener('change', () => {
-        if (selectDemo.value) {
-          document.getElementById('login-email').value = selectDemo.value;
-          document.getElementById('login-password').value = "123456";
-        }
-      });
-    }
-
-    async function loadConfigAndTheme() {
-      const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
-      if (savedTheme === 'light') {
-        document.body.classList.add('light-theme');
-      }
-
-      try {
-        const res = await fetch('/api/settings');
-        if (res.ok) {
-          const settings = await res.json();
-          applyDynamicTheme({
-            palette: settings.themePalette,
-            font: settings.themeFont,
-            fontSize: settings.themeFontSize
-          });
-          if (settings.businessName) {
-            document.getElementById('brand-text').textContent = settings.businessName.toUpperCase();
-          }
-        }
-      } catch (e) {
-        console.log("No se pudo conectar a la API del servidor para el tema dinámico, usando valores por defecto.");
-      }
-    }
-
-    function applyDynamicTheme(themeSettings) {
-      if (!themeSettings) return;
-      const root = document.documentElement;
-      const isLight = document.body.classList.contains('light-theme');
-      const palettes = isLight ? {
-        gold: { color: '#c59b27', hover: '#a37d1d', glow: 'rgba(197, 155, 39, 0.15)', border: 'rgba(197, 155, 39, 0.12)' },
-        emerald: { color: '#059669', hover: '#047857', glow: 'rgba(5, 150, 105, 0.15)', border: 'rgba(5, 150, 105, 0.12)' },
-        sapphire: { color: '#2563eb', hover: '#1d4ed8', glow: 'rgba(37, 99, 235, 0.15)', border: 'rgba(37, 99, 235, 0.12)' },
-        ruby: { color: '#dc2626', hover: '#b91c1c', glow: 'rgba(220, 38, 38, 0.15)', border: 'rgba(220, 38, 38, 0.12)' },
-        rose: { color: '#db2777', hover: '#be185d', glow: 'rgba(219, 39, 119, 0.15)', border: 'rgba(219, 39, 119, 0.12)' }
-      } : {
-        gold: { color: '#ffcf4b', hover: '#ffe28a', glow: 'rgba(255, 207, 75, 0.25)', border: 'rgba(255, 207, 75, 0.08)' },
-        emerald: { color: '#34d399', hover: '#6ee7b7', glow: 'rgba(52, 211, 153, 0.25)', border: 'rgba(52, 211, 153, 0.08)' },
-        sapphire: { color: '#60a5fa', hover: '#93c5fd', glow: 'rgba(96, 165, 250, 0.25)', border: 'rgba(96, 165, 250, 0.08)' },
-        ruby: { color: '#f87171', hover: '#fca5a5', glow: 'rgba(248, 113, 113, 0.25)', border: 'rgba(248, 113, 113, 0.08)' },
-        rose: { color: '#f472b6', hover: '#f9a8d4', glow: 'rgba(244, 114, 182, 0.25)', border: 'rgba(244, 114, 182, 0.08)' }
-      };
-      
-      const p = palettes[themeSettings.palette] || palettes.gold;
-      root.style.setProperty('--accent-gold', p.color);
-      root.style.setProperty('--accent-gold-hover', p.hover);
-      root.style.setProperty('--accent-gold-glow', p.glow);
-      root.style.setProperty('--border-color', p.border);
-      
-      const fonts = {
-        outfit: "'Outfit', sans-serif",
-        inter: "'Inter', sans-serif",
-        montserrat: "'Montserrat', sans-serif",
-        playfair: "'Playfair Display', Georgia, serif",
-        cormorant: "'Cormorant Garamond', serif"
-      };
-      const fontVal = fonts[themeSettings.font] || fonts.outfit;
-      root.style.setProperty('--font-body', fontVal);
-      if (themeSettings.font === 'playfair' || themeSettings.font === 'cormorant') {
-        root.style.setProperty('--font-title', fontVal);
-      } else {
-        root.style.setProperty('--font-title', "'Playfair Display', Georgia, serif");
-      }
-      root.style.setProperty('--base-font-size', themeSettings.fontSize || '16px');
-    }
-
-    // Interceptar el parámetro 'demo' para activar el simulador si viene en la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('demo')) {
-      const isDemo = urlParams.get('demo') === 'true';
-      localStorage.setItem('controlbanquete_force_mock', isDemo ? 'true' : 'false');
-    }
-
-    const isMock = localStorage.getItem('controlbanquete_force_mock') === 'true';
-    const demoAuthSelector = document.getElementById('demo-auth-selector');
-    if (isMock && demoAuthSelector) {
-      demoAuthSelector.style.display = 'block';
-    }
-
+    // ────────── 1. Si ya hay sesión activa, ir al panel ──────────
     const cachedUser = localStorage.getItem('controlbanquete_current_user');
     const cachedToken = localStorage.getItem('controlbanquete_token');
     if (cachedUser && cachedToken) {
       window.location.href = 'index.html';
     }
 
-    loadConfigAndTheme();
+    // ────────── 2. Parámetro ?demo=true en la URL ──────────
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('demo')) {
+      localStorage.setItem('controlbanquete_force_mock', urlParams.get('demo') === 'true' ? 'true' : 'false');
+    }
+    if (localStorage.getItem('controlbanquete_force_mock') === 'true') {
+      document.getElementById('demo-auth-selector').style.display = 'block';
+    }
 
-    document.getElementById('btn-back-cotizar').addEventListener('click', () => {
+    // ────────── 3. Demo: selección automática de usuario ──────────
+    document.getElementById('select-demo-user').addEventListener('change', function() {
+      if (this.value) {
+        document.getElementById('login-email').value = this.value;
+        document.getElementById('login-password').value = '123456';
+        document.getElementById('btn-login-submit').click();
+      }
+    });
+
+    // ────────── 4. Envío del formulario ──────────
+    document.getElementById('form-login').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const errorBox = document.getElementById('error-box');
+      const btnSubmit = document.getElementById('btn-login-submit');
+
+      errorBox.style.display = 'none';
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Ingresando...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Credenciales inválidas');
+        }
+
+        localStorage.setItem('controlbanquete_current_user', JSON.stringify(data.user));
+        localStorage.setItem('controlbanquete_token', data.token);
+        window.location.href = 'index.html';
+
+      } catch (err) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Ingresar';
+      }
+    });
+
+    // ────────── 5. Botón volver al cotizador ──────────
+    document.getElementById('btn-back-cotizar').addEventListener('click', function() {
       window.location.href = 'index.html';
     });
+
+    // ────────── 6. Tema y nombre de empresa desde servidor ──────────
+    (async function loadTheme() {
+      const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
+      if (savedTheme === 'light') document.body.classList.add('light-theme');
+      try {
+        const res = await fetch('/api/settings');
+        if (!res.ok) return;
+        const settings = await res.json();
+        if (settings.businessName) {
+          document.getElementById('brand-text').textContent = settings.businessName.toUpperCase();
+        }
+      } catch(e) { /* sin conexión, usar valores por defecto */ }
+    })();
   </script>
 </body>
 </html>

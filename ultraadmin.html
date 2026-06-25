@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Ultra Admin — Control Banquete</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #ef4444; --red-d: #b91c1c; --red-glow: rgba(239,68,68,0.2);
+      --bg: #070710; --bg2: #0f0f1a; --bg3: #161625;
+      --text: #f0f0f5; --text2: #7070a0; --text3: #4a4a70;
+      --border: rgba(239,68,68,0.15); --border2: rgba(255,255,255,0.07);
+      --gold: #f59e0b; --green: #10b981; --blue: #3b82f6; --purple: #a78bfa;
+      --radius: 16px;
+    }
+    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── BG ── */
+    .bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse 700px 400px at 80% 10%, rgba(239,68,68,0.06), transparent),
+                  radial-gradient(ellipse 500px 500px at 10% 90%, rgba(167,139,250,0.04), transparent); }
+
+    /* ── LOGIN ── */
+    #login-screen { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: var(--bg); }
+    .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 24px;
+      padding: 3rem 2.5rem; width: min(440px, 94vw); box-shadow: 0 0 60px rgba(239,68,68,0.08); }
+    .login-icon { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; }
+    .login-title { font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 0.35rem; }
+    .login-sub { color: var(--text2); font-size: 0.9rem; text-align: center; margin-bottom: 2rem; }
+    .login-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text2); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .login-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+      border-radius: 12px; color: var(--text); font-family: inherit; font-size: 1rem;
+      padding: 0.85rem 1rem; outline: none; transition: border-color 0.2s; margin-bottom: 1.1rem; }
+    .login-input:focus { border-color: var(--red); box-shadow: 0 0 0 3px var(--red-glow); }
+    .login-btn { width: 100%; background: linear-gradient(135deg, var(--red), #dc2626); color: #fff;
+      border: none; border-radius: 12px; font-family: inherit; font-size: 1rem; font-weight: 700;
+      padding: 0.95rem; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+    .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .login-err { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px;
+      color: #fca5a5; font-size: 0.85rem; padding: 0.7rem 1rem; margin-bottom: 1rem; display: none; }
+
+    /* ── LAYOUT ── */
+    #main-screen { display: none; position: relative; z-index: 1; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh;
+      background: var(--bg2); border-right: 1px solid var(--border2);
+      display: flex; flex-direction: column; z-index: 50; }
+    .sidebar-brand { padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid var(--border2); }
+    .brand-badge { display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, var(--red), #dc2626);
+      color: #fff; font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+      padding: 0.3rem 0.7rem; border-radius: 100px; margin-bottom: 0.5rem; }
+    .brand-name { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .brand-sub { font-size: 0.75rem; color: var(--text2); }
+    .sidebar-nav { flex: 1; padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; }
+    .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.7rem 0.9rem;
+      border-radius: 10px; cursor: pointer; transition: background 0.15s, color 0.15s;
+      font-size: 0.9rem; color: var(--text2); font-weight: 500; border: none; background: none; width: 100%; text-align: left; }
+    .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .nav-item.active { background: rgba(239,68,68,0.12); color: var(--red); }
+    .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid var(--border2); }
+    .logout-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.9rem;
+      border-radius: 10px; cursor: pointer; font-size: 0.85rem; color: var(--text2);
+      border: none; background: none; width: 100%; transition: color 0.2s; }
+    .logout-btn:hover { color: var(--red); }
+
+    /* Main content */
+    .main-content { margin-left: 240px; padding: 2rem 2rem 4rem; min-height: 100vh; }
+    .page-header { margin-bottom: 2rem; }
+    .page-title { font-size: 1.8rem; font-weight: 800; }
+    .page-sub { font-size: 0.9rem; color: var(--text2); margin-top: 0.25rem; }
+
+    /* Sections */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Stat cards */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius);
+      padding: 1.25rem 1.5rem; transition: border-color 0.2s; }
+    .stat-card:hover { border-color: rgba(239,68,68,0.25); }
+    .stat-label { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2); margin-bottom: 0.5rem; }
+    .stat-val { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .stat-val.red { color: var(--red); }
+    .stat-val.green { color: var(--green); }
+    .stat-val.gold { color: var(--gold); }
+    .stat-val.blue { color: var(--blue); }
+    .stat-val.purple { color: var(--purple); }
+    .stat-meta { font-size: 0.78rem; color: var(--text2); margin-top: 0.35rem; }
+
+    /* Revenue card */
+    .revenue-card { background: linear-gradient(135deg, rgba(239,68,68,0.08), rgba(167,139,250,0.06));
+      border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius); padding: 1.5rem 2rem;
+      margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .revenue-main { font-size: 0.85rem; color: var(--text2); }
+    .revenue-total { font-size: 2.8rem; font-weight: 800; color: var(--text); }
+    .revenue-breakdown { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .rev-item { text-align: center; }
+    .rev-amount { font-size: 1.2rem; font-weight: 700; }
+    .rev-label { font-size: 0.72rem; color: var(--text2); }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+    .search-box { flex: 1; min-width: 200px; background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 10px; color: var(--text); font-family: inherit; font-size: 0.9rem;
+      padding: 0.65rem 1rem; outline: none; transition: border-color 0.2s; }
+    .search-box:focus { border-color: var(--red); }
+    .filter-select { background: var(--bg2); border: 1px solid var(--border2); border-radius: 10px;
+      color: var(--text); font-family: inherit; font-size: 0.85rem; padding: 0.65rem 0.9rem; outline: none; cursor: pointer; }
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; border: none; border-radius: 10px;
+      font-family: inherit; font-size: 0.85rem; font-weight: 600; padding: 0.65rem 1.1rem; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn-red { background: linear-gradient(135deg, var(--red), #dc2626); color: #fff; }
+    .btn-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+    .btn-blue { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+    .btn-ghost { background: rgba(255,255,255,0.04); color: var(--text2); border: 1px solid var(--border2); }
+    .btn-danger { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+
+    /* Table */
+    .table-wrap { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 0.85rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; color: var(--text2);
+      background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border2); }
+    td { padding: 0.9rem 1rem; font-size: 0.87rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.65rem;
+      border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .badge-active { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+    .badge-trial { background: rgba(245,158,11,0.15); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+    .badge-expired { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+    .badge-cancelled { background: rgba(255,255,255,0.06); color: var(--text2); border: 1px solid var(--border2); }
+    .badge-monthly { background: rgba(59,130,246,0.12); color: var(--blue); }
+    .badge-quarterly { background: rgba(167,139,250,0.12); color: var(--purple); }
+    .badge-annual { background: rgba(245,158,11,0.12); color: var(--gold); }
+
+    /* Actions */
+    .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .action-btn { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.3rem 0.6rem;
+      border-radius: 7px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: none; transition: opacity 0.2s; }
+    .action-btn:hover { opacity: 0.75; }
+
+    /* Empty state */
+    .empty { text-align: center; padding: 4rem 1rem; color: var(--text2); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+      display: none; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 20px;
+      padding: 2rem; width: min(520px, 96vw); max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+    .close-btn { background: none; border: none; color: var(--text2); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text2); margin-bottom: 0.4rem; text-transform: uppercase; letter-spacing: 0.3px; }
+    .form-input, .form-select { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border2);
+      border-radius: 10px; color: var(--text); font-family: inherit; font-size: 0.9rem;
+      padding: 0.75rem 1rem; outline: none; transition: border-color 0.2s; }
+    .form-input:focus, .form-select:focus { border-color: var(--red); }
+    .modal-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; justify-content: flex-end; }
+
+    /* Warning box */
+    .warning-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 10px; padding: 0.9rem 1.1rem; font-size: 0.85rem; color: #fca5a5; margin-bottom: 1.25rem; }
+
+    /* Responsive */
+    @media(max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; padding: 1.25rem 1rem 4rem; }
+    }
+
+    /* Refresh indicator */
+    .last-refresh { font-size: 0.75rem; color: var(--text3); margin-left: auto; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  </style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-icon">🛡️</div>
+    <div class="login-title">Ultra Admin</div>
+    <div class="login-sub">Acceso restringido — Solo personal autorizado</div>
+    <div class="login-err" id="login-err"></div>
+    <form id="login-form">
+      <label class="login-label">Correo</label>
+      <input class="login-input" type="email" id="ua-email" placeholder="ultra@controlbanquete.com" required>
+      <label class="login-label">Contraseña</label>
+      <input class="login-input" type="password" id="ua-pass" placeholder="••••••••" required>
+      <button class="login-btn" type="submit">🔓 Ingresar al Panel</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div id="main-screen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-badge">🛡️ Ultra Admin</div>
+      <div class="brand-name">Control Banquete</div>
+      <div class="brand-sub">Panel de Gestión Global</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-section="dashboard" onclick="switchSection('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-item" data-section="tenants" onclick="switchSection('tenants', this)">
+        <span class="nav-icon">🏢</span> Suscriptores
+      </button>
+      <button class="nav-item" data-section="new-sub" onclick="switchSection('new-sub', this)">
+        <span class="nav-icon">➕</span> Nueva Suscripción
+      </button>
+      <button class="nav-item" data-section="revenue" onclick="switchSection('revenue', this)">
+        <span class="nav-icon">💰</span> Ingresos
+      </button>
+      <button class="nav-item" data-section="config" onclick="switchSection('config', this)">
+        <span class="nav-icon">⚙️</span> Configuración
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">🚪 Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section id="sec-dashboard" class="section active">
+      <div class="page-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div>
+            <div class="page-title">📊 Dashboard</div>
+            <div class="page-sub">Visión global de todos los negocios</div>
+          </div>
+          <div class="last-refresh"><span class="dot"></span> En vivo</div>
+          <button class="btn btn-ghost" onclick="loadAll()" style="margin-left:0.5rem;">↻ Refrescar</button>
+        </div>
+      </div>
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total Negocios</div><div class="stat-val blue" id="stat-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Activos</div><div class="stat-val green" id="stat-active">—</div></div>
+        <div class="stat-card"><div class="stat-label">En Prueba</div><div class="stat-val gold" id="stat-trial">—</div></div>
+        <div class="stat-card"><div class="stat-label">Expirados</div><div class="stat-val red" id="stat-expired">—</div></div>
+        <div class="stat-card"><div class="stat-label">Cancelados</div><div class="stat-val purple" id="stat-cancelled">—</div></div>
+      </div>
+      <div class="revenue-card">
+        <div>
+          <div class="revenue-main">💵 Ingresos Estimados / Período Actual</div>
+          <div class="revenue-total">$<span id="rev-total">0</span> USD</div>
+          <div style="font-size:0.8rem;color:var(--text2);margin-top:0.25rem;">Solo suscripciones activas</div>
+        </div>
+        <div class="revenue-breakdown">
+          <div class="rev-item"><div class="rev-amount" style="color:var(--blue);">$<span id="rev-monthly">0</span></div><div class="rev-label">Mensual</div></div>
+          <div class="rev-item"><div class="rev-amount" style="color:var(--purple);">$<span id="rev-quarterly">0</span></div><div class="rev-label">Trimestral</div></div>
+          <div class="rev-item"><div class="rev-amount" style="color:var(--gold);">$<span id="rev-annual">0</span></div><div class="rev-label">Anual</div></div>
+        </div>
+      </div>
+      <div class="page-title" style="font-size:1.1rem;margin-bottom:1rem;">Registros Recientes</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Negocio</th><th>Email</th><th>Estado</th><th>Registrado</th><th>Acción</th></tr></thead>
+          <tbody id="recent-table"><tr><td colspan="5" class="empty"><div class="empty-icon">⏳</div>Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SUSCRIPTORES -->
+    <section id="sec-tenants" class="section">
+      <div class="page-header">
+        <div class="page-title">🏢 Suscriptores</div>
+        <div class="page-sub">Gestiona los planes y accesos de cada negocio</div>
+      </div>
+      <div class="toolbar">
+        <input class="search-box" id="tenant-search" placeholder="🔍 Buscar negocio, email..." oninput="renderTenants()">
+        <select class="filter-select" id="tenant-filter-status" onchange="renderTenants()">
+          <option value="">Todos los estados</option>
+          <option value="active">✅ Activos</option>
+          <option value="trial">🕐 En prueba</option>
+          <option value="expired">⏰ Expirados</option>
+          <option value="cancelled">❌ Cancelados</option>
+        </select>
+        <select class="filter-select" id="tenant-filter-plan" onchange="renderTenants()">
+          <option value="">Todos los planes</option>
+          <option value="monthly">Mensual</option>
+          <option value="quarterly">Trimestral</option>
+          <option value="annual">Anual</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Negocio</th>
+              <th>Email / Propietario</th>
+              <th>Estado</th>
+              <th>Plan</th>
+              <th>Vence</th>
+              <th>Usuarios</th>
+              <th>Eventos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tenants-table"><tr><td colspan="8" class="empty"><div class="empty-icon">⏳</div>Cargando...</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- NUEVA SUSCRIPCIÓN -->
+    <section id="sec-new-sub" class="section">
+      <div class="page-header">
+        <div class="page-title">➕ Nueva Suscripción Manual</div>
+        <div class="page-sub">Activa o renueva la suscripción de un negocio</div>
+      </div>
+      <div style="background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius); padding:2rem; max-width:560px;">
+        <form id="new-sub-form">
+          <div class="form-group">
+            <label class="form-label">Negocio (seleccionar)</label>
+            <select class="form-select" id="ns-tenant" required>
+              <option value="">— Selecciona un negocio —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plan</label>
+            <select class="form-select" id="ns-plan" required>
+              <option value="monthly">Mensual — $10 USD</option>
+              <option value="quarterly">Trimestral — $35 USD</option>
+              <option value="annual">Anual — $95 USD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha de expiración (opcional — se calcula automático)</label>
+            <input class="form-input" type="date" id="ns-expiry">
+          </div>
+          <div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); border-radius:10px; padding:0.9rem 1.1rem; font-size:0.85rem; color:#93c5fd; margin-bottom:1.25rem;">
+            ℹ️ Si no especificas fecha, se calcula automáticamente según el plan desde hoy.
+          </div>
+          <button class="btn btn-red" type="submit" style="width:100%;">✅ Activar Suscripción</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- INGRESOS -->
+    <section id="sec-revenue" class="section">
+      <div class="page-header">
+        <div class="page-title">💰 Análisis de Ingresos</div>
+        <div class="page-sub">Distribución por plan y estado</div>
+      </div>
+      <div class="stats-grid" id="rev-detail-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));"></div>
+    </section>
+
+    <!-- CONFIGURACIÓN SISTEMA -->
+    <section id="sec-config" class="section">
+      <div class="page-header">
+        <div class="page-title">⚙️ Configuración del Sistema</div>
+        <div class="page-sub">Parámetros globales de la plataforma</div>
+      </div>
+      <div style="display:grid;gap:1.5rem;max-width:700px;">
+        <!-- Prueba global -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.35rem;">🕐 Días de Prueba Global</h3>
+          <p style="font-size:0.83rem;color:var(--text2);margin-bottom:1.25rem;">Aplica a todos los nuevos registros que no tengan días personalizados.</p>
+          <div style="display:flex;gap:0.75rem;align-items:flex-end;">
+            <div style="flex:1;">
+              <label class="form-label">Días de prueba por defecto</label>
+              <input class="form-input" type="number" id="cfg-trial-days" min="0" max="365" value="3" style="width:100%;">
+            </div>
+            <button class="btn btn-red" onclick="saveGlobalConfig()" style="white-space:nowrap;">Guardar</button>
+          </div>
+        </div>
+        <!-- Email soporte -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.35rem;">📬 Email de Soporte</h3>
+          <p style="font-size:0.83rem;color:var(--text2);margin-bottom:1.25rem;">Aparece en los documentos legales y notificaciones del sistema.</p>
+          <div style="display:flex;gap:0.75rem;align-items:flex-end;">
+            <div style="flex:1;">
+              <label class="form-label">Email</label>
+              <input class="form-input" type="email" id="cfg-support-email" placeholder="soporte@controlbanquete.app" style="width:100%;">
+            </div>
+            <button class="btn btn-red" onclick="saveGlobalConfig()" style="white-space:nowrap;">Guardar</button>
+          </div>
+        </div>
+        <!-- Planes -->
+        <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:2rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.35rem;">💳 Estado de Planes</h3>
+          <p style="font-size:0.83rem;color:var(--text2);margin-bottom:1.25rem;">Deshabilitar impide que nuevos usuarios puedan suscribirse (mantenimiento).</p>
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.9rem;">
+              <input type="checkbox" id="cfg-plans-enabled" checked style="width:18px;height:18px;"> Planes habilitados
+            </label>
+            <button class="btn btn-red" onclick="saveGlobalConfig()">Guardar</button>
+          </div>
+        </div>
+        <!-- Credenciales ultra admin -->
+        <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:2rem;">
+          <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:0.35rem;color:var(--red);">🔐 Credenciales Ultra Admin</h3>
+          <p style="font-size:0.83rem;color:var(--text2);margin-bottom:0.75rem;">Para cambiar credenciales, modifica las variables de entorno del servidor:</p>
+          <code style="font-size:0.82rem;color:#fca5a5;background:rgba(0,0,0,0.3);display:block;padding:0.75rem;border-radius:8px;line-height:1.8;">
+            ULTRA_ADMIN_EMAIL=tu@email.com<br>
+            ULTRA_ADMIN_PASSWORD=TuPasswordSeguro!
+          </code>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal Editar Suscripción -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-title">
+      ✏️ Editar Suscripción
+      <button class="close-btn" onclick="closeModal('modal-edit')">×</button>
+    </div>
+    <div id="modal-edit-biz" style="font-size:0.85rem;color:var(--text2);margin-bottom:1.25rem;"></div>
+    <input type="hidden" id="edit-tenantId">
+    <div class="form-group">
+      <label class="form-label">Estado</label>
+      <select class="form-select" id="edit-status">
+        <option value="active">✅ Activo</option>
+        <option value="trial">🕐 En prueba</option>
+        <option value="expired">⏰ Expirado</option>
+        <option value="cancelled">❌ Cancelado</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Plan</label>
+      <select class="form-select" id="edit-plan">
+        <option value="">— Sin plan —</option>
+        <option value="monthly">Mensual — $10</option>
+        <option value="quarterly">Trimestral — $35</option>
+        <option value="annual">Anual — $95</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fecha expiración</label>
+      <input class="form-input" type="date" id="edit-expiry">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Extender (días desde expiración actual)</label>
+      <input class="form-input" type="number" id="edit-extend" min="0" placeholder="Ej: 30">
+    </div>
+    <hr style="border:none;border-top:1px solid var(--border2);margin:1.25rem 0;">
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;">⏰ Días de Prueba</div>
+    <div class="form-group">
+      <label class="form-label">Días de prueba personalizados (dejar en blanco = usar global)</label>
+      <input class="form-input" type="number" id="edit-trial-days" min="0" max="365" placeholder="Global: 3 días">
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:0.75rem;">
+      <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.88rem;">
+        <input type="checkbox" id="edit-reset-trial" style="width:16px;height:16px;"> Reiniciar fecha de inicio de prueba (desde hoy)
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn btn-red" onclick="saveEdit()">💾 Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Confirmar Eliminar -->
+<div class="modal-overlay" id="modal-delete">
+  <div class="modal">
+    <div class="modal-title">
+      🗑️ Eliminar Negocio
+      <button class="close-btn" onclick="closeModal('modal-delete')">×</button>
+    </div>
+    <div class="warning-box">⚠️ Esta acción es <strong>IRREVERSIBLE</strong>. Se eliminarán todos los datos del negocio: usuarios, eventos, cotizaciones, inventario y configuración.</div>
+    <div id="modal-delete-biz" style="font-size:1rem;font-weight:600;margin-bottom:1.25rem;"></div>
+    <input type="hidden" id="delete-tenantId">
+    <div class="form-group">
+      <label class="form-label">Escribe "ELIMINAR" para confirmar</label>
+      <input class="form-input" id="delete-confirm-input" placeholder="ELIMINAR">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-delete')">Cancelar</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">🗑️ Eliminar permanentemente</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API = '';
+  let ua_token = localStorage.getItem('ua_token') || '';
+  let allTenants = [];
+  let allStats = {};
+
+  // ── AUTH ──
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = document.getElementById('login-err');
+    err.style.display = 'none';
+    try {
+      const res = await fetch(API + '/api/auth/ultraadmin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: document.getElementById('ua-email').value, password: document.getElementById('ua-pass').value })
+      });
+      const data = await res.json();
+      if (!res.ok) { err.textContent = data.error || 'Error de autenticación'; err.style.display = 'block'; return; }
+      ua_token = data.token;
+      localStorage.setItem('ua_token', ua_token);
+      showMain();
+    } catch(ex) { err.textContent = 'Error de conexión: ' + ex.message; err.style.display = 'block'; }
+  });
+
+  function doLogout() {
+    localStorage.removeItem('ua_token');
+    ua_token = '';
+    document.getElementById('main-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+  }
+
+  function showMain() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    loadAll();
+  }
+
+  // Auto-login si hay token
+  if (ua_token) showMain();
+
+  // ── NAVIGATION ──
+  function switchSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('sec-' + id).classList.add('active');
+    btn.classList.add('active');
+    if (id === 'new-sub') populateTenantSelect();
+    if (id === 'revenue') renderRevenue();
+    if (id === 'config') loadGlobalConfig();
+  }
+
+  // ── API ──
+  async function api(method, url, body = null) {
+    const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ua_token } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API + url, opts);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error API');
+    return data;
+  }
+
+  async function loadAll() {
+    try {
+      const { tenants, stats } = await api('GET', '/api/admin/tenants');
+      allTenants = tenants;
+      allStats = stats;
+      renderDashboard();
+      renderTenants();
+    } catch(e) {
+      if (e.message === 'Acceso denegado') { doLogout(); return; }
+      console.error(e);
+    }
+  }
+
+  // ── DASHBOARD ──
+  function renderDashboard() {
+    document.getElementById('stat-total').textContent   = allStats.total || 0;
+    document.getElementById('stat-active').textContent  = allStats.active || 0;
+    document.getElementById('stat-trial').textContent   = allStats.trial || 0;
+    document.getElementById('stat-expired').textContent = allStats.expired || 0;
+    document.getElementById('stat-cancelled').textContent = allStats.cancelled || 0;
+    const rev = allStats.revenue || {};
+    document.getElementById('rev-total').textContent    = (rev.total || 0).toLocaleString();
+    document.getElementById('rev-monthly').textContent  = (rev.monthly || 0).toLocaleString();
+    document.getElementById('rev-quarterly').textContent = (rev.quarterly || 0).toLocaleString();
+    document.getElementById('rev-annual').textContent   = (rev.annual || 0).toLocaleString();
+
+    // Recent (last 5)
+    const recent = [...allTenants].sort((a,b) => new Date(b.createdAt||0) - new Date(a.createdAt||0)).slice(0,5);
+    const tbody = document.getElementById('recent-table');
+    tbody.innerHTML = recent.length === 0 ? '<tr><td colspan="5" class="empty"><div class="empty-icon">📭</div>Sin registros</td></tr>' :
+      recent.map(t => `
+        <tr>
+          <td><strong>${esc(t.businessName)}</strong></td>
+          <td style="color:var(--text2)">${esc(t.email)}</td>
+          <td>${statusBadge(t.subscriptionStatus)}</td>
+          <td style="color:var(--text2)">${fmtDate(t.createdAt)}</td>
+          <td><button class="action-btn btn-blue" style="background:rgba(59,130,246,0.12);color:var(--blue);" onclick="openEdit('${t.tenantId}')">✏️ Editar</button></td>
+        </tr>`).join('');
+  }
+
+  // ── TENANTS TABLE ──
+  function renderTenants() {
+    const q    = (document.getElementById('tenant-search')?.value || '').toLowerCase();
+    const fs   = document.getElementById('tenant-filter-status')?.value || '';
+    const fp   = document.getElementById('tenant-filter-plan')?.value   || '';
+
+    const filtered = allTenants.filter(t => {
+      const matchQ = !q || t.businessName.toLowerCase().includes(q) || t.email.toLowerCase().includes(q) || t.name.toLowerCase().includes(q);
+      const matchS = !fs || t.subscriptionStatus === fs;
+      const matchP = !fp || t.subscriptionPlan === fp;
+      return matchQ && matchS && matchP;
+    });
+
+    const tbody = document.getElementById('tenants-table');
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty"><div class="empty-icon">🔍</div>No se encontraron resultados</td></tr>'; return; }
+
+    tbody.innerHTML = filtered.map(t => {
+      const plan = t.subscriptionPlan ? `<span class="badge badge-${t.subscriptionPlan}">${{'monthly':'Mensual','quarterly':'Trimestral','annual':'Anual'}[t.subscriptionPlan]||t.subscriptionPlan}</span>` : '<span style="color:var(--text3)">—</span>';
+      const expiry = t.subscriptionExpiry ? fmtDate(t.subscriptionExpiry) : (t.trialStartDate ? '🧪 Trial' : '—');
+      return `<tr>
+        <td>
+          <div style="font-weight:600">${esc(t.businessName)}</div>
+          <div style="font-size:0.75rem;color:var(--text3)">${esc(t.name)}</div>
+        </td>
+        <td style="color:var(--text2);font-size:0.83rem">${esc(t.email)}</td>
+        <td>${statusBadge(t.subscriptionStatus)} ${t.daysLeft != null && t.subscriptionStatus==='trial' ? `<div style="font-size:0.72rem;color:var(--text2)">${t.daysLeft}d restantes</div>` : ''}</td>
+        <td>${plan}</td>
+        <td style="font-size:0.82rem;color:var(--text2)">${expiry}</td>
+        <td style="text-align:center">${t.usersCount}</td>
+        <td style="text-align:center">${t.eventsCount}</td>
+        <td>
+          <div class="actions">
+            <button class="action-btn" style="background:rgba(59,130,246,0.12);color:var(--blue);" onclick="openEdit('${t.tenantId}')">✏️</button>
+            <button class="action-btn" style="background:rgba(16,185,129,0.12);color:var(--green);" onclick="quickActivate('${t.tenantId}')">✅</button>
+            <button class="action-btn" style="background:rgba(239,68,68,0.1);color:var(--red);" onclick="openDelete('${t.tenantId}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── REVENUE ──
+  function renderRevenue() {
+    const monthly  = allTenants.filter(t => t.subscriptionStatus === 'active' && t.subscriptionPlan === 'monthly');
+    const quarterly = allTenants.filter(t => t.subscriptionStatus === 'active' && t.subscriptionPlan === 'quarterly');
+    const annual   = allTenants.filter(t => t.subscriptionStatus === 'active' && t.subscriptionPlan === 'annual');
+    const grid = document.getElementById('rev-detail-grid');
+    grid.innerHTML = `
+      <div class="stat-card" style="border-color:rgba(59,130,246,0.3)">
+        <div class="stat-label">Plan Mensual ($10/mes)</div>
+        <div class="stat-val blue">${monthly.length}</div>
+        <div class="stat-meta">suscriptores · $${monthly.length*10} USD/mes</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(167,139,250,0.3)">
+        <div class="stat-label">Plan Trimestral ($35)</div>
+        <div class="stat-val purple">${quarterly.length}</div>
+        <div class="stat-meta">suscriptores · $${quarterly.length*35} USD/trimestre</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(245,158,11,0.3)">
+        <div class="stat-label">Plan Anual ($95)</div>
+        <div class="stat-val gold">${annual.length}</div>
+        <div class="stat-meta">suscriptores · $${annual.length*95} USD/año</div>
+      </div>
+      <div class="stat-card" style="border-color:rgba(16,185,129,0.3)">
+        <div class="stat-label">Ingreso Total Activo</div>
+        <div class="stat-val green">$${(allStats.revenue?.total||0).toLocaleString()}</div>
+        <div class="stat-meta">USD período corriente estimado</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En Prueba</div>
+        <div class="stat-val gold">${allStats.trial||0}</div>
+        <div class="stat-meta">potenciales conversiones</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Tasa Conversión</div>
+        <div class="stat-val blue">${allStats.total ? Math.round((allStats.active/allStats.total)*100) : 0}%</div>
+        <div class="stat-meta">trial → activo</div>
+      </div>`;
+  }
+
+  // ── MODAL EDIT ──
+  function openEdit(tenantId) {
+    const t = allTenants.find(x => x.tenantId === tenantId);
+    if (!t) return;
+    document.getElementById('edit-tenantId').value = tenantId;
+    document.getElementById('modal-edit-biz').innerHTML = `<strong>${esc(t.businessName)}</strong> · ${esc(t.email)}`;
+    document.getElementById('edit-status').value = t.subscriptionStatus || 'trial';
+    document.getElementById('edit-plan').value   = t.subscriptionPlan   || '';
+    document.getElementById('edit-expiry').value = t.subscriptionExpiry ? t.subscriptionExpiry.substring(0,10) : '';
+    document.getElementById('edit-extend').value = '';
+    document.getElementById('edit-trial-days').value = t.customTrialDays != null ? t.customTrialDays : '';
+    document.getElementById('edit-reset-trial').checked = false;
+    document.getElementById('modal-edit').classList.add('open');
+  }
+
+  async function saveEdit() {
+    const tenantId   = document.getElementById('edit-tenantId').value;
+    const status     = document.getElementById('edit-status').value;
+    const plan       = document.getElementById('edit-plan').value;
+    const expiryDate = document.getElementById('edit-expiry').value;
+    const extendDays = document.getElementById('edit-extend').value;
+    const trialDays  = document.getElementById('edit-trial-days').value;
+    const resetTrial = document.getElementById('edit-reset-trial').checked;
+    try {
+      // Guardar suscripción
+      await api('PUT', `/api/admin/tenants/${tenantId}/subscription`, { status, plan, expiryDate: expiryDate||null, extendDays: extendDays||null });
+      // Guardar trial si hay cambios
+      if (trialDays !== '' || resetTrial) {
+        await api('PUT', `/api/admin/tenants/${tenantId}/trial`, {
+          trialDays: trialDays !== '' ? parseInt(trialDays) : undefined,
+          resetTrialDate: resetTrial
+        });
+      }
+      closeModal('modal-edit');
+      await loadAll();
+      toast('✅ Suscripción y prueba actualizadas');
+    } catch(e) { toast('❌ ' + e.message, true); }
+  }
+
+  // Quick activate (modal-less)
+  async function quickActivate(tenantId) {
+    const t = allTenants.find(x => x.tenantId === tenantId);
+    const plan = prompt(`Activar plan para "${t?.businessName}":\nEscribe: monthly, quarterly, annual`, 'monthly');
+    if (!['monthly','quarterly','annual'].includes(plan)) return;
+    try {
+      await api('POST', `/api/admin/tenants/${tenantId}/subscription`, { plan });
+      await loadAll();
+      toast('✅ Suscripción activada');
+    } catch(e) { toast('❌ ' + e.message, true); }
+  }
+
+  // ── MODAL DELETE ──
+  function openDelete(tenantId) {
+    const t = allTenants.find(x => x.tenantId === tenantId);
+    if (!t) return;
+    document.getElementById('delete-tenantId').value = tenantId;
+    document.getElementById('modal-delete-biz').textContent = `🏢 ${t.businessName} — ${t.email}`;
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('modal-delete').classList.add('open');
+  }
+
+  async function confirmDelete() {
+    if (document.getElementById('delete-confirm-input').value !== 'ELIMINAR') {
+      toast('❌ Debes escribir ELIMINAR para confirmar', true); return;
+    }
+    const tenantId = document.getElementById('delete-tenantId').value;
+    try {
+      await api('DELETE', `/api/admin/tenants/${tenantId}`);
+      closeModal('modal-delete');
+      await loadAll();
+      toast('🗑️ Negocio eliminado permanentemente');
+    } catch(e) { toast('❌ ' + e.message, true); }
+  }
+
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+  // ── NEW SUB FORM ──
+  function populateTenantSelect() {
+    const sel = document.getElementById('ns-tenant');
+    sel.innerHTML = '<option value="">— Selecciona un negocio —</option>' +
+      allTenants.map(t => `<option value="${t.tenantId}">${esc(t.businessName)} · ${esc(t.email)}</option>`).join('');
+  }
+
+  document.getElementById('new-sub-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tenantId = document.getElementById('ns-tenant').value;
+    const plan     = document.getElementById('ns-plan').value;
+    const expiry   = document.getElementById('ns-expiry').value;
+    if (!tenantId) { toast('❌ Selecciona un negocio', true); return; }
+    try {
+      if (expiry) {
+        await api('PUT', `/api/admin/tenants/${tenantId}/subscription`, { status: 'active', plan, expiryDate: expiry });
+      } else {
+        await api('POST', `/api/admin/tenants/${tenantId}/subscription`, { plan });
+      }
+      await loadAll();
+      toast('✅ Suscripción creada/activada correctamente');
+      document.getElementById('ns-tenant').value = '';
+      document.getElementById('ns-expiry').value = '';
+    } catch(e) { toast('❌ ' + e.message, true); }
+  });
+
+
+  // ── GLOBAL CONFIG ──
+  async function loadGlobalConfig() {
+    try {
+      const cfg = await api('GET', '/api/admin/config');
+      document.getElementById('cfg-trial-days').value = cfg.trialDays ?? 3;
+      document.getElementById('cfg-support-email').value = cfg.supportEmail || '';
+      document.getElementById('cfg-plans-enabled').checked = cfg.plansEnabled !== false;
+    } catch(e) { toast('❌ Error cargando config: ' + e.message, true); }
+  }
+
+  async function saveGlobalConfig() {
+    try {
+      const trialDays    = parseInt(document.getElementById('cfg-trial-days').value);
+      const supportEmail = document.getElementById('cfg-support-email').value;
+      const plansEnabled = document.getElementById('cfg-plans-enabled').checked;
+      await api('PUT', '/api/admin/config', { trialDays, supportEmail, plansEnabled });
+      toast('✅ Configuración guardada');
+    } catch(e) { toast('❌ ' + e.message, true); }
+  }
+
+  // ── HELPERS ──
+
+  function statusBadge(s) {
+    const m = { active: '✅ Activo', trial: '🕐 Prueba', expired: '⏰ Expirado', cancelled: '❌ Cancelado' };
+    return `<span class="badge badge-${s||'expired'}">${m[s]||s||'—'}</span>`;
+  }
+  function fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('es-CO', { year:'numeric', month:'short', day:'numeric' });
+  }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s||''; return d.innerHTML; }
+
+  let toastTimer;
+  function toast(msg, isErr = false) {
+    let el = document.getElementById('ua-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'ua-toast';
+      el.style.cssText = 'position:fixed;bottom:2rem;right:2rem;z-index:999;padding:0.9rem 1.5rem;border-radius:12px;font-size:0.9rem;font-weight:600;font-family:Outfit,sans-serif;transition:opacity 0.3s;';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.background = isErr ? 'rgba(239,68,68,0.95)' : 'rgba(16,185,129,0.95)';
+    el.style.color = '#fff';
+    el.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+  }
+</script>
+</body>
+</html>
