@@ -73,7 +73,10 @@ export async function registerNewUser(email, password, name, role, phone) {
   try {
     const response = await fetch('/api/users', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('controlbanquete_token')}`
+      },
       body: JSON.stringify({ email, password, name, role, phone })
     });
     
