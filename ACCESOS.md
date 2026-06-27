@@ -11,11 +11,11 @@ El dominio público asignado a tu aplicación es:
 
 ### 📱 Flujo de la App (Página de Inicio)
 * **Pantalla de Entrada**: Al entrar al dominio sin haber iniciado sesión, la aplicación te enviará automáticamente a la pantalla de creación de cuentas (SuperAdmin):  
-  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/register.html](https://control-banquete-controlban.uah3tl.easypanel.host/register.html)
+  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/register](https://control-banquete-controlban.uah3tl.easypanel.host/register)
 * **Inicio de Sesión**: Para usuarios con cuentas creadas (SuperAdmin, chef, cotizadores, clientes):  
-  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/login.html](https://control-banquete-controlban.uah3tl.easypanel.host/login.html)
+  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/login](https://control-banquete-controlban.uah3tl.easypanel.host/login)
 * **Gestión de Planes y Facturación**: Pantalla nativa con diseño para Play Store para suscribirse a los planes (Mensual $10, Trimestral $35, Anual $95):  
-  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/subscription.html](https://control-banquete-controlban.uah3tl.easypanel.host/subscription.html)
+  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/subscription](https://control-banquete-controlban.uah3tl.easypanel.host/subscription)
 
 ---
 
@@ -24,7 +24,7 @@ El dominio público asignado a tu aplicación es:
 Esta es la cuenta especial e independiente del sistema diseñada para que el administrador principal gestione la plataforma, edite las suscripciones, extienda días de prueba y elimine negocios.
 
 * **Enlace del panel**:  
-  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/ultraadmin.html](https://control-banquete-controlban.uah3tl.easypanel.host/ultraadmin.html)
+  🔗 [https://control-banquete-controlban.uah3tl.easypanel.host/ultraadmin](https://control-banquete-controlban.uah3tl.easypanel.host/ultraadmin)
 * **Credenciales por defecto**:
   * **Email / Usuario**: `ultra@controlbanquete.com`
   * **Contraseña**: `UltraAdmin2026!`
@@ -37,10 +37,10 @@ Google Play Store exige que pongas enlaces públicos a los términos legales y d
 
 | Documento Legal | Enlace Directo |
 | :--- | :--- |
-| **Política de Privacidad** | [Ver Privacidad](https://control-banquete-controlban.uah3tl.easypanel.host/legal.html#privacy) |
-| **Términos de Servicio** | [Ver Términos](https://control-banquete-controlban.uah3tl.easypanel.host/legal.html#terms) |
-| **Política de Cancelación y Reembolso** | [Ver Cancelación](https://control-banquete-controlban.uah3tl.easypanel.host/legal.html#cancellation) |
-| **Solicitud de Eliminación de Datos** | [Ver Eliminación de Datos](https://control-banquete-controlban.uah3tl.easypanel.host/legal.html#data-deletion) |
+| **Política de Privacidad** | [Ver Privacidad](https://control-banquete-controlban.uah3tl.easypanel.host/legal#privacy) |
+| **Términos de Servicio** | [Ver Términos](https://control-banquete-controlban.uah3tl.easypanel.host/legal#terms) |
+| **Política de Cancelación y Reembolso** | [Ver Cancelación](https://control-banquete-controlban.uah3tl.easypanel.host/legal#cancellation) |
+| **Solicitud de Eliminación de Datos** | [Ver Eliminación de Datos](https://control-banquete-controlban.uah3tl.easypanel.host/legal#data-deletion) |
 
 ---
 
@@ -49,7 +49,7 @@ Google Play Store exige que pongas enlaces públicos a los términos legales y d
 Cada negocio (SuperAdmin) tiene una página pública para que sus clientes coticen de manera independiente. El enlace dinámico se compone del ID del negocio (`tenantId`).
 
 * **Estructura del enlace**:  
-  `https://control-banquete-controlban.uah3tl.easypanel.host/cotizar.html?t={ID_DEL_NEGOCIO}`
+  `https://control-banquete-controlban.uah3tl.easypanel.host/cotizar?t={ID_DEL_NEGOCIO}`
 
 ---
 

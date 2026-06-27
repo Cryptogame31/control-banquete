@@ -3675,8 +3675,8 @@ function setupAdminLinks() {
   if (!tenantId) return;
 
   const base = window.location.origin;
-  const cotizadorLink = `${base}/cotizar.html?t=${tenantId}`;
-  const portalLink    = `${base}/login.html`;
+  const cotizadorLink = `${base}/cotizar?t=${tenantId}`;
+  const portalLink    = `${base}/login`;
 
   const cotInput    = document.getElementById('cotizador-link-input');
   const portalInput = document.getElementById('portal-link-input');
