@@ -23,6 +23,17 @@ let globalConfig = {
   plansEnabled: true
 };
 
+// 🔍 DIAGNÓSTICO DE VARIABLES DE ENTORNO EN EASYPANEL
+console.log("🔍 [DIAGNÓSTICO ENTORNO]");
+console.log("   - DATABASE_URL definida:", !!process.env.DATABASE_URL);
+if (process.env.DATABASE_URL) {
+  console.log("   - DATABASE_URL valor (censurado):", process.env.DATABASE_URL.replace(/:[^@]+@/, ':****@'));
+}
+console.log("   - PORT:", process.env.PORT);
+console.log("   - NODE_ENV:", process.env.NODE_ENV);
+console.log("   - Listado de claves env disponibles:", Object.keys(process.env).filter(k => k.includes('DB') || k.includes('URL') || k.includes('POSTGRES') || k.includes('PORT')));
+console.log("─────────────────────────────────────────────────");
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(__dirname));
