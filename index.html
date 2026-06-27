@@ -23,6 +23,12 @@
         window.location.reload(true);
       }
     }
+
+    // ── Redirección automática a registro para la app móvil / sin sesión ──
+    const token = localStorage.getItem('controlbanquete_token');
+    if (!token) {
+      window.location.href = 'register.html';
+    }
   </script>
 
   <!-- PWA & Mobile Web App Settings -->
