@@ -426,6 +426,9 @@
           <!-- 3. SALONES -->
           <div class="card" id="card-venues" style="display: none;">
             <div class="card-title">🏛️ 3. Salón o Locación</div>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+              🔍 <strong>Consultar Disponibilidad de Salones</strong>: Selecciona una fecha arriba y el sistema verificará automáticamente y en tiempo real qué salones tenemos disponibles para ese día.
+            </p>
             <div class="products-selector-grid" id="grid-venues"></div>
           </div>
 
@@ -524,6 +527,7 @@
     let selVenue = '', selCatering = '', selPhoto = '', selDeco = '', selRecreation = '';
     let selServices = []; // guardará { id, qty }
     let latestPayload = null;
+    let bookedVenueIds = []; // Salones reservados en la fecha elegida
 
     async function init() {
       if (!TENANT) { show('not-found-view'); return; }
@@ -543,13 +547,47 @@
         document.getElementById('biz-name').textContent = bizData.businessName;
         document.getElementById('success-biz').textContent = bizData.businessName;
 
+        // Escuchar cambios de fecha para validar disponibilidad en tiempo real
+        document.getElementById('c-fecha').addEventListener('change', fetchAvailability);
+
         setupSelectors();
         renderProducts();
-        calcPrice();
+        
+        // Ejecutar primera consulta si ya hay una fecha establecida por defecto
+        if (document.getElementById('c-fecha').value) {
+          await fetchAvailability();
+        } else {
+          calcPrice();
+        }
+        
         show('main-view');
       } catch(e) {
         console.error(e);
         show('not-found-view');
+      }
+    }
+
+    // Consultar disponibilidad del salón al backend público
+    async function fetchAvailability() {
+      const dateVal = document.getElementById('c-fecha').value;
+      if (!dateVal) return;
+
+      try {
+        const res = await fetch(`/api/public/availability?t=${TENANT}&date=${dateVal}`);
+        if (res.ok) {
+          const data = await res.json();
+          bookedVenueIds = data.bookedVenueIds || [];
+          
+          // Si el salón previamente seleccionado quedó ocupado, lo deseleccionamos
+          if (selVenue && bookedVenueIds.includes(selVenue)) {
+            selVenue = '';
+          }
+          
+          renderProducts();
+          calcPrice();
+        }
+      } catch(e) {
+        console.error('Error al consultar disponibilidad:', e);
       }
     }
 
@@ -604,20 +642,39 @@
       if (gridVenues && products.venues && products.venues.length) {
         gridVenues.innerHTML = '';
         products.venues.forEach(p => {
+          const isBooked = bookedVenueIds.includes(p.id);
           const card = document.createElement('div');
-          card.className = 'product-card';
-          card.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">${fmt(p.price)}</div><div class="product-desc">${p.description||''}</div>`;
-          card.onclick = () => {
-            const isSel = card.classList.contains('selected');
-            gridVenues.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-            if (isSel) {
-              selVenue = '';
-            } else {
-              selVenue = p.id;
-              card.classList.add('selected');
-            }
-            calcPrice();
-          };
+          
+          if (isBooked) {
+            card.className = 'product-card occupied';
+            card.style.opacity = '0.55';
+            card.style.cursor = 'not-allowed';
+            card.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+            card.innerHTML = `
+              <div class="product-name" style="text-decoration: line-through; color: var(--text-muted);">${p.name}</div>
+              <div class="product-price" style="color: var(--text-muted);">${fmt(p.price)}</div>
+              <div class="product-desc" style="color: var(--danger); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">🔒 Reservado en esta fecha</div>
+            `;
+          } else {
+            card.className = 'product-card' + (selVenue === p.id ? ' selected' : '');
+            card.innerHTML = `
+              <div class="product-name">${p.name}</div>
+              <div class="product-price">${fmt(p.price)}</div>
+              <div class="product-desc">${p.description||''}</div>
+              <div class="product-desc" style="color: var(--success); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">✅ Disponible</div>
+            `;
+            card.onclick = () => {
+              const isSel = card.classList.contains('selected');
+              gridVenues.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+              if (isSel) {
+                selVenue = '';
+              } else {
+                selVenue = p.id;
+                card.classList.add('selected');
+              }
+              calcPrice();
+            };
+          }
           gridVenues.appendChild(card);
         });
         document.getElementById('card-venues').style.display = 'block';

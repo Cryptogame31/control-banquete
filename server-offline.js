@@ -694,6 +694,20 @@ app.get('/api/public/products', (req, res) => {
   res.json(structured);
 });
 
+// Obtener salones reservados para una fecha (disponibilidad pública de salones)
+app.get('/api/public/availability', (req, res) => {
+  const tenantId = req.query.t;
+  const date = req.query.date;
+  if (!tenantId || !date) return res.status(400).json({ error: 'Faltan parámetros t o date' });
+
+  const bookedVenueIds = memDB.events
+    .filter(e => e.tenantId === tenantId && e.date === date && e.status !== 'cancelado')
+    .map(e => e.venueId)
+    .filter(Boolean);
+
+  res.json({ bookedVenueIds });
+});
+
 // Enviar cotización pública (el cliente llena el formulario)
 app.post('/api/public/quotations', (req, res) => {
   const tenantId = req.query.t;
