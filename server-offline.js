@@ -744,6 +744,86 @@ app.post('/api/public/quotations', (req, res) => {
   res.json({ success: true, id: item.id, message: '¡Cotización enviada! El equipo se pondrá en contacto.' });
 });
 
+// PDF público para una cotización ya guardada (Evita restricciones Blob en móviles)
+app.get('/api/public/quotations/:id/pdf', (req, res) => {
+  const q = memDB.quotations.find(item => item.id === req.params.id);
+  if (!q) return res.status(404).send('Cotización no encontrada');
+
+  try {
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="cotizacion_${q.clientName.replace(/\s+/g, '_')}.pdf"`);
+    doc.pipe(res);
+    
+    doc.fontSize(22).text('CONTROL BANQUETE', { align: 'center' });
+    doc.fontSize(14).text('Resumen de Cotización Oficial', { align: 'center' });
+    doc.moveDown();
+    
+    doc.fontSize(12)
+       .text(`Cliente: ${q.clientName || ''}`)
+       .text(`Email: ${q.clientEmail || ''}`)
+       .text(`Teléfono: ${q.clientPhone || ''}`)
+       .text(`Tipo de Evento: ${q.eventType || ''}`)
+       .text(`Fecha: ${q.date || ''}`)
+       .text(`Invitados: ${q.guests || 0}`);
+       
+    doc.moveDown();
+    if (q.menu) doc.text(`Plan de Catering: ${q.menu}`);
+    if (q.notes) doc.text(`Notas adicionales: ${q.notes}`);
+    
+    doc.moveDown();
+    doc.fontSize(14).text(`Total Estimado: $${(q.totalValue || 0).toLocaleString('es-CO')} COP`, { color: '#ffcf4b' });
+    doc.end();
+  } catch (err) {
+    res.status(500).send('Error al generar PDF: ' + err.message);
+  }
+});
+
+// Registrar presupuesto temporal para abrirlo en PDF nativo (Evita restricciones Blob en móviles)
+app.post('/api/public/quotations/temp', (req, res) => {
+  const q = req.body;
+  const tempId = 'temp_' + Date.now().toString(36);
+  if (!memDB.tempQuotations) memDB.tempQuotations = {};
+  memDB.tempQuotations[tempId] = q;
+  res.json({ tempId });
+});
+
+// PDF público para presupuesto temporal
+app.get('/api/public/quotations/temp/:id/pdf', (req, res) => {
+  if (!memDB.tempQuotations) memDB.tempQuotations = {};
+  const q = memDB.tempQuotations[req.params.id];
+  if (!q) return res.status(404).send('Presupuesto temporal expirado o no encontrado');
+
+  try {
+    const doc = new PDFDocument({ margin: 50, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="presupuesto_${q.clientName.replace(/\s+/g, '_')}.pdf"`);
+    doc.pipe(res);
+    
+    doc.fontSize(22).text('CONTROL BANQUETE', { align: 'center' });
+    doc.fontSize(14).text('Presupuesto Estimado Interactivo', { align: 'center' });
+    doc.moveDown();
+    
+    doc.fontSize(12)
+       .text(`Cliente: ${q.clientName || ''}`)
+       .text(`Email: ${q.clientEmail || ''}`)
+       .text(`Teléfono: ${q.clientPhone || ''}`)
+       .text(`Tipo de Evento: ${q.eventType || ''}`)
+       .text(`Fecha: ${q.date || ''}`)
+       .text(`Invitados: ${q.guests || 0}`);
+       
+    doc.moveDown();
+    if (q.menu) doc.text(`Catering: ${q.menu}`);
+    if (q.notes) doc.text(`Notas: ${q.notes}`);
+    
+    doc.moveDown();
+    doc.fontSize(14).text(`Total Estimado: $${(q.totalValue || 0).toLocaleString('es-CO')} COP`);
+    doc.end();
+  } catch (err) {
+    res.status(500).send('Error al generar PDF: ' + err.message);
+  }
+});
+
 // Login del cliente (portal privado de su evento)
 // El login normal ya funciona; este endpoint devuelve el tenantId del cliente al loguearse
 // para que el portal sepa qué negocio mostrar.

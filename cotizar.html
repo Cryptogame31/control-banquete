@@ -872,6 +872,8 @@
       }
       errorBox.style.display = 'none';
 
+      let lastSavedQuotationId = null;
+
       btn.disabled = true;
       btn.textContent = '⏳ Enviando solicitud...';
 
@@ -903,6 +905,8 @@
         });
 
         if (!res.ok) throw new Error('Error al guardar la solicitud en el servidor.');
+        const resData = await res.json();
+        lastSavedQuotationId = resData.id;
 
         // Rellenar resumen de éxito
         const tNames = { boda: 'Boda', quinces: 'Quinceañera', grados_otros: 'Grados u Otros', comuniones: 'Primera Comunión', fiesta_infantil: 'Fiesta Infantil', empresarial: 'Empresarial' };
@@ -913,6 +917,13 @@
           <div><span>Invitados:</span> <strong>${guests} personas</strong></div>
           <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>${fmt(totalEstimate)}</strong></div>
         `;
+
+        // Modificar evento onclick del botón de descarga en el éxito para usar el ID real guardado
+        document.getElementById('btn-download-pdf').onclick = () => {
+          if (lastSavedQuotationId) {
+            window.open(`/api/public/quotations/${lastSavedQuotationId}/pdf`, '_blank');
+          }
+        };
 
         show('success-view');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1003,22 +1014,19 @@
           selectedServices: selServices
         };
 
-        const res = await fetch('/api/quotations/generate-pdf', {
+        // Guardar presupuesto temporalmente en el backend
+        const res = await fetch('/api/public/quotations/temp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error('No se pudo procesar la solicitud de PDF.');
+        if (!res.ok) throw new Error('No se pudo guardar la estimación temporal.');
+        
+        const resData = await res.json();
+        const tempId = resData.tempId;
 
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `presupuesto_${nombre.replace(/\s+/g, '_')}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
+        // Abrir pestaña limpia de descarga nativa en el móvil
+        window.open(`/api/public/quotations/temp/${tempId}/pdf`, '_blank');
       } catch(e) {
         alert('No se pudo generar el PDF: ' + e.message);
       } finally {
@@ -1030,35 +1038,7 @@
 
     // Descargar PDF de cotización mediante el endpoint del backend (Pantalla de Éxito)
     async function downloadPDF() {
-      if (!latestPayload) return;
-      const btn = document.getElementById('btn-download-pdf');
-      const oldText = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = '⏳ Generando PDF...';
-      
-      try {
-        const res = await fetch('/api/quotations/generate-pdf', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(latestPayload)
-        });
-        if (!res.ok) throw new Error('No se pudo procesar la solicitud de PDF.');
-        
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `cotizacion_${latestPayload.clientName.replace(/\s+/g, '_')}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-      } catch(e) {
-        alert('No se pudo generar el PDF: ' + e.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = oldText;
-      }
+      // Este método es sobreescrito dinámicamente en sendQuotation
     }
     window.downloadPDF = downloadPDF;
 
