@@ -9,6 +9,7 @@ const PDFDocument = require('pdfkit');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
+const PG = require('./pg-storage');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -35,16 +36,27 @@ console.log("=================================================");
 // BASE DE DATOS EN MEMORIA (multi-tenant)
 // ==========================================
 let memDB = {
-  users: [],      // { id, tenantId, email, name, role, phone, password, businessName, trialStartDate, subscriptionStatus, subscriptionPlan, subscriptionExpiry }
-  products: [],   // { id, tenantId, ... }
-  quotations: [], // { id, tenantId, ... }
-  events: [],     // { id, tenantId, ... }
-  providers: [],  // { id, tenantId, ... }
-  recipes: [],    // { id, tenantId, ... }
-  inventory: [],  // { id, tenantId, ... }
-  clients: [],    // { id, tenantId, ... }
+  users: [],
+  products: [],
+  quotations: [],
+  events: [],
+  providers: [],
+  recipes: [],
+  inventory: [],
+  clients: [],
   notifications: []
 };
+
+// Inicializar PostgreSQL (hidrata memDB si DATABASE_URL existe)
+PG.initPG(memDB).then(async () => {
+  // Cargar config global desde PG si existe
+  const pgCfg = await PG.loadGlobalConfig();
+  if (pgCfg) {
+    if (pgCfg.trialDays !== undefined) globalConfig.trialDays = pgCfg.trialDays;
+    if (pgCfg.supportEmail !== undefined) globalConfig.supportEmail = pgCfg.supportEmail;
+    if (pgCfg.plansEnabled !== undefined) globalConfig.plansEnabled = pgCfg.plansEnabled;
+  }
+}).catch(err => console.error('PG init error:', err.message));
 
 function genId(prefix) {
   return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -57,21 +69,25 @@ function seedTenantData(tenantId, businessName) {
     { id: genId('prod'), tenantId, category: 'catering', name: 'Plan Infantil', price: 28000, description: 'Plato adaptado para niños, incluye helado, postre infantil y bebida.', allowMultiples: false, position: 2 },
     { id: genId('prod'), tenantId, category: 'catering', name: 'Plan Premium', price: 55000, description: 'Menú premium de gala con entrada especial, carnes finas, postre gourmet y bebidas ilimitadas.', allowMultiples: false, position: 3 },
   ];
-  defaultProducts.forEach(p => memDB.products.push(p));
+  defaultProducts.forEach(p => {
+    memDB.products.push(p);
+    PG.upsert('products', tenantId, p.id, p);
+  });
 
   // Configuración por defecto para el tenant (incluye webhook n8n)
   const settingsKey = 'settings_' + tenantId;
-  memDB[settingsKey] = {
+  const settingsData = {
     businessName: businessName || 'Mi Empresa de Banquetes',
     servicioTransporte: 180000,
     servicioAnimacion: 250000,
     servicioSonido: 300000,
     ivaPercent: 0,
-    // Webhook n8n para correos — cada tenant configura el suyo
     webhookUrl: '',
     webhookSecret: '',
     webhookEnabled: false
   };
+  memDB[settingsKey] = settingsData;
+  PG.upsertSettings(tenantId, settingsData);
 }
 
 // ==========================================
@@ -151,6 +167,7 @@ app.post('/api/auth/register', async (req, res) => {
       createdAt: new Date().toISOString()
     };
     memDB.users.push(user);
+    PG.upsert('users', tenantId, user.id, user);
     seedTenantData(tenantId, businessName || name);
 
     const token = jwt.sign(
@@ -217,6 +234,7 @@ app.post('/api/subscription/activate', requireAuth, (req, res) => {
   superadmin.subscriptionStatus = 'active';
   superadmin.subscriptionPlan = plan;
   superadmin.subscriptionExpiry = expiry.toISOString();
+  PG.upsert('users', superadmin.tenantId, superadmin.id, superadmin);
 
   const planNames = { monthly: 'Mensual', quarterly: 'Trimestral', annual: 'Anual' };
   res.json({ success: true, plan, planName: planNames[plan], expiry: expiry.toISOString() });
@@ -242,6 +260,7 @@ app.get('/api/settings', requireAuth, (req, res) => {
 app.post('/api/settings', requireAuth, (req, res) => {
   const key = 'settings_' + req.tenantId;
   memDB[key] = { ...(memDB[key] || {}), ...req.body };
+  PG.upsertSettings(req.tenantId, memDB[key]);
   res.json(memDB[key]);
 });
 
@@ -276,15 +295,23 @@ app.post('/api/products', requireAuth, (req, res) => {
   const idx = memDB.products.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   const item = { ...p, id, tenantId: req.tenantId, price: parseFloat(p.price) || 0, allowMultiples: p.allowMultiples === true || p.allowMultiples === 'true', position: p.position !== undefined ? parseInt(p.position) : 999999 };
   if (idx >= 0) memDB.products[idx] = item; else memDB.products.push(item);
+  PG.upsert('products', req.tenantId, item.id, item);
   res.json(item);
 });
 app.post('/api/products/reorder', requireAuth, (req, res) => {
   const { orders } = req.body;
-  if (Array.isArray(orders)) orders.forEach(o => { const idx = memDB.products.findIndex(p => p.id === o.id && p.tenantId === req.tenantId); if (idx >= 0) memDB.products[idx].position = parseInt(o.position); });
+  if (Array.isArray(orders)) orders.forEach(o => { 
+    const idx = memDB.products.findIndex(p => p.id === o.id && p.tenantId === req.tenantId); 
+    if (idx >= 0) {
+      memDB.products[idx].position = parseInt(o.position);
+      PG.upsert('products', req.tenantId, memDB.products[idx].id, memDB.products[idx]);
+    }
+  });
   res.json({ success: true });
 });
 app.delete('/api/products/:id', requireAuth, (req, res) => {
   memDB.products = memDB.products.filter(p => !(p.id === req.params.id && p.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -297,10 +324,12 @@ app.post('/api/providers', requireAuth, (req, res) => {
   const idx = memDB.providers.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   const item = { ...p, id, tenantId: req.tenantId };
   if (idx >= 0) memDB.providers[idx] = item; else memDB.providers.push(item);
+  PG.upsert('providers', req.tenantId, item.id, item);
   res.json(item);
 });
 app.delete('/api/providers/:id', requireAuth, (req, res) => {
   memDB.providers = memDB.providers.filter(p => !(p.id === req.params.id && p.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -333,6 +362,7 @@ app.post('/api/events', requireAuth, (req, res) => {
   const item = { id, tenantId: req.tenantId, clientName: event.clientName||'Sin Nombre', clientEmail: event.clientEmail||'', clientPhone: event.clientPhone||'', eventType: event.eventType||'grados_otros', date: event.date||new Date().toISOString().substring(0,10), time: event.time||'', guests: parseInt(event.guests)||0, totalValue, paidAmount, balance: totalValue - paidAmount, discount: parseFloat(event.discount)||0, discountLabel: event.discountLabel||'', status: event.status||'confirmado', notes: event.notes||'', menu: event.menu||null, extraServices: event.selectedServices||event.extraServices||null, payments: event.payments||null, schedule: event.timeline||event.schedule||null, clientId: event.clientId||null, venueId: event.venueId||null, photographyId: event.photographyId||null, decorationId: event.decorationId||null, recreationId: event.recreationId||null, cateringId: event.cateringId||null, quotationId: event.quotationId||null, photoDriveLink: event.photoDriveLink||null, photoSelectionText: event.photoSelectionText||null, photoSelectionLocked: event.photoSelectionLocked===true, photoStatus: event.photoStatus||'sin_fotografia', allowColorSelection: event.allowColorSelection===true, selectedColor: event.selectedColor||null, selectedColors: event.selectedColors||null, appointments: event.appointments||null, completedTasks: event.completedTasks||null, completedPurchases: event.completedPurchases||null, createdAt: new Date().toISOString() };
   const idx = memDB.events.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   if (idx >= 0) memDB.events[idx] = item; else memDB.events.push(item);
+  PG.upsert('events', req.tenantId, item.id, item);
   res.json(mapEventResponse(item));
 });
 app.put('/api/events/:id', requireAuth, (req, res) => {
@@ -344,10 +374,12 @@ app.put('/api/events/:id', requireAuth, (req, res) => {
   const paidAmount = (merged.payments || []).reduce((s,p) => s + p.amount, 0);
   merged.paidAmount = paidAmount; merged.balance = (parseFloat(merged.totalValue)||0) - paidAmount;
   memDB.events[idx] = merged;
+  PG.upsert('events', req.tenantId, merged.id, merged);
   res.json(mapEventResponse(merged));
 });
 app.delete('/api/events/:id', requireAuth, (req, res) => {
   memDB.events = memDB.events.filter(e => !(e.id === req.params.id && e.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -362,7 +394,10 @@ app.post('/api/quotations', requireAuth, (req, res) => {
   const item = { id, tenantId: req.tenantId, clientName: q.clientName||'Sin Nombre', clientEmail: q.clientEmail||'', clientPhone: q.clientPhone||'', eventType: q.eventType||'grados_otros', date: q.date||new Date().toISOString().substring(0,10), guests: parseInt(q.guests)||0, totalValue: parseFloat(q.totalValue)||0, discount: parseFloat(q.discount)||0, discountLabel: q.discountLabel||'', status: q.status||'pendiente', notes: q.notes||'', menu: q.menu||null, extraServices: q.selectedServices||q.extraServices||null, venueId: q.venueId||null, photographyId: q.photographyId||null, decorationId: q.decorationId||null, cateringId: q.cateringId||null, recreationId: q.recreationId||null, createdAt: new Date().toISOString() };
   const idx = memDB.quotations.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   if (idx >= 0) memDB.quotations[idx] = item; else memDB.quotations.push(item);
-  memDB.notifications.push({ id: genId('notif'), tenantId: req.tenantId, title: 'Nueva Cotización', message: `El cliente ${item.clientName} solicitó cotización para ${item.eventType}.`, type: 'quote', role: 'superadmin', read: false, createdAt: new Date().toISOString() });
+  PG.upsert('quotations', req.tenantId, item.id, item);
+  const notifItem = { id: genId('notif'), tenantId: req.tenantId, title: 'Nueva Cotización', message: `El cliente ${item.clientName} solicitó cotización para ${item.eventType}.`, type: 'quote', role: 'superadmin', read: false, createdAt: new Date().toISOString() };
+  memDB.notifications.push(notifItem);
+  PG.upsert('notifications', req.tenantId, notifItem.id, notifItem);
   res.json(mapQuotationResponse(item));
 });
 app.put('/api/quotations/:id', requireAuth, (req, res) => {
@@ -371,10 +406,12 @@ app.put('/api/quotations/:id', requireAuth, (req, res) => {
   const merged = { ...memDB.quotations[idx], ...req.body };
   if (req.body.selectedServices !== undefined) merged.extraServices = req.body.selectedServices;
   memDB.quotations[idx] = merged;
+  PG.upsert('quotations', req.tenantId, merged.id, merged);
   res.json(mapQuotationResponse(merged));
 });
 app.delete('/api/quotations/:id', requireAuth, (req, res) => {
   memDB.quotations = memDB.quotations.filter(q => !(q.id === req.params.id && q.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -390,10 +427,12 @@ app.post('/api/recipes', requireAuth, (req, res) => {
   const item = { id, tenantId: req.tenantId, productId: r.productId||'unknown', supplies: suppliesData };
   const idx = memDB.recipes.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   if (idx >= 0) memDB.recipes[idx] = item; else memDB.recipes.push(item);
+  PG.upsert('recipes', req.tenantId, item.id, item);
   res.json({ id: item.id, productId: item.productId, name: item.supplies.name, category: item.supplies.category, baseGuests: item.supplies.baseGuests, procedure: item.supplies.procedure, ingredients: item.supplies.ingredients });
 });
 app.delete('/api/recipes/:id', requireAuth, (req, res) => {
   memDB.recipes = memDB.recipes.filter(r => !(r.id === req.params.id && r.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -406,10 +445,12 @@ app.post('/api/inventory', requireAuth, (req, res) => {
   const item = { ...p, id, tenantId: req.tenantId, stock: parseInt(p.quantity||p.stock)||0 };
   const idx = memDB.inventory.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   if (idx >= 0) memDB.inventory[idx] = item; else memDB.inventory.push(item);
+  PG.upsert('inventory', req.tenantId, item.id, item);
   res.json({ ...item, quantity: item.stock });
 });
 app.delete('/api/inventory/:id', requireAuth, (req, res) => {
   memDB.inventory = memDB.inventory.filter(i => !(i.id === req.params.id && i.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -422,10 +463,12 @@ app.post('/api/clients', requireAuth, (req, res) => {
   const item = { ...c, id, tenantId: req.tenantId, createdAt: c.createdAt || new Date().toISOString() };
   const idx = memDB.clients.findIndex(x => x.id === id && x.tenantId === req.tenantId);
   if (idx >= 0) memDB.clients[idx] = item; else memDB.clients.push(item);
+  PG.upsert('clients', req.tenantId, item.id, item);
   res.json(item);
 });
 app.delete('/api/clients/:id', requireAuth, (req, res) => {
   memDB.clients = memDB.clients.filter(c => !(c.id === req.params.id && c.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -443,11 +486,13 @@ app.post('/api/users', requireAuth, (req, res) => {
   if (idx >= 0) {
     memDB.users[idx] = { ...memDB.users[idx], ...(u.email ? { email: u.email } : {}), ...(u.name ? { name: u.name } : {}), ...(u.role ? { role: u.role } : {}), ...(u.phone !== undefined ? { phone: u.phone } : {}), ...(u.password ? { password: bcrypt.hashSync(u.password, 10) } : {}) };
     const saved = memDB.users[idx];
+    PG.upsert('users', req.tenantId, saved.id, saved);
     return res.json({ id: saved.id, uid: saved.id, email: saved.email, name: saved.name, role: saved.role, phone: saved.phone });
   }
   const hashedPassword = u.password ? bcrypt.hashSync(u.password, 10) : bcrypt.hashSync('123456', 10);
   const item = { id, tenantId: req.tenantId, email: u.email, name: u.name, role: u.role||'cliente', phone: u.phone||'', password: hashedPassword, trialStartDate: new Date().toISOString(), subscriptionStatus: 'trial', subscriptionPlan: null, subscriptionExpiry: null };
   memDB.users.push(item);
+  PG.upsert('users', req.tenantId, item.id, item);
   res.json({ id: item.id, uid: item.id, email: item.email, name: item.name, role: item.role, phone: item.phone });
 });
 app.put('/api/users/:id', requireAuth, (req, res) => {
@@ -456,10 +501,12 @@ app.put('/api/users/:id', requireAuth, (req, res) => {
   const u = req.body;
   memDB.users[idx] = { ...memDB.users[idx], ...(u.email ? { email: u.email } : {}), ...(u.name ? { name: u.name } : {}), ...(u.role ? { role: u.role } : {}), ...(u.phone !== undefined ? { phone: u.phone } : {}), ...(u.password ? { password: bcrypt.hashSync(u.password, 10) } : {}) };
   const saved = memDB.users[idx];
+  PG.upsert('users', req.tenantId, saved.id, saved);
   res.json({ id: saved.id, uid: saved.id, email: saved.email, name: saved.name, role: saved.role, phone: saved.phone });
 });
 app.delete('/api/users/:id', requireAuth, (req, res) => {
   memDB.users = memDB.users.filter(u => !(u.id === req.params.id && u.tenantId === req.tenantId));
+  PG.remove(req.params.id);
   res.json({ success: true });
 });
 
@@ -509,6 +556,7 @@ app.post('/api/webhook/config', requireAuth, (req, res) => {
   if (webhookSecret !== undefined && webhookSecret && webhookSecret !== '••••••••') {
     memDB[key].webhookSecret = webhookSecret;
   }
+  PG.upsertSettings(req.tenantId, memDB[key]);
   res.json({ success: true, webhookEnabled: memDB[key].webhookEnabled, webhookUrl: memDB[key].webhookUrl });
 });
 
@@ -767,6 +815,7 @@ app.put('/api/admin/tenants/:tenantId/subscription', requireUltraAdmin, (req, re
   }
 
   res.json({ success: true, tenantId, subscriptionStatus: user.subscriptionStatus, subscriptionPlan: user.subscriptionPlan, subscriptionExpiry: user.subscriptionExpiry });
+  PG.upsert('users', user.tenantId, user.id, user);
 });
 
 // Crear suscripción nueva manualmente
@@ -783,6 +832,7 @@ app.post('/api/admin/tenants/:tenantId/subscription', requireUltraAdmin, (req, r
   user.subscriptionStatus = 'active';
   user.subscriptionPlan = plan;
   user.subscriptionExpiry = expiry.toISOString();
+  PG.upsert('users', user.tenantId, user.id, user);
 
   res.json({ success: true, plan, expiry: expiry.toISOString() });
 });
@@ -803,6 +853,7 @@ app.delete('/api/admin/tenants/:tenantId', requireUltraAdmin, (req, res) => {
   memDB.notifications = memDB.notifications.filter(n => n.tenantId !== tenantId);
   memDB.recipes     = memDB.recipes.filter(r => r.tenantId !== tenantId);
   delete memDB['settings_' + tenantId];
+  PG.removeTenant(tenantId);
 
   res.json({ success: true, message: 'Tenant y todos sus datos eliminados.' });
 });
@@ -813,6 +864,7 @@ app.post('/api/subscription/cancel', requireAuth, (req, res) => {
   if (!superadmin) return res.status(404).json({ error: 'Tenant no encontrado' });
 
   superadmin.subscriptionStatus = 'cancelled';
+  PG.upsert('users', superadmin.tenantId, superadmin.id, superadmin);
   // El acceso se mantiene hasta la fecha de expiración original
   res.json({
     success: true,
@@ -836,6 +888,7 @@ app.put('/api/admin/config', requireUltraAdmin, (req, res) => {
   }
   if (supportEmail !== undefined) globalConfig.supportEmail = supportEmail;
   if (plansEnabled !== undefined) globalConfig.plansEnabled = !!plansEnabled;
+  PG.saveGlobalConfig(globalConfig);
   res.json({ success: true, config: { ...globalConfig } });
 });
 
@@ -857,6 +910,7 @@ app.put('/api/admin/tenants/:tenantId/trial', requireUltraAdmin, (req, res) => {
   }
 
   const trial = getTrialStatus(user);
+  PG.upsert('users', user.tenantId, user.id, user);
   res.json({ success: true, tenantId, customTrialDays: user.customTrialDays, trialStatus: trial });
 });
 
