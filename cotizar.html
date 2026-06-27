@@ -426,9 +426,29 @@
           <!-- 3. SALONES -->
           <div class="card" id="card-venues" style="display: none;">
             <div class="card-title">🏛️ 3. Salón o Locación</div>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-              🔍 <strong>Consultar Disponibilidad de Salones</strong>: Selecciona una fecha arriba y el sistema verificará automáticamente y en tiempo real qué salones tenemos disponibles para ese día.
-            </p>
+            
+            <!-- Buscador Explícito de Disponibilidad (Idéntico a la SPA) -->
+            <div style="background: rgba(255, 207, 75, 0.02); border: 1px solid rgba(255, 207, 75, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
+              <h4 style="font-size: 0.95rem; color: var(--accent-gold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                🔍 Consultar Disponibilidad de Salones
+              </h4>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Ingresa una fecha específica para verificar en tiempo real qué salones tenemos disponibles para tu evento.
+              </p>
+              <div style="display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 180px;">
+                  <label for="check-avail-date" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-secondary);">Selecciona la Fecha</label>
+                  <input type="date" id="check-avail-date" style="padding: 0.65rem 0.85rem; font-size: 0.9rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: var(--text-primary); border-radius: 8px; width: 100%; outline: none;">
+                </div>
+                <button type="button" class="btn-primary" onclick="checkVenueAvailabilityPublic()" style="width: auto; padding: 0.65rem 1.25rem; font-size: 0.85rem; height: 42px; font-weight: 700; border-radius: 8px;">
+                  Consultar Fecha
+                </button>
+              </div>
+              <div id="availability-results-public" style="display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem; border-radius: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+                <!-- Resultados inyectados por JS -->
+              </div>
+            </div>
+
             <div class="products-selector-grid" id="grid-venues"></div>
           </div>
 
@@ -483,6 +503,10 @@
 
             <button class="btn-primary" id="btn-send" onclick="sendQuotation()">
               Solicitar Cotización Oficial
+            </button>
+
+            <button class="btn-primary" id="btn-download-estimate-pdf" onclick="downloadEstimatePDF()" style="margin-top: 0.75rem; background: rgba(255,207,75,0.08); border: 1px solid rgba(255,207,75,0.25); color: var(--accent-gold); box-shadow: none;">
+              📥 Descargar PDF de Presupuesto
             </button>
 
             <div class="portal-link-box">
@@ -840,8 +864,10 @@
       const eventType = document.getElementById('c-tipo').value;
 
       if (!nombre || !email || !tel || !fecha || !guests) {
-        errorBox.textContent = 'Por favor completa todos los campos marcados con (*)';
+        errorBox.textContent = '⚠️ Por favor completa todos los campos obligatorios marcados con (*) antes de continuar.';
         errorBox.style.display = 'block';
+        errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('⚠️ Faltan datos obligatorios.\n\nPor favor completa los campos de contacto y la fecha de tu evento en el formulario antes de presionar Solicitar Cotización.');
         return;
       }
       errorBox.style.display = 'none';
@@ -898,7 +924,111 @@
       }
     }
 
-    // Descargar PDF de cotización mediante el endpoint del backend
+    // Consultar disponibilidad de salones de forma interactiva y explícita
+    async function checkVenueAvailabilityPublic() {
+      const dateVal = document.getElementById('check-avail-date').value;
+      if (!dateVal) {
+        alert('Por favor selecciona una fecha primero para consultar.');
+        return;
+      }
+
+      const resultsDiv = document.getElementById('availability-results-public');
+      resultsDiv.style.display = 'block';
+      resultsDiv.innerHTML = '<p style="color: var(--accent-gold); font-weight: 500;">⏳ Consultando disponibilidad de salones...</p>';
+
+      try {
+        const res = await fetch(`/api/public/availability?t=${TENANT}&date=${dateVal}`);
+        if (!res.ok) throw new Error('Error en el servidor al consultar.');
+
+        const data = await res.json();
+        bookedVenueIds = data.bookedVenueIds || [];
+
+        // Sincronizar automáticamente la fecha del evento del cliente
+        document.getElementById('c-fecha').value = dateVal;
+
+        // Si el salón previamente seleccionado quedó ocupado, lo deseleccionamos
+        if (selVenue && bookedVenueIds.includes(selVenue)) {
+          selVenue = '';
+        }
+
+        renderProducts();
+        calcPrice();
+
+        const allVenuesCount = products.venues ? products.venues.length : 0;
+        const occupiedCount = bookedVenueIds.length;
+        const availableCount = Math.max(0, allVenuesCount - occupiedCount);
+
+        if (availableCount > 0) {
+          resultsDiv.innerHTML = `<p style="color: var(--success); font-weight: 700;">✅ ¡Tenemos ${availableCount} salones disponibles para el día ${dateVal}! Puedes seleccionarlos abajo.</p>`;
+        } else {
+          resultsDiv.innerHTML = `<p style="color: var(--danger); font-weight: 700;">❌ Lo sentimos, todos nuestros salones están ocupados para el día ${dateVal}.</p>`;
+        }
+      } catch(err) {
+        resultsDiv.innerHTML = `<p style="color: var(--danger);">Error al consultar disponibilidad: ${err.message}</p>`;
+      }
+    }
+    window.checkVenueAvailabilityPublic = checkVenueAvailabilityPublic;
+
+    // Descargar PDF del presupuesto actual (Simulador / Vista Previa)
+    async function downloadEstimatePDF() {
+      const btn = document.getElementById('btn-download-estimate-pdf');
+      const oldText = btn.textContent;
+
+      const nombre = document.getElementById('c-nombre').value.trim() || 'Cliente Estimado';
+      const email = document.getElementById('c-email').value.trim() || 'cliente@estimado.com';
+      const tel = document.getElementById('c-tel').value.trim() || 'Sin Teléfono';
+      const fecha = document.getElementById('c-fecha').value || new Date().toISOString().substring(0, 10);
+      const guests = parseInt(document.getElementById('c-invitados').value) || 80;
+      const notes = document.getElementById('c-notes').value.trim() || 'Presupuesto interactivo estimado.';
+      const eventType = document.getElementById('c-tipo').value || 'grados_otros';
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Generando PDF...';
+
+      try {
+        const payload = {
+          clientName: nombre,
+          clientEmail: email,
+          clientPhone: tel,
+          eventType,
+          date: fecha,
+          guests,
+          notes,
+          totalValue: calcPrice(),
+          menu: selCatering ? findProdName(selCatering, 'catering') : null,
+          venueId: selVenue || null,
+          photographyId: selPhoto || null,
+          decorationId: selDeco || null,
+          recreationId: selRecreation || null,
+          selectedServices: selServices
+        };
+
+        const res = await fetch('/api/quotations/generate-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('No se pudo procesar la solicitud de PDF.');
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `presupuesto_${nombre.replace(/\s+/g, '_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch(e) {
+        alert('No se pudo generar el PDF: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = oldText;
+      }
+    }
+    window.downloadEstimatePDF = downloadEstimatePDF;
+
+    // Descargar PDF de cotización mediante el endpoint del backend (Pantalla de Éxito)
     async function downloadPDF() {
       if (!latestPayload) return;
       const btn = document.getElementById('btn-download-pdf');
