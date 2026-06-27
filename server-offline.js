@@ -740,12 +740,20 @@ app.post('/api/public/quotations', (req, res) => {
 // ULTRA-ADMIN ENDPOINTS
 // ==========================================
 
-const ULTRA_ADMIN_EMAIL    = process.env.ULTRA_ADMIN_EMAIL    || 'ultra@controlbanquete.com';
-const ULTRA_ADMIN_PASSWORD = process.env.ULTRA_ADMIN_PASSWORD || 'UltraAdmin2026!';
+const ULTRA_ADMIN_EMAIL    = process.env.ULTRA_ADMIN_EMAIL;
+const ULTRA_ADMIN_PASSWORD = process.env.ULTRA_ADMIN_PASSWORD;
+
+if (!ULTRA_ADMIN_EMAIL || !ULTRA_ADMIN_PASSWORD) {
+  console.warn("⚠️  [SEGURIDAD]: ULTRA_ADMIN_EMAIL o ULTRA_ADMIN_PASSWORD no están definidos en las variables de entorno.");
+  console.warn("               El acceso al panel /ultraadmin.html estará deshabilitado.");
+}
 
 // Login ultra-admin (credenciales fijas, no en memDB)
 app.post('/api/auth/ultraadmin', async (req, res) => {
   const { email, password } = req.body;
+  if (!ULTRA_ADMIN_EMAIL || !ULTRA_ADMIN_PASSWORD) {
+    return res.status(403).json({ error: 'El panel de Ultra Admin no está configurado en el servidor' });
+  }
   if (email !== ULTRA_ADMIN_EMAIL || password !== ULTRA_ADMIN_PASSWORD)
     return res.status(401).json({ error: 'Credenciales inválidas' });
   const token = jwt.sign({ uid: 'ultra', email, role: 'ultraadmin' }, JWT_SECRET, { expiresIn: '8h' });

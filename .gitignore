@@ -10,3 +10,7 @@ c:/Users/USER/.gemini/
 
 /generated/prisma
 generated-client/
+CREDENTIALS_DONT_SHARE.txt
+*.key
+*.pem
+private_keys/
