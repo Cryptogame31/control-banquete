@@ -3707,6 +3707,11 @@ function openCotizadorPreview() {
   if (input && input.value !== 'Cargando...') window.open(input.value, '_blank');
 }
 
+// Exponer globalmente para que funcionen los onClicks del HTML
+window.copyCotizadorLink = copyCotizadorLink;
+window.copyPortalLink = copyPortalLink;
+window.openCotizadorPreview = openCotizadorPreview;
+
 // 5. Gestión de Usuarios
 async function renderAdminUsers() {
   const tableContainer = document.getElementById('admin-users-table-container');
