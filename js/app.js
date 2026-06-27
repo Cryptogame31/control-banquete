@@ -3198,6 +3198,9 @@ async function renderAdminProducts() {
   if (contractTextEl) contractTextEl.value = baseSettings.contractText || '';
 
   // Cargar valores del tema
+  const defaultLanguageEl = document.getElementById('setting-default-language');
+  if (defaultLanguageEl) defaultLanguageEl.value = baseSettings.defaultLanguage || 'es';
+
   const themePaletteEl = document.getElementById('setting-theme-palette');
   if (themePaletteEl) themePaletteEl.value = baseSettings.themePalette || 'gold';
 
@@ -3522,6 +3525,7 @@ async function saveBaseSettings(e) {
   const businessLogoUrl = document.getElementById('setting-business-logo-url')?.value.trim() || '';
   const contractText = document.getElementById('setting-contract-text')?.value.trim() || '';
 
+  const defaultLanguage = document.getElementById('setting-default-language')?.value || 'es';
   const themePalette = document.getElementById('setting-theme-palette')?.value || 'gold';
   const themeFont = document.getElementById('setting-theme-font')?.value || 'outfit';
   const themeFontSize = document.getElementById('setting-theme-font-size')?.value || '16px';
@@ -3542,7 +3546,8 @@ async function saveBaseSettings(e) {
     availableColors: settingsAvailableColors,
     themePalette,
     themeFont,
-    themeFontSize
+    themeFontSize,
+    defaultLanguage
   };
   
   try {

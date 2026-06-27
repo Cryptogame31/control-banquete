@@ -95,7 +95,8 @@ function seedTenantData(tenantId, businessName) {
     ivaPercent: 0,
     webhookUrl: '',
     webhookSecret: '',
-    webhookEnabled: false
+    webhookEnabled: false,
+    defaultLanguage: 'es'
   };
   memDB[settingsKey] = settingsData;
   PG.upsertSettings(tenantId, settingsData);
@@ -172,9 +173,9 @@ app.post('/api/auth/register', async (req, res) => {
       password: hashedPassword,
       businessName: businessName || name,
       trialStartDate: new Date().toISOString(),
-      subscriptionStatus: 'trial',
-      subscriptionPlan: null,
-      subscriptionExpiry: null,
+      subscriptionStatus: 'active',
+      subscriptionPlan: 'annual',
+      subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 10).toISOString(), // 10 años de vigencia
       createdAt: new Date().toISOString()
     };
     memDB.users.push(user);
@@ -501,7 +502,7 @@ app.post('/api/users', requireAuth, (req, res) => {
     return res.json({ id: saved.id, uid: saved.id, email: saved.email, name: saved.name, role: saved.role, phone: saved.phone });
   }
   const hashedPassword = u.password ? bcrypt.hashSync(u.password, 10) : bcrypt.hashSync('123456', 10);
-  const item = { id, tenantId: req.tenantId, email: u.email, name: u.name, role: u.role||'cliente', phone: u.phone||'', password: hashedPassword, trialStartDate: new Date().toISOString(), subscriptionStatus: 'trial', subscriptionPlan: null, subscriptionExpiry: null };
+  const item = { id, tenantId: req.tenantId, email: u.email, name: u.name, role: u.role||'cliente', phone: u.phone||'', password: hashedPassword, trialStartDate: new Date().toISOString(), subscriptionStatus: 'active', subscriptionPlan: 'annual', subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 10).toISOString() };
   memDB.users.push(item);
   PG.upsert('users', req.tenantId, item.id, item);
   res.json({ id: item.id, uid: item.id, email: item.email, name: item.name, role: item.role, phone: item.phone });

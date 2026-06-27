@@ -351,14 +351,14 @@
     <!-- CARGANDO -->
     <div id="loading-view">
       <div style="font-size: 2.5rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
-      <p style="color: var(--text-secondary);">Cargando cotizador oficial...</p>
+      <p style="color: var(--text-secondary);" data-i18n="cotizar.loading">Cargando cotizador...</p>
     </div>
 
     <!-- NEGOCIO NO ENCONTRADO -->
     <div id="not-found-view" style="display: none; text-align: center; padding: 6rem 2rem;">
       <div style="font-size: 4rem; margin-bottom: 1.5rem;">🔍</div>
-      <h2 style="font-family: var(--font-title); font-size: 1.8rem; margin-bottom: 0.75rem;">Negocio No Registrado</h2>
-      <p style="color: var(--text-secondary); font-size: 0.95rem;">El enlace puede estar incompleto o el negocio no existe en la plataforma.</p>
+      <h2 style="font-family: var(--font-title); font-size: 1.8rem; margin-bottom: 0.75rem;" data-i18n="cotizar.not_found">Cotizador no encontrado</h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;" data-i18n="cotizar.not_found_sub">El enlace puede ser incorrecto o el negocio no existe.</p>
     </div>
 
     <!-- MAIN VIEW: GRID INTERACTIVO -->
@@ -370,7 +370,7 @@
           <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/><path d="M12 17v4"/><path d="M8 21h8"/><circle cx="12" cy="9" r="1"/>
         </svg>
         <div class="biz-name" id="biz-name">Sarahy Banquetes</div>
-        <div class="biz-tagline">Solicita un presupuesto en minutos estimando el valor de tu evento soñado</div>
+        <div class="biz-tagline" data-i18n="cotizar.tagline">Solicita tu cotización — sin compromiso</div>
       </div>
 
       <div class="grid-2-1">
@@ -381,57 +381,57 @@
 
           <!-- 1. DATOS DE CONTACTO -->
           <div class="card">
-            <div class="card-title">👤 1. Datos de Contacto</div>
+            <div class="card-title" data-i18n="cotizar.contact">👤 Tus datos de contacto</div>
             <div class="form-grid">
               <div class="form-group">
-                <label for="c-nombre">Nombre Completo *</label>
+                <label for="c-nombre" data-i18n="cotizar.full_name">Nombre completo *</label>
                 <input type="text" id="c-nombre" placeholder="Ej: Diana Valencia" required>
               </div>
               <div class="form-group">
-                <label for="c-tel">Teléfono / WhatsApp *</label>
+                <label for="c-tel" data-i18n="cotizar.phone">Teléfono / WhatsApp *</label>
                 <input type="tel" id="c-tel" placeholder="Ej: 312 456 7890" required>
               </div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="c-email">Correo Electrónico *</label>
+              <label for="c-email" data-i18n="cotizar.email">Correo electrónico *</label>
               <input type="email" id="c-email" placeholder="nombre@correo.com" required>
             </div>
           </div>
 
           <!-- 2. DETALLES DEL EVENTO -->
           <div class="card">
-            <div class="card-title">📅 2. Detalles del Evento</div>
+            <div class="card-title" data-i18n="cotizar.event">📅 Tu evento</div>
             <div class="form-grid">
               <div class="form-group">
-                <label for="c-tipo">Tipo de Evento *</label>
+                <label for="c-tipo" data-i18n="cotizar.event_type">Tipo de evento *</label>
                 <select id="c-tipo" required>
-                  <option value="boda">Boda (Matrimonio)</option>
-                  <option value="quinces">Fiesta de Quinces</option>
-                  <option value="grados_otros">Cumpleaños, Grados u Otros</option>
-                  <option value="comuniones">Primera Comunión</option>
-                  <option value="fiesta_infantil">Fiesta Infantil</option>
-                  <option value="empresarial">Evento Empresarial</option>
+                  <option value="boda" data-i18n="cotizar.wedding">Boda</option>
+                  <option value="quinces" data-i18n="cotizar.quinces">Quinceañera</option>
+                  <option value="grados_otros" data-i18n="cotizar.graduation">Grado / Aniversario</option>
+                  <option value="comuniones" data-i18n="cotizar.communion">Comunión / Confirmación</option>
+                  <option value="fiesta_infantil" data-i18n="cotizar.kids">Fiesta Infantil</option>
+                  <option value="empresarial" data-i18n="cotizar.corporate">Evento Empresarial</option>
                 </select>
               </div>
               <div class="form-group">
-                <label for="c-fecha">Fecha Deseada *</label>
+                <label for="c-fecha" data-i18n="cotizar.event_date">Fecha del evento *</label>
                 <input type="date" id="c-fecha" required>
               </div>
               <div class="form-group">
-                <label for="c-invitados">Número de Invitados *</label>
+                <label for="c-invitados" data-i18n="cotizar.guests">Número de invitados *</label>
                 <input type="number" id="c-invitados" min="10" max="2000" value="80" required>
                 <div id="c-catering-desc" style="font-size: 0.8rem; color: var(--accent-gold); margin-top: 0.35rem; font-weight: 500;">Plan seleccionado: Sin Alimentación</div>
               </div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label for="c-notas">Notas o requerimientos especiales</label>
-              <textarea id="c-notes" placeholder="Ej: Decoración en tonos pastel, restricciones alimentarias, etc."></textarea>
+              <label for="c-notas" data-i18n="cotizar.notes">¿Algo especial que quieras comunicarnos?</label>
+              <textarea id="c-notes" data-i18n-ph="cotizar.notes_ph" placeholder="Temática, requerimientos especiales..."></textarea>
             </div>
           </div>
 
           <!-- 3. SALONES -->
           <div class="card" id="card-venues" style="display: none;">
-            <div class="card-title">🏛️ 3. Salón Requerido</div>
+            <div class="card-title" data-i18n="cotizar.venues">🏛️ Salón / Lugar</div>
             <div class="products-selector-grid" id="grid-venues"></div>
           </div>
 
@@ -440,22 +440,22 @@
             <div class="card-title">🍽️ 4. Alimentación, Recreación, Fotografía y Decoración</div>
             <div class="form-grid">
               <div class="form-group" id="group-catering">
-                <label for="c-catering">Plan de Alimentación</label>
+                <label for="c-catering" data-i18n="cotizar.catering">🍽️ Catering</label>
                 <select id="c-catering"></select>
                 <div id="desc-catering" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
               <div class="form-group" id="group-recreation" style="display: none;">
-                <label for="c-recreation">Paquete Recreativo</label>
+                <label for="c-recreation" data-i18n="cotizar.recreation">🎭 Recreación / Animación</label>
                 <select id="c-recreation"></select>
                 <div id="desc-recreation" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
               <div class="form-group" id="group-photography" style="display: none;">
-                <label for="c-photo">Paquete de Fotografía</label>
+                <label for="c-photo" data-i18n="cotizar.photography">📸 Fotografía y Video</label>
                 <select id="c-photo"></select>
                 <div id="desc-photo" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
               <div class="form-group" id="group-decoration" style="display: none;">
-                <label for="c-deco">Estilo de Decoración</label>
+                <label for="c-deco" data-i18n="cotizar.decoration">🌸 Decoración</label>
                 <select id="c-deco"></select>
                 <div id="desc-deco" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
@@ -464,7 +464,7 @@
 
           <!-- 5. ADICIONALES -->
           <div class="card" id="card-services" style="display: none;">
-            <div class="card-title">✨ 5. Servicios Adicionales</div>
+            <div class="card-title" data-i18n="cotizar.services">✨ Servicios Adicionales</div>
             <div class="products-selector-grid" id="grid-services"></div>
           </div>
 
@@ -493,7 +493,7 @@
         <!-- COLUMNA DERECHA: PRESUPUESTO STICKY (Idéntico a la SPA) -->
         <div class="sticky-summary">
           <div class="budget-card">
-            <h3 class="budget-header">Resumen de Cotización</h3>
+            <h3 class="budget-header" data-i18n="cotizar.summary">📋 Resumen de tu solicitud</h3>
             
             <div class="budget-items" id="budget-items-list">
               <!-- Se calcula en tiempo real -->
@@ -565,6 +565,13 @@
 
         bizData = await bizRes.json();
         products = await prodRes.json();
+
+        // Aplicar idioma de origen del negocio por defecto
+        if (bizData.settings && bizData.settings.defaultLanguage) {
+          if (window.i18n && typeof window.i18n.setLang === 'function') {
+            window.i18n.setLang(bizData.settings.defaultLanguage);
+          }
+        }
 
         document.title = `Cotizador Oficial — ${bizData.businessName}`;
         document.getElementById('biz-name').textContent = bizData.businessName;
