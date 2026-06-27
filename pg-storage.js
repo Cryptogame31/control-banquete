@@ -25,11 +25,13 @@ async function initPG(memDB) {
     return;
   }
 
+  const { Pool } = require('pg');
+
   try {
-    const { Pool } = require('pg');
+    console.log('🔄 Conectando a PostgreSQL...');
     pool = new Pool({
       connectionString: dbUrl,
-      ssl: dbUrl.includes('localhost') ? false : { rejectUnauthorized: false },
+      ssl: (dbUrl.includes('localhost') || dbUrl.includes('sslmode=disable')) ? false : { rejectUnauthorized: false },
       max: 10,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000
@@ -49,7 +51,34 @@ async function initPG(memDB) {
     isReady = true;
     console.log('✅ PostgreSQL conectado y datos hidratados en memoria');
   } catch (err) {
-    console.error('⚠️  PostgreSQL no disponible, usando solo memoria:', err.message);
+    if (err.message.includes('does not support SSL') || err.message.includes('SSL connection') || err.message.includes('SSL')) {
+      console.log('⚠️  El servidor de base de datos no soporta SSL. Reintentando de forma segura sin SSL...');
+      try {
+        if (pool) await pool.end().catch(() => {});
+        pool = new Pool({
+          connectionString: dbUrl,
+          ssl: false,
+          max: 10,
+          idleTimeoutMillis: 30000,
+          connectionTimeoutMillis: 10000
+        });
+
+        const client = await pool.connect();
+        await client.query('SELECT 1');
+        client.release();
+
+        await createSchema();
+        await hydrateMemDB(memDB);
+
+        isReady = true;
+        console.log('✅ PostgreSQL conectado (sin SSL) y datos hidratados en memoria');
+        return;
+      } catch (retryErr) {
+        console.error('⚠️  PostgreSQL no disponible (reintento sin SSL falló):', retryErr.message);
+      }
+    } else {
+      console.error('⚠️  PostgreSQL no disponible:', err.message);
+    }
     console.error('   (Los datos NO persistirán entre reinicios)');
     pool = null;
     isReady = true;
