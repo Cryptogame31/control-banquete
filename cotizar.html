@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Cotizador Oficial — Control Banquete</title>
   <script src="js/i18n.js"></script>
-  <meta name="description" content="Cotiza tu evento de forma rápida y sencilla con precios oficiales en tiempo real.">
+  <meta name="description" content="Genera el presupuesto estimado de tu evento en minutos de forma oficial y en tiempo real.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -202,6 +202,33 @@
       line-height: 1.4;
     }
 
+    /* SUMMARY ITEMS (Idéntico a la SPA) */
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+      padding-bottom: 0.5rem;
+    }
+    .summary-row span.accent {
+      color: var(--accent-gold);
+      font-weight: 700;
+    }
+    .summary-row.total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 207, 75, 0.2);
+      margin-top: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
     /* STICKY BUDGET SUMMARY (Columna Derecha) */
     .sticky-summary {
       position: sticky;
@@ -226,33 +253,7 @@
     .budget-items {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.75rem;
-    }
-    .budget-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-    .budget-row span {
-      flex: 1;
-      padding-right: 0.5rem;
-    }
-    .budget-row strong {
-      color: var(--text-primary);
-      text-align: right;
-    }
-    .budget-total {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: var(--accent-gold);
-      padding-top: 1.25rem;
-      border-top: 1px solid rgba(255, 207, 75, 0.2);
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     /* BUTTONS */
@@ -269,6 +270,10 @@
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       box-shadow: 0 4px 15px rgba(255, 207, 75, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
     .btn-primary:hover {
       transform: translateY(-2px);
@@ -346,7 +351,7 @@
     <!-- CARGANDO -->
     <div id="loading-view">
       <div style="font-size: 2.5rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
-      <p style="color: var(--text-secondary);">Cargando cotizador interactivo...</p>
+      <p style="color: var(--text-secondary);">Cargando cotizador oficial...</p>
     </div>
 
     <!-- NEGOCIO NO ENCONTRADO -->
@@ -365,7 +370,7 @@
           <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/><path d="M12 17v4"/><path d="M8 21h8"/><circle cx="12" cy="9" r="1"/>
         </svg>
         <div class="biz-name" id="biz-name">Sarahy Banquetes</div>
-        <div class="biz-tagline">Genera tu presupuesto estimado oficial en tiempo real</div>
+        <div class="biz-tagline">Solicita un presupuesto en minutos estimando el valor de tu evento soñado</div>
       </div>
 
       <div class="grid-2-1">
@@ -414,55 +419,38 @@
               </div>
               <div class="form-group">
                 <label for="c-invitados">Número de Invitados *</label>
-                <input type="number" id="c-invitados" min="10" max="1000" value="80" required>
+                <input type="number" id="c-invitados" min="10" max="2000" value="80" required>
+                <div id="c-catering-desc" style="font-size: 0.8rem; color: var(--accent-gold); margin-top: 0.35rem; font-weight: 500;">Plan seleccionado: Sin Alimentación</div>
               </div>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
               <label for="c-notas">Notas o requerimientos especiales</label>
-              <textarea id="c-notas" placeholder="Ej: Decoración en tonos pastel, restricciones alimentarias, etc."></textarea>
+              <textarea id="c-notes" placeholder="Ej: Decoración en tonos pastel, restricciones alimentarias, etc."></textarea>
             </div>
           </div>
 
           <!-- 3. SALONES -->
           <div class="card" id="card-venues" style="display: none;">
-            <div class="card-title">🏛️ 3. Salón o Locación</div>
-            
-            <!-- Buscador Explícito de Disponibilidad (Idéntico a la SPA) -->
-            <div style="background: rgba(255, 207, 75, 0.02); border: 1px solid rgba(255, 207, 75, 0.15); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;">
-              <h4 style="font-size: 0.95rem; color: var(--accent-gold); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                🔍 Consultar Disponibilidad de Salones
-              </h4>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                Ingresa una fecha específica para verificar en tiempo real qué salones tenemos disponibles para tu evento.
-              </p>
-              <div style="display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 180px;">
-                  <label for="check-avail-date" style="font-size: 0.75rem; margin-bottom: 0.35rem; display: block; color: var(--text-secondary);">Selecciona la Fecha</label>
-                  <input type="date" id="check-avail-date" style="padding: 0.65rem 0.85rem; font-size: 0.9rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: var(--text-primary); border-radius: 8px; width: 100%; outline: none;">
-                </div>
-                <button type="button" class="btn-primary" onclick="checkVenueAvailabilityPublic()" style="width: auto; padding: 0.65rem 1.25rem; font-size: 0.85rem; height: 42px; font-weight: 700; border-radius: 8px;">
-                  Consultar Fecha
-                </button>
-              </div>
-              <div id="availability-results-public" style="display: none; margin-top: 1rem; font-size: 0.85rem; padding: 0.75rem; border-radius: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
-                <!-- Resultados inyectados por JS -->
-              </div>
-            </div>
-
+            <div class="card-title">🏛️ 3. Salón Requerido</div>
             <div class="products-selector-grid" id="grid-venues"></div>
           </div>
 
-          <!-- 4. PAQUETES -->
+          <!-- 4. PAQUETES (dropdowns interactivos de la SPA) -->
           <div class="card">
-            <div class="card-title">🍽️ 4. Servicios Principales</div>
+            <div class="card-title">🍽️ 4. Alimentación, Recreación, Fotografía y Decoración</div>
             <div class="form-grid">
               <div class="form-group" id="group-catering">
                 <label for="c-catering">Plan de Alimentación</label>
                 <select id="c-catering"></select>
                 <div id="desc-catering" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
+              <div class="form-group" id="group-recreation" style="display: none;">
+                <label for="c-recreation">Paquete Recreativo</label>
+                <select id="c-recreation"></select>
+                <div id="desc-recreation" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
+              </div>
               <div class="form-group" id="group-photography" style="display: none;">
-                <label for="c-photo">Fotografía y Video</label>
+                <label for="c-photo">Paquete de Fotografía</label>
                 <select id="c-photo"></select>
                 <div id="desc-photo" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
@@ -471,11 +459,6 @@
                 <select id="c-deco"></select>
                 <div id="desc-deco" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
               </div>
-              <div class="form-group" id="group-recreation" style="display: none;">
-                <label for="c-recreation">Paquete Recreativo</label>
-                <select id="c-recreation"></select>
-                <div id="desc-recreation" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
-              </div>
             </div>
           </div>
 
@@ -483,6 +466,26 @@
           <div class="card" id="card-services" style="display: none;">
             <div class="card-title">✨ 5. Servicios Adicionales</div>
             <div class="products-selector-grid" id="grid-services"></div>
+          </div>
+
+          <!-- 6. BUSCADOR DISPONIBILIDAD (Explícito como abajo del cotizador interno) -->
+          <div class="card" id="check-availability-card">
+            <h3 style="color: var(--accent-gold); font-family: var(--font-title); font-size: 1.6rem; margin-bottom: 0.5rem;">🔍 Consultar Disponibilidad de Salones</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.95rem;">Ingresa la fecha deseada para tu evento y consulta de inmediato qué salones tenemos disponibles.</p>
+            
+            <div class="form-grid" style="align-items: flex-end; max-width: 600px; margin-bottom: 1.5rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="check-avail-date">Selecciona la Fecha</label>
+                <input type="date" id="check-avail-date" required>
+              </div>
+              <div>
+                <button type="button" class="btn-primary" id="btn-check-availability" onclick="checkVenueAvailabilityPublic()" style="height: 46px; width: auto; padding: 0 1.5rem;">Consultar Fecha</button>
+              </div>
+            </div>
+
+            <div id="availability-results-public" style="display: none; margin-top: 1.5rem; padding: 1rem; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+              <!-- Resultados inyectados por JS -->
+            </div>
           </div>
 
         </div>
@@ -496,17 +499,13 @@
               <!-- Se calcula en tiempo real -->
             </div>
 
-            <div class="budget-total">
-              <span>Total Estimado</span>
-              <span id="price-total">$0</span>
-            </div>
-
             <button class="btn-primary" id="btn-send" onclick="sendQuotation()">
               Solicitar Cotización Oficial
             </button>
 
-            <button class="btn-primary" id="btn-download-estimate-pdf" onclick="downloadEstimatePDF()" style="margin-top: 0.75rem; background: rgba(255,207,75,0.08); border: 1px solid rgba(255,207,75,0.25); color: var(--accent-gold); box-shadow: none;">
-              📥 Descargar PDF de Presupuesto
+            <button class="btn-primary" id="btn-descargar-cotizacion" onclick="triggerDownloadLiveQuotation()" style="margin-top: 0.75rem; background: rgba(255,207,75,0.08); border: 1px solid rgba(255,207,75,0.25); color: var(--accent-gold); box-shadow: none;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Descargar Cotización (PDF)
             </button>
 
             <div class="portal-link-box">
@@ -533,7 +532,7 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; max-width: 320px; margin: 0 auto;">
-        <button class="btn-primary" id="btn-download-pdf" onclick="downloadPDF()">
+        <button class="btn-primary" id="btn-download-pdf-success">
           📥 Descargar PDF de Cotización
         </button>
         <button class="btn-primary" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); box-shadow: none;" onclick="location.reload()">
@@ -550,8 +549,8 @@
     let bizData = null, products = null;
     let selVenue = '', selCatering = '', selPhoto = '', selDeco = '', selRecreation = '';
     let selServices = []; // guardará { id, qty }
-    let latestPayload = null;
-    let bookedVenueIds = []; // Salones reservados en la fecha elegida
+    let bookedVenueIds = [];
+    let lastSavedQuotationId = null;
 
     async function init() {
       if (!TENANT) { show('not-found-view'); return; }
@@ -571,47 +570,18 @@
         document.getElementById('biz-name').textContent = bizData.businessName;
         document.getElementById('success-biz').textContent = bizData.businessName;
 
-        // Escuchar cambios de fecha para validar disponibilidad en tiempo real
-        document.getElementById('c-fecha').addEventListener('change', fetchAvailability);
-
         setupSelectors();
         renderProducts();
         
-        // Ejecutar primera consulta si ya hay una fecha establecida por defecto
-        if (document.getElementById('c-fecha').value) {
-          await fetchAvailability();
-        } else {
-          calcPrice();
-        }
-        
+        // Listener del cambio en los inputs del formulario
+        document.getElementById('c-invitados').addEventListener('input', calcPrice);
+        document.getElementById('c-fecha').addEventListener('change', fetchAvailability);
+
+        calcPrice();
         show('main-view');
       } catch(e) {
         console.error(e);
         show('not-found-view');
-      }
-    }
-
-    // Consultar disponibilidad del salón al backend público
-    async function fetchAvailability() {
-      const dateVal = document.getElementById('c-fecha').value;
-      if (!dateVal) return;
-
-      try {
-        const res = await fetch(`/api/public/availability?t=${TENANT}&date=${dateVal}`);
-        if (res.ok) {
-          const data = await res.json();
-          bookedVenueIds = data.bookedVenueIds || [];
-          
-          // Si el salón previamente seleccionado quedó ocupado, lo deseleccionamos
-          if (selVenue && bookedVenueIds.includes(selVenue)) {
-            selVenue = '';
-          }
-          
-          renderProducts();
-          calcPrice();
-        }
-      } catch(e) {
-        console.error('Error al consultar disponibilidad:', e);
       }
     }
 
@@ -624,12 +594,12 @@
 
     function fmt(n) { return '$' + Math.round(n).toLocaleString('es-CO') + ' COP'; }
 
-    // Rellenar los dropdowns (comportamiento idéntico al admin)
+    // Rellenar dropdowns (Idéntico a la SPA)
     function setupSelectors() {
-      const fillSelect = (id, items, descId, changeCallback) => {
+      const fillSelect = (id, items, descId, changeCallback, defaultText = 'Sin Selección') => {
         const select = document.getElementById(id);
         if (!select) return;
-        select.innerHTML = '<option value="">— Ninguno / Por Definir —</option>';
+        select.innerHTML = `<option value="">${defaultText}</option>`;
         if (items && items.length) {
           items.forEach(p => {
             const opt = document.createElement('option');
@@ -651,10 +621,10 @@
         };
       };
 
-      fillSelect('c-catering', products.catering || [], 'desc-catering', (v) => { selCatering = v; });
-      fillSelect('c-photo', products.photography || [], 'desc-photo', (v) => { selPhoto = v; });
-      fillSelect('c-deco', products.decoration || [], 'desc-deco', (v) => { selDeco = v; });
-      fillSelect('c-recreation', products.recreation || [], 'desc-recreation', (v) => { selRecreation = v; });
+      fillSelect('c-catering', products.catering || [], 'desc-catering', (v) => { selCatering = v; }, 'Sin Alimentación (No incluye comida/bebida)');
+      fillSelect('c-photo', products.photography || [], 'desc-photo', (v) => { selPhoto = v; }, 'Sin Fotografía');
+      fillSelect('c-deco', products.decoration || [], 'desc-deco', (v) => { selDeco = v; }, 'Sin Decoración');
+      fillSelect('c-recreation', products.recreation || [], 'desc-recreation', (v) => { selRecreation = v; }, 'Sin Recreación');
     }
 
     // Renderizar Salones y Adicionales (tarjetas interactivas)
@@ -706,7 +676,7 @@
         document.getElementById('card-venues').style.display = 'none';
       }
 
-      // Adicionales (con soporte para cantidades +/- si allowMultiples es true)
+      // Adicionales
       const gridServices = document.getElementById('grid-services');
       const svcs = products.services?.[eventType] || [];
       if (gridServices && svcs.length) {
@@ -759,7 +729,6 @@
       }
     }
 
-    // Cambiar cantidad de servicio adicional de forma reactiva
     function changeQty(id, diff) {
       let item = selServices.find(s => s.id === id);
       if (!item) {
@@ -791,64 +760,204 @@
       calcPrice();
     };
 
-    // Calcular precio y pintar el Resumen lateral (Idéntico a la SPA)
+    // Consultar disponibilidad (automática de fecha)
+    async function fetchAvailability() {
+      const dateVal = document.getElementById('c-fecha').value;
+      if (!dateVal) return;
+
+      try {
+        const res = await fetch(`/api/public/availability?t=${TENANT}&date=${dateVal}`);
+        if (res.ok) {
+          const data = await res.json();
+          bookedVenueIds = data.bookedVenueIds || [];
+          
+          if (selVenue && bookedVenueIds.includes(selVenue)) {
+            selVenue = '';
+          }
+          renderProducts();
+          calcPrice();
+        }
+      } catch(e) {
+        console.error('Error availability:', e);
+      }
+    }
+
+    // Motor de Cálculo Principal (Portado 1:1 de computePricingBreakdown de la SPA)
+    function computePricingBreakdown(guests, venueId, photographyId, decorationId, selectedServicesIds, settings, cateringId = null, recreationId = null) {
+      guests = Math.max(10, guests);
+      
+      const costoMeseroVal = settings.costoMesero !== undefined ? settings.costoMesero : 110000;
+      const meseros = Math.ceil(guests / 35);
+      const costoMeseros = meseros * costoMeseroVal;
+      
+      let costoAlimentacion = 0;
+      let descripcionAlimentacion = 'Sin servicio de catering contratado.';
+      let selectedCateringPlanName = 'Sin Alimentación';
+
+      if (cateringId && cateringId !== 'none') {
+        const selectedPlan = products.catering ? products.catering.find(p => p.id === cateringId) : null;
+        if (selectedPlan) {
+          costoAlimentacion = guests * selectedPlan.price;
+          descripcionAlimentacion = selectedPlan.description || selectedPlan.name;
+          selectedCateringPlanName = selectedPlan.name;
+        }
+      }
+      
+      const venue = products.venues ? products.venues.find(v => v.id === venueId) : null;
+      const venuePrice = venue ? venue.price : 0;
+      
+      const photo = products.photography ? products.photography.find(p => p.id === photographyId) : null;
+      const photoPrice = photo ? photo.price : 0;
+      
+      const deco = products.decoration ? products.decoration.find(d => d.id === decorationId) : null;
+      const decoPrice = deco ? deco.price : 0;
+
+      const recreation = products.recreation ? products.recreation.find(r => r.id === recreationId) : null;
+      const recreationPrice = recreation ? recreation.price : 0;
+      
+      let servicesSum = 0;
+      const servicesList = [];
+      
+      const allServices = [];
+      if (products.services) {
+        Object.keys(products.services).forEach(key => {
+          allServices.push(...products.services[key]);
+        });
+      }
+      
+      selectedServicesIds.forEach(id => {
+        const service = allServices.find(s => s.id === id);
+        if (service) {
+          servicesSum += service.price;
+          servicesList.push(service);
+        }
+      });
+
+      // Cálculo de meseros y settings adicionales
+      let customChargesSum = 0;
+      const customChargesList = [];
+      
+      // Mapear cobros del negocio si existen
+      if (settings && settings.servicioSonido) {
+        customChargesSum += settings.servicioSonido;
+        customChargesList.push({ label: 'Servicio de Sonido', totalCost: settings.servicioSonido });
+      }
+      if (settings && settings.servicioAnimacion) {
+        customChargesSum += settings.servicioAnimacion;
+        customChargesList.push({ label: 'Servicio de Animación', totalCost: settings.servicioAnimacion });
+      }
+      if (settings && settings.servicioTransporte) {
+        customChargesSum += settings.servicioTransporte;
+        customChargesList.push({ label: 'Servicio de Transporte', totalCost: settings.servicioTransporte });
+      }
+
+      const total = costoMeseros + costoAlimentacion + venuePrice + photoPrice + decoPrice + recreationPrice + servicesSum + customChargesSum;
+
+      return {
+        meseros,
+        costoMeseros,
+        costoAlimentacion,
+        descripcionAlimentacion,
+        selectedCateringPlanName,
+        venueName: venue ? venue.name : 'No Seleccionado',
+        venuePrice,
+        photoPrice,
+        decoPrice,
+        recreationPrice,
+        servicesSum,
+        customChargesSum,
+        customChargesList,
+        total,
+        venueId,
+        photoId: photographyId,
+        decorationId
+      };
+    }
+
+    // Pintar e inyectar el resumen detallado (Idéntico a calculateLiveCotizacion de la SPA)
     function calcPrice() {
       if (!products) return;
 
       const guests = parseInt(document.getElementById('c-invitados').value) || 0;
-      const allProds = [
-        ...(products.catering || []),
-        ...(products.venues || []),
-        ...(products.photography || []),
-        ...(products.decoration || []),
-        ...(products.recreation || []),
-        ...Object.values(products.services || {}).flat()
-      ];
-
-      const findProd = id => allProds.find(p => p.id === id);
-      const itemsList = document.getElementById('budget-items-list');
-      itemsList.innerHTML = '';
-
-      let total = 0;
-
-      // 1. Invitados / Catering
-      if (guests > 0) {
-        const cat = findProd(selCatering);
-        if (cat) {
-          const cost = cat.price * guests;
-          total += cost;
-          itemsList.innerHTML += `<div class="budget-row"><span>🍽️ ${cat.name} (×${guests} pax)</span><strong>${fmt(cost)}</strong></div>`;
-        } else {
-          itemsList.innerHTML += `<div class="budget-row"><span>👥 Invitados</span><strong>${guests} Personas</strong></div>`;
-        }
-      }
-
-      // 2. Salón
-      if (selVenue) {
-        const v = findProd(selVenue);
-        if (v) { total += v.price; itemsList.innerHTML += `<div class="budget-row"><span>🏛️ Salón: ${v.name}</span><strong>${fmt(v.price)}</strong></div>`; }
-      }
-
-      // 3. Foto, Deco, Recreación
-      const pId = findProd(selPhoto); if (pId) { total += pId.price; itemsList.innerHTML += `<div class="budget-row"><span>📸 Fotografía: ${pId.name}</span><strong>${fmt(pId.price)}</strong></div>`; }
-      const dId = findProd(selDeco); if (dId) { total += dId.price; itemsList.innerHTML += `<div class="budget-row"><span>🌸 Decoración: ${dId.name}</span><strong>${fmt(dId.price)}</strong></div>`; }
-      const rId = findProd(selRecreation); if (rId) { total += rId.price; itemsList.innerHTML += `<div class="budget-row"><span>🎭 Recreación: ${rId.name}</span><strong>${fmt(rId.price)}</strong></div>`; }
-
-      // 4. Servicios Adicionales (multiplicado por cantidad)
-      selServices.forEach(entry => {
-        const s = findProd(entry.id);
-        if (s) {
-          const cost = s.price * entry.qty;
-          total += cost;
-          itemsList.innerHTML += `<div class="budget-row"><span>✨ Adicional: ${s.name} ${entry.qty > 1 ? `(×${entry.qty})` : ''}</span><strong>${fmt(cost)}</strong></div>`;
+      const venueId = selVenue || null;
+      const cateringId = selCatering || 'none';
+      const photographyId = selPhoto || '';
+      const decorationId = selDeco || '';
+      const recreationId = selRecreation || '';
+      
+      const flatServices = [];
+      selServices.forEach(item => {
+        for (let i = 0; i < item.qty; i++) {
+          flatServices.push(item.id);
         }
       });
 
-      document.getElementById('price-total').textContent = fmt(total);
-      return total;
-    }
+      const res = computePricingBreakdown(guests, venueId, photographyId, decorationId, flatServices, bizData.settings || {}, cateringId, recreationId);
 
-    document.getElementById('c-invitados').oninput = calcPrice;
+      // Actualizar leyenda del catering seleccionado
+      document.getElementById('c-catering-desc').textContent = res.selectedCateringPlanName ? 'Plan seleccionado: ' + res.selectedCateringPlanName : '';
+
+      let customChargesHtml = '';
+      if (res.customChargesList && res.customChargesList.length > 0) {
+        res.customChargesList.forEach(cc => {
+          customChargesHtml += `
+            <div class="summary-row">
+              <span>${cc.label}</span>
+              <span>$${cc.totalCost.toLocaleString('es-CO')} COP</span>
+            </div>
+          `;
+        });
+      }
+
+      const itemsList = document.getElementById('budget-items-list');
+      itemsList.innerHTML = `
+        <div class="summary-row">
+          <span>Invitados</span>
+          <span class="accent">${guests} personas</span>
+        </div>
+        <div class="summary-row">
+          <span>Meseros requeridos (${res.meseros})</span>
+          <span>$${res.costoMeseros.toLocaleString('es-CO')} COP</span>
+        </div>
+        <div class="summary-row" style="flex-direction:column; align-items:flex-start; gap:0.25rem; ${res.costoAlimentacion === 0 ? 'display:none;' : ''}">
+          <div style="display:flex; justify-content:space-between; width:100%;">
+            <span>Banquete (${res.selectedCateringPlanName})</span>
+            <span>$${res.costoAlimentacion.toLocaleString('es-CO')} COP</span>
+          </div>
+          <span style="font-size:0.75rem; color:var(--text-secondary); line-height:1.2;">${res.descripcionAlimentacion}</span>
+        </div>
+        <div class="summary-row">
+          <span>Salón (${res.venueName})</span>
+          <span>$${res.venuePrice.toLocaleString('es-CO')} COP</span>
+        </div>
+        <div class="summary-row">
+          <span>Fotografía</span>
+          <span>$${res.photoPrice.toLocaleString('es-CO')} COP</span>
+        </div>
+        <div class="summary-row">
+          <span>Decoración</span>
+          <span>$${res.decoPrice.toLocaleString('es-CO')} COP</span>
+        </div>
+        <div class="summary-row" style="${res.recreationPrice === 0 ? 'display:none;' : ''}">
+          <span>Recreación</span>
+          <span>$${res.recreationPrice.toLocaleString('es-CO')} COP</span>
+        </div>
+        <div class="summary-row">
+          <span>Servicios adicionales</span>
+          <span>$${res.servicesSum.toLocaleString('es-CO')} COP</span>
+        </div>
+        ${customChargesHtml}
+        <div class="summary-row total">
+          <span>TOTAL ESTIMADO</span>
+          <span id="price-total">$${res.total.toLocaleString('es-CO')} COP</span>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1.5rem; text-align:center; line-height:1.2;">
+          * Este es un presupuesto preliminar no vinculante. Los meseros se calculan automáticamente (1 mesero cada 35 invitados).
+        </p>
+      `;
+
+      return res;
+    }
 
     // Enviar solicitud de cotización
     async function sendQuotation() {
@@ -872,16 +981,12 @@
       }
       errorBox.style.display = 'none';
 
-      let lastSavedQuotationId = null;
-
       btn.disabled = true;
       btn.textContent = '⏳ Enviando solicitud...';
 
       try {
-        const totalEstimate = calcPrice();
-        
-        // Guardar payload para descarga de PDF
-        latestPayload = {
+        const bd = calcPrice();
+        const payload = {
           clientName: nombre,
           clientEmail: email,
           clientPhone: tel,
@@ -889,7 +994,7 @@
           date: fecha,
           guests,
           notes,
-          totalValue: totalEstimate,
+          totalValue: bd.total,
           menu: selCatering ? findProdName(selCatering, 'catering') : null,
           venueId: selVenue || null,
           photographyId: selPhoto || null,
@@ -901,7 +1006,7 @@
         const res = await fetch(`/api/public/quotations?t=${TENANT}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(latestPayload)
+          body: JSON.stringify(payload)
         });
 
         if (!res.ok) throw new Error('Error al guardar la solicitud en el servidor.');
@@ -915,13 +1020,13 @@
           <div><span>Evento:</span> <strong>${tNames[eventType]}</strong></div>
           <div><span>Fecha:</span> <strong>${fecha}</strong></div>
           <div><span>Invitados:</span> <strong>${guests} personas</strong></div>
-          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>${fmt(totalEstimate)}</strong></div>
+          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>$${bd.total.toLocaleString('es-CO')} COP</strong></div>
         `;
 
-        // Modificar evento onclick del botón de descarga en el éxito para usar el ID real guardado
-        document.getElementById('btn-download-pdf').onclick = () => {
+        // Descarga de PDF en pantalla de éxito
+        document.getElementById('btn-download-pdf-success').onclick = () => {
           if (lastSavedQuotationId) {
-            window.open(`/api/public/quotations/${lastSavedQuotationId}/pdf`, '_blank');
+            triggerDownloadLiveQuotation(lastSavedQuotationId);
           }
         };
 
@@ -935,7 +1040,7 @@
       }
     }
 
-    // Consultar disponibilidad de salones de forma interactiva y explícita
+    // Buscador de disponibilidad de salones (Explícito como abajo del cotizador interno)
     async function checkVenueAvailabilityPublic() {
       const dateVal = document.getElementById('check-avail-date').value;
       if (!dateVal) {
@@ -954,10 +1059,9 @@
         const data = await res.json();
         bookedVenueIds = data.bookedVenueIds || [];
 
-        // Sincronizar automáticamente la fecha del evento del cliente
+        // Sincronizar fecha en el cotizador
         document.getElementById('c-fecha').value = dateVal;
 
-        // Si el salón previamente seleccionado quedó ocupado, lo deseleccionamos
         if (selVenue && bookedVenueIds.includes(selVenue)) {
           selVenue = '';
         }
@@ -970,7 +1074,7 @@
         const availableCount = Math.max(0, allVenuesCount - occupiedCount);
 
         if (availableCount > 0) {
-          resultsDiv.innerHTML = `<p style="color: var(--success); font-weight: 700;">✅ ¡Tenemos ${availableCount} salones disponibles para el día ${dateVal}! Puedes seleccionarlos abajo.</p>`;
+          resultsDiv.innerHTML = `<p style="color: var(--success); font-weight: 700;">✅ ¡Tenemos ${availableCount} salones disponibles para el día ${dateVal}! Puedes seleccionarlos arriba.</p>`;
         } else {
           resultsDiv.innerHTML = `<p style="color: var(--danger); font-weight: 700;">❌ Lo sentimos, todos nuestros salones están ocupados para el día ${dateVal}.</p>`;
         }
@@ -978,69 +1082,247 @@
         resultsDiv.innerHTML = `<p style="color: var(--danger);">Error al consultar disponibilidad: ${err.message}</p>`;
       }
     }
-    window.checkVenueAvailabilityPublic = checkVenueAvailabilityPublic;
 
-    // Descargar PDF del presupuesto actual (Simulador / Vista Previa)
-    async function downloadEstimatePDF() {
-      const btn = document.getElementById('btn-download-estimate-pdf');
-      const oldText = btn.textContent;
+    // Descarga interactiva de PDF (Idéntico a triggerDownloadLiveQuotation + downloadQuotationPDF de la SPA)
+    function triggerDownloadLiveQuotation(forcedId = null) {
+      const bd = calcPrice();
+      if (!bd) return;
 
-      const nombre = document.getElementById('c-nombre').value.trim() || 'Cliente Estimado';
-      const email = document.getElementById('c-email').value.trim() || 'cliente@estimado.com';
-      const tel = document.getElementById('c-tel').value.trim() || 'Sin Teléfono';
-      const fecha = document.getElementById('c-fecha').value || new Date().toISOString().substring(0, 10);
-      const guests = parseInt(document.getElementById('c-invitados').value) || 80;
-      const notes = document.getElementById('c-notes').value.trim() || 'Presupuesto interactivo estimado.';
-      const eventType = document.getElementById('c-tipo').value || 'grados_otros';
-
-      btn.disabled = true;
-      btn.textContent = '⏳ Generando PDF...';
-
-      try {
-        const payload = {
-          clientName: nombre,
-          clientEmail: email,
-          clientPhone: tel,
-          eventType,
-          date: fecha,
-          guests,
-          notes,
-          totalValue: calcPrice(),
-          menu: selCatering ? findProdName(selCatering, 'catering') : null,
-          venueId: selVenue || null,
-          photographyId: selPhoto || null,
-          decorationId: selDeco || null,
-          recreationId: selRecreation || null,
-          selectedServices: selServices
-        };
-
-        // Guardar presupuesto temporalmente en el backend
-        const res = await fetch('/api/public/quotations/temp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (!res.ok) throw new Error('No se pudo guardar la estimación temporal.');
-        
-        const resData = await res.json();
-        const tempId = resData.tempId;
-
-        // Abrir pestaña limpia de descarga nativa en el móvil
-        window.open(`/api/public/quotations/temp/${tempId}/pdf`, '_blank');
-      } catch(e) {
-        alert('No se pudo generar el PDF: ' + e.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = oldText;
+      if (!selVenue && !bd.venueId) {
+        alert("Por favor, selecciona un salón antes de descargar el presupuesto.");
+        return;
       }
-    }
-    window.downloadEstimatePDF = downloadEstimatePDF;
 
-    // Descargar PDF de cotización mediante el endpoint del backend (Pantalla de Éxito)
-    async function downloadPDF() {
-      // Este método es sobreescrito dinámicamente en sendQuotation
+      const settingsObj = bizData.settings || {};
+      const phone1 = settingsObj.telefonoContacto1 || '3163048505';
+      const phone2 = settingsObj.telefonoContacto2 || '';
+      const businessName = settingsObj.businessName || bizData.businessName || 'Control Banquete';
+      const businessSubtitle = settingsObj.businessSubtitle || 'Presupuesto';
+      
+      const printWindow = window.open('', '_blank', 'width=800,height=800');
+      if (!printWindow) {
+        alert('⚠️ Por favor permite las ventanas emergentes (pop-ups) en tu navegador para descargar el PDF.');
+        return;
+      }
+
+      const venue = products.venues.find(v => v.id === bd.venueId);
+      const venueNameClean = venue ? venue.name : bd.venueName;
+
+      const detailsList = [];
+      detailsList.push({ 
+        name: `Salón de Recepciones: ${venueNameClean}`, 
+        price: bd.venuePrice,
+        desc: venue ? venue.description : ''
+      });
+      
+      if (bd.costoAlimentacion > 0) {
+        detailsList.push({
+          name: `Catering (${bd.selectedCateringPlanName})`,
+          price: bd.costoAlimentacion,
+          desc: bd.descripcionAlimentacion
+        });
+      }
+
+      if (bd.photoPrice > 0) {
+        const photo = products.photography.find(p => p.id === bd.photoId);
+        detailsList.push({ 
+          name: photo ? photo.name : 'Servicio de Fotografía', 
+          price: bd.photoPrice,
+          desc: photo ? photo.description : ''
+        });
+      }
+      
+      if (bd.decoPrice > 0) {
+        const deco = products.decoration.find(d => d.id === bd.decorationId);
+        detailsList.push({ 
+          name: deco ? deco.name : 'Servicio de Decoración', 
+          price: bd.decoPrice,
+          desc: deco ? deco.description : ''
+        });
+      }
+      
+      if (bd.recreationPrice > 0) {
+        const recreation = products.recreation.find(r => r.id === bd.recreationId);
+        detailsList.push({ 
+          name: recreation ? recreation.name : 'Paquete Recreativo', 
+          price: bd.recreationPrice,
+          desc: recreation ? recreation.description : ''
+        });
+      }
+
+      const serviceCounts = {};
+      selServices.forEach(item => {
+        serviceCounts[item.id] = item.qty;
+      });
+
+      const allServices = [];
+      if (products.services) {
+        Object.keys(products.services).forEach(key => {
+          allServices.push(...products.services[key]);
+        });
+      }
+
+      Object.keys(serviceCounts).forEach(sid => {
+        const match = allServices.find(s => s.id === sid);
+        if (match) {
+          const qty = serviceCounts[sid];
+          const nameText = qty > 1 ? `${match.name} (x${qty})` : match.name;
+          detailsList.push({ 
+            name: nameText, 
+            price: match.price * qty,
+            desc: match.description || ''
+          });
+        }
+      });
+
+      let customSettingsHtml = '';
+      if (bd.customChargesList && Array.isArray(bd.customChargesList)) {
+        bd.customChargesList.forEach(cc => {
+          customSettingsHtml += `
+            <tr>
+              <td>
+                <span class="desc-title">${cc.label}</span>
+                <span class="desc-subtitle">Cargo operativo del negocio</span>
+              </td>
+              <td style="text-align: right; font-weight: 500; vertical-align: middle;">$${cc.totalCost.toLocaleString('es-CO')} COP</td>
+            </tr>
+          `;
+        });
+      }
+
+      const qId = forcedId || 'COT_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      const nombreCliente = document.getElementById('c-nombre').value || 'Cliente Solicitante';
+      const emailCliente = document.getElementById('c-email').value || 'cliente@correo.com';
+      const telCliente = document.getElementById('c-tel').value || 'Sin Teléfono';
+      const eventTypeClean = document.getElementById('c-tipo').value;
+
+      let itemsRowsHtml = '';
+      detailsList.forEach(item => {
+        itemsRowsHtml += `
+          <tr>
+            <td>
+              <span class="desc-title">${item.name}</span>
+              ${item.desc ? `<span class="desc-subtitle">${item.desc}</span>` : ''}
+            </td>
+            <td style="text-align: right; font-weight: 500; vertical-align: middle;">$${item.price.toLocaleString('es-CO')} COP</td>
+          </tr>
+        `;
+      });
+
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+          <meta charset="UTF-8">
+          <title>Cotización_${qId}</title>
+          <style>
+            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #2d3748; margin: 40px; line-height: 1.6; background-color: #fff; }
+            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #b39264; padding-bottom: 25px; margin-bottom: 30px; }
+            .logo-title { font-family: Georgia, serif; color: #1a202c; font-size: 26px; margin: 0; font-weight: bold; letter-spacing: 0.5px; }
+            .logo-sub { font-size: 10px; text-transform: uppercase; color: #b39264; letter-spacing: 4px; font-weight: bold; margin-top: 4px; display: block; }
+            .info-grid { display: flex; justify-content: space-between; margin-bottom: 35px; font-size: 13.5px; gap: 4%; }
+            .info-col { width: 48%; background: #faf8f5; padding: 20px; border-radius: 12px; border: 1px solid #ebdcc5; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+            .info-title { font-weight: bold; color: #1a202c; border-bottom: 2px solid #b39264; padding-bottom: 6px; margin-bottom: 12px; text-transform: uppercase; font-size: 11px; letter-spacing: 1.5px; }
+            .info-row { margin-bottom: 8px; }
+            .info-row strong { color: #1a202c; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 35px; font-size: 13.5px; }
+            th { background: #1a202c; text-align: left; padding: 14px 16px; border-bottom: 2px solid #b39264; color: #fff; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+            td { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; }
+            tr:nth-child(even) td { background-color: #fafaf9; }
+            .desc-title { font-weight: 600; color: #1a202c; font-size: 14px; }
+            .desc-subtitle { font-size: 11.5px; color: #718096; margin-top: 4px; display: block; line-height: 1.4; }
+            .total-box { display: flex; flex-direction: column; align-items: flex-end; font-size: 14px; margin-top: 20px; }
+            .total-row { display: flex; justify-content: space-between; width: 340px; padding: 8px 12px; border-bottom: 1px dashed #e2e8f0; color: #4a5568; }
+            .total-row.final { background: #1a202c; border-radius: 8px; border: 1px solid #b39264; padding: 14px 18px; margin-top: 15px; font-size: 22px; font-weight: bold; color: #ffcf4b; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+            .total-row.final span:first-child { color: #fff; font-size: 18px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; align-self: center; }
+            .footer { border-top: 1px solid #edf2f7; margin-top: 60px; padding-top: 25px; text-align: center; font-size: 11px; color: #718096; line-height: 1.7; }
+            @media print {
+              body { margin: 20px; }
+              .info-col { background: #faf8f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .total-row.final { background: #1a202c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              th { background: #1a202c !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <h1 class="logo-title">${businessName.toUpperCase()}</h1>
+              <span class="logo-sub">Elegancia & Distinción</span>
+            </div>
+            <div style="text-align: right; font-size: 12px; color: #4a5568; line-height: 1.6;">
+              <strong>PRESUPUESTO DE RESERVA</strong><br>
+              Código Cotización: <strong>${qId}</strong><br>
+              Fecha de Emisión: ${new Date().toLocaleDateString('es-CO')}
+            </div>
+          </div>
+          
+          <div class="info-grid">
+            <div class="info-col">
+              <div class="info-title">Detalles del Cliente</div>
+              <div class="info-row">Nombre: <strong>${nombreCliente}</strong></div>
+              <div class="info-row">Email: <strong>${emailCliente}</strong></div>
+              <div class="info-row">Teléfono: <strong>${telCliente}</strong></div>
+            </div>
+            <div class="info-col">
+              <div class="info-title">Especificaciones del Evento</div>
+              <div class="info-row">Tipo de Evento: <strong>${eventTypeClean.toUpperCase()}</strong></div>
+              <div class="info-row">Fecha Reservada: <strong>${document.getElementById('c-fecha').value || 'Por Definir'}</strong></div>
+              <div class="info-row">Invitados: <strong>${bd.guests} Personas</strong></div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Descripción del Servicio</th>
+                <th style="text-align: right; width: 180px;">Valor (COP)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsRowsHtml}
+              <tr>
+                <td>
+                  <span class="desc-title">Meseros de Atención (${bd.meseros})</span>
+                  <span class="desc-subtitle">1 mesero cada 35 invitados para garantizar la atención</span>
+                </td>
+                <td style="text-align: right; font-weight: 500; vertical-align: middle;">$${bd.costoMeseros.toLocaleString('es-CO')} COP</td>
+              </tr>
+              ${customSettingsHtml}
+            </tbody>
+          </table>
+
+          <div class="total-box">
+            <div class="total-row final">
+              <span>Total Estimado</span>
+              <span>$${bd.total.toLocaleString('es-CO')} COP</span>
+            </div>
+          </div>
+
+          <div class="footer">
+            Presupuesto estimado generado a través del Cotizador Oficial de ${businessName}.<br>
+            Contacto: ${phone1} ${phone2 ? ' - ' + phone2 : ''} | Generado el ${new Date().toLocaleString('es-CO')}<br>
+            * Este documento es un presupuesto preliminar no vinculante.
+          </div>
+        </body>
+        </html>
+      `;
+
+      printWindow.document.open();
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Lanzar el print nativo del navegador tras la carga
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      
+      // Fallback si onload no se dispara en el WebView
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
     }
-    window.downloadPDF = downloadPDF;
+    window.triggerDownloadLiveQuotation = triggerDownloadLiveQuotation;
 
     function findProdName(id, type) {
       if (!products || !products[type]) return null;
