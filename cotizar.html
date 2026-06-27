@@ -3,520 +3,787 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Cotizador — Control Banquete</title>
+  <title>Cotizador Oficial — Control Banquete</title>
   <script src="js/i18n.js"></script>
-  <meta name="description" content="Solicita tu cotización de banquetes de forma rápida y sencilla.">
+  <meta name="description" content="Cotiza tu evento de forma rápida y sencilla con precios oficiales en tiempo real.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --gold: #ffcf4b; --gold-glow: rgba(255,207,75,0.2);
-      --bg: #0a0a0f; --bg2: #12121a; --bg3: #1a1a26;
-      --text: #f0f0f5; --text2: #8888aa;
-      --border: rgba(255,207,75,0.12); --border2: rgba(255,255,255,0.07);
-      --success: #34d399; --danger: #f87171; --radius: 14px;
+      --bg-primary: #050609;
+      --bg-secondary: #0b0d16;
+      --bg-tertiary: #121522;
+      --accent-gold: #ffcf4b;
+      --accent-gold-hover: #ffe28a;
+      --accent-gold-glow: rgba(255, 207, 75, 0.25);
+      --text-primary: #ffffff;
+      --text-secondary: #a0aec0;
+      --text-muted: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border-color: rgba(255, 207, 75, 0.08);
+      --glass-bg: rgba(11, 13, 22, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.04);
+      --font-title: 'Playfair Display', Georgia, serif;
+      --font-body: 'Outfit', sans-serif;
+      --border-radius: 16px;
     }
-    body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* BG */
-    .bg-orbs { position: fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-    .orb { position:absolute; border-radius:50%; filter:blur(90px); }
-    .orb-1 { width:400px; height:400px; background:rgba(255,207,75,0.05); top:-80px; right:-80px; }
-    .orb-2 { width:300px; height:300px; background:rgba(139,92,246,0.04); bottom:-60px; left:-60px; }
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Ambient Glows */
+    .bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(100px); }
+    .orb-1 { width: 45vw; height: 45vw; background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(0,0,0,0) 70%); top: -10%; right: -10%; }
+    .orb-2 { width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(255, 207, 75, 0.04) 0%, rgba(0,0,0,0) 70%); bottom: -10%; left: -10%; }
 
     /* LAYOUT */
-    .page { position:relative; z-index:1; max-width:720px; margin:0 auto; padding:2rem 1.25rem 4rem; }
-
-    /* HEADER */
-    .biz-header { text-align:center; margin-bottom:2.5rem; }
-    .biz-logo { width:56px; height:56px; margin:0 auto 0.75rem; }
-    .biz-name { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); margin-bottom:0.3rem; }
-    .biz-tagline { font-size:0.85rem; color:var(--text2); }
-
-    /* STEPS */
-    .steps-bar { display:flex; align-items:center; gap:0.5rem; margin-bottom:2rem; }
-    .step-dot {
-      flex:1; height:4px; border-radius:4px; background:var(--border2);
-      transition: background 0.4s;
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
     }
-    .step-dot.active { background: var(--gold); }
-    .step-label { font-size:0.75rem; color:var(--text2); white-space:nowrap; }
 
-    /* CARD */
-    .card { background:rgba(26,26,38,0.95); border:1px solid var(--border2); border-radius:var(--radius); padding:1.75rem; margin-bottom:1.25rem; }
-    .card-title { font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem; }
+    /* BIZ HEADER */
+    .biz-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .biz-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 0.75rem;
+      filter: drop-shadow(0 0 10px var(--accent-gold-glow));
+    }
+    .biz-name {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      color: var(--accent-gold);
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.5px;
+    }
+    .biz-tagline {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+    }
 
-    /* FORM */
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-    @media(max-width:540px) { .form-row { grid-template-columns:1fr; } }
-    .form-group { margin-bottom:1rem; }
-    label { display:block; font-size:0.8rem; font-weight:500; color:var(--text2); margin-bottom:0.4rem; }
+    /* GRID LAYOUT (Idéntico a la SPA) */
+    .grid-2-1 {
+      display: grid;
+      grid-template-columns: 2.1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .grid-2-1 { grid-template-columns: 1fr; }
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      color: var(--accent-gold);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 0.75rem;
+    }
+
+    /* FORM GROUPS */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
     input, select, textarea {
-      width:100%; padding:0.75rem 0.9rem;
-      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1);
-      border-radius:10px; color:var(--text); font-family:'Outfit',sans-serif; font-size:0.9rem;
-      outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+      padding: 0.85rem 1.1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    input:focus, select:focus, textarea:focus { border-color:rgba(255,207,75,0.4); box-shadow:0 0 0 3px rgba(255,207,75,0.07); }
-    input::placeholder, textarea::placeholder { color:rgba(136,136,170,0.4); }
-    select option { background:#1a1a26; }
-    textarea { resize:vertical; min-height:80px; }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(255, 207, 75, 0.4);
+      box-shadow: 0 0 0 3px rgba(255, 207, 75, 0.08);
+    }
+    select option { background: var(--bg-secondary); }
+    textarea { resize: vertical; min-height: 90px; }
 
-    /* PRODUCT GRID */
-    .products-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.75rem; }
+    /* VENUE CARDS (Selector interactivo) */
+    .products-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
     .product-card {
-      border:1px solid var(--border2); border-radius:12px; padding:1rem;
-      cursor:pointer; transition:border-color 0.2s, background 0.2s, transform 0.15s;
-      position:relative;
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .product-card:hover { border-color:rgba(255,207,75,0.3); transform:translateY(-2px); }
-    .product-card.selected { border-color:var(--gold); background:rgba(255,207,75,0.06); }
-    .product-card.selected::after { content:'✓'; position:absolute; top:0.5rem; right:0.75rem; color:var(--gold); font-weight:700; font-size:1rem; }
-    .product-name { font-size:0.88rem; font-weight:600; color:var(--text); margin-bottom:0.25rem; }
-    .product-price { font-size:0.78rem; color:var(--gold); font-weight:600; }
-    .product-desc { font-size:0.73rem; color:var(--text2); margin-top:0.3rem; line-height:1.4; }
+    .product-card:hover {
+      border-color: rgba(255, 207, 75, 0.3);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .product-card.selected {
+      border-color: var(--accent-gold);
+      background: rgba(255, 207, 75, 0.05);
+      box-shadow: 0 0 20px rgba(255, 207, 75, 0.05);
+    }
+    .product-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      color: var(--accent-gold);
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .product-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+    }
+    .product-price {
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .product-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
 
-    /* PRICE SUMMARY */
-    .price-box { background:rgba(255,207,75,0.05); border:1px solid rgba(255,207,75,0.15); border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; }
-    .price-row { display:flex; justify-content:space-between; font-size:0.85rem; color:var(--text2); margin-bottom:0.4rem; }
-    .price-total { display:flex; justify-content:space-between; font-size:1.1rem; font-weight:700; color:var(--gold); margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid rgba(255,207,75,0.15); }
+    /* STICKY BUDGET SUMMARY (Columna Derecha) */
+    .sticky-summary {
+      position: sticky;
+      top: 2rem;
+    }
+    .budget-card {
+      background: rgba(255, 207, 75, 0.03);
+      border: 1px solid rgba(255, 207, 75, 0.15);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(25px);
+    }
+    .budget-header {
+      font-family: var(--font-title);
+      font-size: 1.5rem;
+      color: var(--accent-gold);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 207, 75, 0.15);
+    }
+    .budget-items {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    .budget-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+    .budget-row span {
+      flex: 1;
+      padding-right: 0.5rem;
+    }
+    .budget-row strong {
+      color: var(--text-primary);
+      text-align: right;
+    }
+    .budget-total {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(255, 207, 75, 0.2);
+      margin-bottom: 2rem;
+    }
 
     /* BUTTONS */
-    .btn-row { display:flex; gap:1rem; }
     .btn-primary {
-      flex:1; padding:0.9rem; background:linear-gradient(135deg,#ffcf4b,#f59e0b);
-      border:none; border-radius:12px; color:#0a0a0f;
-      font-family:'Outfit',sans-serif; font-size:1rem; font-weight:700;
-      cursor:pointer; transition:transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #ffcf4b, #f59e0b);
+      border: none;
+      border-radius: 12px;
+      color: #050609;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 15px rgba(255, 207, 75, 0.2);
     }
-    .btn-primary:hover { transform:translateY(-1px); box-shadow:0 6px 24px rgba(255,207,75,0.3); }
-    .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-    .btn-secondary { padding:0.9rem 1.5rem; background:rgba(255,255,255,0.05); border:1px solid var(--border2); border-radius:12px; color:var(--text2); font-family:'Outfit',sans-serif; font-size:0.95rem; cursor:pointer; }
-    .btn-secondary:hover { background:rgba(255,255,255,0.08); }
-
-    /* SUCCESS */
-    .success-view { display:none; text-align:center; padding:3rem 1rem; }
-    .success-icon { font-size:4rem; margin-bottom:1rem; animation:bounce 1s ease; }
-    @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-    .success-title { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--success); margin-bottom:0.75rem; }
-    .success-sub { font-size:0.9rem; color:var(--text2); line-height:1.6; max-width:420px; margin:0 auto 2rem; }
-    .summary-box { background:rgba(52,211,153,0.05); border:1px solid rgba(52,211,153,0.15); border-radius:12px; padding:1.25rem; text-align:left; max-width:420px; margin:0 auto; }
-    .summary-row { display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.4rem; color:var(--text2); }
-    .summary-row strong { color:var(--text); }
-
-    /* CLIENT LOGIN LINK */
-    .client-login-box {
-      margin-top:1.5rem; padding:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--border2);
-      border-radius:12px; font-size:0.82rem; color:var(--text2); text-align:center;
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 207, 75, 0.35);
+      background: linear-gradient(135deg, #ffe28a, #d97706);
     }
-    .client-login-box a { color:var(--gold); font-weight:600; text-decoration:none; }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-    /* ERROR */
-    .error-box { background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.2); color:var(--danger); border-radius:10px; padding:0.75rem 1rem; font-size:0.84rem; margin-bottom:1rem; display:none; }
+    /* PORTAL ACCESO CLIENTES LINK */
+    .portal-link-box {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .portal-link-box a {
+      color: var(--accent-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .portal-link-box a:hover {
+      text-decoration: underline;
+    }
 
-    /* SPINNER */
-    .spinner-inline { display:inline-block; width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-top-color:#0a0a0f; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:0.4rem; }
-    @keyframes spin { to{transform:rotate(360deg);} }
+    /* SUCCESS VIEW */
+    .success-view {
+      display: none;
+      text-align: center;
+      padding: 4rem 2rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .success-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.3));
+    }
+    .success-title {
+      font-family: var(--font-title);
+      font-size: 2.2rem;
+      color: var(--success);
+      margin-bottom: 1rem;
+    }
+    .success-sub {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
 
-    /* NOT FOUND */
-    .not-found { text-align:center; padding:4rem 2rem; }
-    .not-found h2 { font-size:1.3rem; color:var(--text2); margin-bottom:0.75rem; }
-
-    /* SECTION HEADER */
-    .section-label { font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin-bottom:0.75rem; }
-    .empty-products { font-size:0.85rem; color:var(--text2); text-align:center; padding:1.5rem; }
+    /* LOADING VIEW & ERROR BOX */
+    #loading-view { text-align: center; padding: 6rem 2rem; }
+    .error-box {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 10px;
+      padding: 1rem;
+      color: var(--danger);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
-<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
+  <div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 
-<div class="page" id="app-page">
-  <div id="loading-view" style="text-align:center;padding:4rem 1rem;">
-    <div style="font-size:1.5rem;margin-bottom:1rem;">⏳</div>
-    <p style="color:var(--text2);" data-i18n="cotizar.loading">Cargando cotizador...</p>
-  </div>
-  <div id="not-found-view" class="not-found" style="display:none;">
-    <div style="font-size:3rem;margin-bottom:1rem;">🔍</div>
-    <h2 data-i18n="cotizar.not_found">Cotizador no encontrado</h2>
-    <p style="color:var(--text2);font-size:0.85rem;" data-i18n="cotizar.not_found_sub">El enlace puede ser incorrecto o el negocio no existe.</p>
-  </div>
-  <div id="main-view" style="display:none;">
-    <!-- Header del negocio -->
-    <div class="biz-header">
-      <svg class="biz-logo" viewBox="0 0 24 24" fill="none" stroke="#ffcf4b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/><path d="M12 17v4"/><path d="M8 21h8"/><circle cx="12" cy="9" r="1"/>
-      </svg>
-      <div class="biz-name" id="biz-name">Control Banquete</div>
-      <div class="biz-tagline" data-i18n="cotizar.tagline">Solicita tu cotización — sin compromiso</div>
+  <div class="page-wrapper" id="app-page">
+    
+    <!-- CARGANDO -->
+    <div id="loading-view">
+      <div style="font-size: 2.5rem; margin-bottom: 1rem; animation: spin 1s linear infinite;">⏳</div>
+      <p style="color: var(--text-secondary);">Cargando cotizador interactivo...</p>
     </div>
 
-    <!-- Pasos -->
-    <div class="steps-bar">
-      <div class="step-dot active" id="dot-1"></div>
-      <div class="step-label">Tus datos</div>
-      <div class="step-dot" id="dot-2"></div>
-      <div class="step-label">Servicios</div>
-      <div class="step-dot" id="dot-3"></div>
-      <div class="step-label">Confirmar</div>
+    <!-- NEGOCIO NO ENCONTRADO -->
+    <div id="not-found-view" style="display: none; text-align: center; padding: 6rem 2rem;">
+      <div style="font-size: 4rem; margin-bottom: 1.5rem;">🔍</div>
+      <h2 style="font-family: var(--font-title); font-size: 1.8rem; margin-bottom: 0.75rem;">Negocio No Registrado</h2>
+      <p style="color: var(--text-secondary); font-size: 0.95rem;">El enlace puede estar incompleto o el negocio no existe en la plataforma.</p>
     </div>
 
-    <!-- PASO 1: Datos del cliente -->
-    <div id="step-1">
-      <div class="card">
-        <div class="card-title">👤 Tus datos de contacto</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="c-nombre">Nombre completo *</label>
-            <input type="text" id="c-nombre" placeholder="Nombre y apellido" required>
+    <!-- MAIN VIEW: GRID INTERACTIVO -->
+    <div id="main-view" style="display: none;">
+      
+      <!-- Header -->
+      <div class="biz-header">
+        <svg class="biz-logo" viewBox="0 0 24 24" fill="none" stroke="#ffcf4b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3h12l-1 9a5 5 0 0 1-10 0L6 3Z"/><path d="M12 17v4"/><path d="M8 21h8"/><circle cx="12" cy="9" r="1"/>
+        </svg>
+        <div class="biz-name" id="biz-name">Sarahy Banquetes</div>
+        <div class="biz-tagline">Genera tu presupuesto estimado oficial en tiempo real</div>
+      </div>
+
+      <div class="grid-2-1">
+        
+        <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+        <div class="main-form">
+          <div class="error-box" id="error-box"></div>
+
+          <!-- 1. DATOS DE CONTACTO -->
+          <div class="card">
+            <div class="card-title">👤 1. Datos de Contacto</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="c-nombre">Nombre Completo *</label>
+                <input type="text" id="c-nombre" placeholder="Ej: Diana Valencia" required>
+              </div>
+              <div class="form-group">
+                <label for="c-tel">Teléfono / WhatsApp *</label>
+                <input type="tel" id="c-tel" placeholder="Ej: 312 456 7890" required>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="c-email">Correo Electrónico *</label>
+              <input type="email" id="c-email" placeholder="nombre@correo.com" required>
+            </div>
           </div>
-          <div class="form-group">
-            <label for="c-tel">Teléfono / WhatsApp *</label>
-            <input type="tel" id="c-tel" placeholder="300 000 0000" required>
+
+          <!-- 2. DETALLES DEL EVENTO -->
+          <div class="card">
+            <div class="card-title">📅 2. Detalles del Evento</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="c-tipo">Tipo de Evento *</label>
+                <select id="c-tipo" required>
+                  <option value="boda">Boda (Matrimonio)</option>
+                  <option value="quinces">Fiesta de Quinces</option>
+                  <option value="grados_otros">Cumpleaños, Grados u Otros</option>
+                  <option value="comuniones">Primera Comunión</option>
+                  <option value="fiesta_infantil">Fiesta Infantil</option>
+                  <option value="empresarial">Evento Empresarial</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="c-fecha">Fecha Deseada *</label>
+                <input type="date" id="c-fecha" required>
+              </div>
+              <div class="form-group">
+                <label for="c-invitados">Número de Invitados *</label>
+                <input type="number" id="c-invitados" min="10" max="1000" value="80" required>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="c-notas">Notas o requerimientos especiales</label>
+              <textarea id="c-notas" placeholder="Ej: Decoración en tonos pastel, restricciones alimentarias, etc."></textarea>
+            </div>
+          </div>
+
+          <!-- 3. SALONES -->
+          <div class="card" id="card-venues" style="display: none;">
+            <div class="card-title">🏛️ 3. Salón o Locación</div>
+            <div class="products-selector-grid" id="grid-venues"></div>
+          </div>
+
+          <!-- 4. PAQUETES -->
+          <div class="card">
+            <div class="card-title">🍽️ 4. Servicios Principales</div>
+            <div class="form-grid">
+              <div class="form-group" id="group-catering">
+                <label for="c-catering">Plan de Alimentación</label>
+                <select id="c-catering"></select>
+                <div id="desc-catering" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
+              </div>
+              <div class="form-group" id="group-photography" style="display: none;">
+                <label for="c-photo">Fotografía y Video</label>
+                <select id="c-photo"></select>
+                <div id="desc-photo" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
+              </div>
+              <div class="form-group" id="group-decoration" style="display: none;">
+                <label for="c-deco">Estilo de Decoración</label>
+                <select id="c-deco"></select>
+                <div id="desc-deco" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
+              </div>
+              <div class="form-group" id="group-recreation" style="display: none;">
+                <label for="c-recreation">Paquete Recreativo</label>
+                <select id="c-recreation"></select>
+                <div id="desc-recreation" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.3;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. ADICIONALES -->
+          <div class="card" id="card-services" style="display: none;">
+            <div class="card-title">✨ 5. Servicios Adicionales</div>
+            <div class="products-selector-grid" id="grid-services"></div>
+          </div>
+
+        </div>
+
+        <!-- COLUMNA DERECHA: PRESUPUESTO STICKY (Idéntico a la SPA) -->
+        <div class="sticky-summary">
+          <div class="budget-card">
+            <h3 class="budget-header">Resumen de Cotización</h3>
+            
+            <div class="budget-items" id="budget-items-list">
+              <!-- Se calcula en tiempo real -->
+            </div>
+
+            <div class="budget-total">
+              <span>Total Estimado</span>
+              <span id="price-total">$0</span>
+            </div>
+
+            <button class="btn-primary" id="btn-send" onclick="sendQuotation()">
+              Solicitar Cotización Oficial
+            </button>
+
+            <div class="portal-link-box">
+              ¿Ya tienes cuenta? <a href="/login" target="_blank">Iniciar sesión</a>
+            </div>
           </div>
         </div>
-        <div class="form-group">
-          <label for="c-email">Correo electrónico *</label>
-          <input type="email" id="c-email" placeholder="tucorreo@email.com" required>
-        </div>
+
       </div>
-      <div class="card">
-        <div class="card-title">📅 Tu evento</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="c-tipo">Tipo de evento *</label>
-            <select id="c-tipo" required>
-              <option value="">— Selecciona —</option>
-              <option value="boda">Boda</option>
-              <option value="quinces">Quinceañera</option>
-              <option value="grados_otros">Grado / Aniversario</option>
-              <option value="comuniones">Comunión / Confirmación</option>
-              <option value="fiesta_infantil">Fiesta Infantil</option>
-              <option value="empresarial">Evento Empresarial</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="c-fecha">Fecha del evento *</label>
-            <input type="date" id="c-fecha" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="c-invitados">Número de invitados *</label>
-          <input type="number" id="c-invitados" placeholder="Ej: 150" min="10" max="2000" required>
-        </div>
-        <div class="form-group">
-          <label for="c-notas">¿Algo especial que quieras comunicarnos?</label>
-          <textarea id="c-notas" placeholder="Colores, temática, requerimientos especiales..."></textarea>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" onclick="goStep(2)">Continuar → Servicios</button>
-      </div>
+
     </div>
 
-    <!-- PASO 2: Servicios -->
-    <div id="step-2" style="display:none;">
-      <div class="card">
-        <div class="card-title">🍽️ Catering</div>
-        <div class="section-label">Selecciona el plan de alimentación</div>
-        <div class="products-grid" id="grid-catering"></div>
+    <!-- PANTALLA ÉXITO -->
+    <div class="success-view" id="success-view">
+      <div class="success-icon">🎉</div>
+      <h2 class="success-title">¡Presupuesto Enviado!</h2>
+      <p class="success-sub">Recibimos tus datos. Un asesor de <strong id="success-biz"></strong> se pondrá en contacto pronto por WhatsApp o Email para coordinar detalles.</p>
+      
+      <div class="card" style="text-align: left; max-width: 450px; margin: 0 auto 2rem;">
+        <div class="card-title" style="font-size: 1.15rem; margin-bottom: 0.75rem;">Resumen de Reserva</div>
+        <div style="font-size: 0.9rem; display: flex; flex-direction: column; gap: 0.5rem;" id="success-summary">
+          <!-- Inyectado dinámicamente -->
+        </div>
       </div>
-      <div class="card" id="card-venues" style="display:none;">
-        <div class="card-title">🏛️ Salón / Lugar</div>
-        <div class="products-grid" id="grid-venues"></div>
-      </div>
-      <div class="card" id="card-photography" style="display:none;">
-        <div class="card-title">📸 Fotografía y Video</div>
-        <div class="products-grid" id="grid-photography"></div>
-      </div>
-      <div class="card" id="card-decoration" style="display:none;">
-        <div class="card-title">🌸 Decoración</div>
-        <div class="products-grid" id="grid-decoration"></div>
-      </div>
-      <div class="card" id="card-recreation" style="display:none;">
-        <div class="card-title">🎭 Recreación / Animación</div>
-        <div class="products-grid" id="grid-recreation"></div>
-      </div>
-      <div class="card" id="card-services" style="display:none;">
-        <div class="card-title">✨ Servicios Adicionales</div>
-        <div class="section-label">Puedes seleccionar varios</div>
-        <div class="products-grid" id="grid-services"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-secondary" onclick="goStep(1)">← Atrás</button>
-        <button class="btn-primary" onclick="goStep(3)">Continuar → Resumen</button>
-      </div>
+
+      <button class="btn-primary" style="max-width: 300px;" onclick="location.reload()">
+        Realizar Otra Cotización
+      </button>
     </div>
 
-    <!-- PASO 3: Confirmar -->
-    <div id="step-3" style="display:none;">
-      <div class="error-box" id="error-box"></div>
-      <div class="card">
-        <div class="card-title">📋 Resumen de tu solicitud</div>
-        <div id="summary-content"></div>
-      </div>
-      <div class="price-box">
-        <div class="price-row"><span>Subtotal estimado</span><span id="price-sub">$0</span></div>
-        <div class="price-row" id="price-guests-row" style="display:none;"><span id="price-guests-label">Invitados</span><span id="price-guests-val">$0</span></div>
-        <div class="price-total"><span>Total Estimado</span><span id="price-total">$0</span></div>
-      </div>
-      <p style="font-size:0.75rem;color:var(--text2);margin-bottom:1.25rem;">* Precio estimado. El valor final puede variar según personalización. Un asesor se pondrá en contacto.</p>
-      <div class="btn-row">
-        <button class="btn-secondary" onclick="goStep(2)">← Editar</button>
-        <button class="btn-primary" id="btn-send" onclick="sendQuotation()">✉️ Enviar Solicitud</button>
-      </div>
-    </div>
   </div>
 
-  <!-- SUCCESS -->
-  <div class="success-view" id="success-view">
-    <div class="success-icon">🎉</div>
-    <h2 class="success-title">¡Solicitud Enviada!</h2>
-    <p class="success-sub">Hemos recibido tu solicitud de cotización. Un asesor de <strong id="success-biz"></strong> te contactará pronto por WhatsApp o correo electrónico.</p>
-    <div class="summary-box" id="success-summary"></div>
-    <div class="client-login-box" style="margin-top:1.5rem;">
-      ¿Ya tienes una cuenta de cliente? <a href="login.html" id="client-login-link">Ingresa a tu portal →</a>
-    </div>
-    <button class="btn-secondary" style="margin-top:1.25rem;width:100%;max-width:420px;" onclick="location.reload()">Hacer otra cotización</button>
-  </div>
-</div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const TENANT = params.get('t') || params.get('negocio') || params.get('id');
+    let bizData = null, products = null;
+    let selVenue = '', selCatering = '', selPhoto = '', selDeco = '', selRecreation = '';
+    let selServices = [];
 
-<script>
-const params  = new URLSearchParams(window.location.search);
-const TENANT  = params.get('t') || params.get('negocio') || params.get('id');
-let   bizData = null, products = null;
-let   selCatering='', selVenue='', selPhoto='', selDeco='', selRecreation='';
-let   selServices = [];
+    async function init() {
+      if (!TENANT) { show('not-found-view'); return; }
 
-// ── Cargar negocio y productos ──
-async function init() {
-  if (!TENANT) { show('not-found-view'); return; }
+      try {
+        const [bizRes, prodRes] = await Promise.all([
+          fetch(`/api/public/business?t=${TENANT}`),
+          fetch(`/api/public/products?t=${TENANT}`)
+        ]);
 
-  try {
-    const [bizRes, prodRes] = await Promise.all([
-      fetch(`/api/public/business?t=${TENANT}`),
-      fetch(`/api/public/products?t=${TENANT}`)
-    ]);
-    if (!bizRes.ok || !prodRes.ok) { show('not-found-view'); return; }
-    bizData  = await bizRes.json();
-    products = await prodRes.json();
+        if (!bizRes.ok || !prodRes.ok) { show('not-found-view'); return; }
 
-    document.title = `Cotizador — ${bizData.businessName}`;
-    document.getElementById('biz-name').textContent = bizData.businessName;
-    document.getElementById('success-biz').textContent = bizData.businessName;
+        bizData = await bizRes.json();
+        products = await prodRes.json();
 
-    renderProducts();
-    show('main-view');
-  } catch(e) { show('not-found-view'); }
-}
+        document.title = `Cotizador Oficial — ${bizData.businessName}`;
+        document.getElementById('biz-name').textContent = bizData.businessName;
+        document.getElementById('success-biz').textContent = bizData.businessName;
 
-function show(id) {
-  document.getElementById('loading-view').style.display  = 'none';
-  document.getElementById('not-found-view').style.display = id==='not-found-view' ? 'block' : 'none';
-  document.getElementById('main-view').style.display     = id==='main-view'      ? 'block' : 'none';
-  document.getElementById('success-view').style.display  = id==='success-view'   ? 'block' : 'none';
-}
-
-function fmt(n) { return '$' + Math.round(n).toLocaleString('es-CO') + ' COP'; }
-
-// ── Renderizar productos en grids ──
-function makeGrid(containerId, items, single, selVar) {
-  const grid = document.getElementById(containerId);
-  if (!grid) return;
-  if (!items || items.length === 0) {
-    grid.innerHTML = '<div class="empty-products">Sin opciones disponibles</div>';
-    return;
-  }
-  grid.innerHTML = '';
-  items.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.dataset.id = p.id;
-    card.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">${p.price>0?fmt(p.price):''}</div><div class="product-desc">${p.description||''}</div>`;
-    card.onclick = () => {
-      if (single) {
-        grid.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
-        window[selVar] = card.classList.contains('selected') ? '' : p.id;
-      } else {
-        if (card.classList.contains('selected')) {
-          selServices = selServices.filter(id => id !== p.id);
-        } else {
-          selServices.push(p.id);
-        }
+        setupSelectors();
+        renderProducts();
+        calcPrice();
+        show('main-view');
+      } catch(e) {
+        console.error(e);
+        show('not-found-view');
       }
-      card.classList.toggle('selected');
+    }
+
+    function show(id) {
+      document.getElementById('loading-view').style.display = 'none';
+      document.getElementById('not-found-view').style.display = id === 'not-found-view' ? 'block' : 'none';
+      document.getElementById('main-view').style.display = id === 'main-view' ? 'block' : 'none';
+      document.getElementById('success-view').style.display = id === 'success-view' ? 'block' : 'none';
+    }
+
+    function fmt(n) { return '$' + Math.round(n).toLocaleString('es-CO') + ' COP'; }
+
+    // Rellenar los dropdowns (comportamiento idéntico al admin)
+    function setupSelectors() {
+      const fillSelect = (id, items, descId, changeCallback) => {
+        const select = document.getElementById(id);
+        if (!select) return;
+        select.innerHTML = '<option value="">— Ninguno / Por Definir —</option>';
+        if (items && items.length) {
+          items.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = `${p.name} (${fmt(p.price)})`;
+            select.appendChild(opt);
+          });
+          select.parentElement.style.display = 'block';
+        } else {
+          select.parentElement.style.display = 'none';
+        }
+
+        select.onchange = (e) => {
+          const val = e.target.value;
+          const found = items.find(p => p.id === val);
+          document.getElementById(descId).textContent = found ? found.description || '' : '';
+          changeCallback(val);
+          calcPrice();
+        };
+      };
+
+      fillSelect('c-catering', products.catering || [], 'desc-catering', (v) => { selCatering = v; });
+      fillSelect('c-photo', products.photography || [], 'desc-photo', (v) => { selPhoto = v; });
+      fillSelect('c-deco', products.decoration || [], 'desc-deco', (v) => { selDeco = v; });
+      fillSelect('c-recreation', products.recreation || [], 'desc-recreation', (v) => { selRecreation = v; });
+    }
+
+    // Renderizar Salones y Adicionales (tarjetas interactivas)
+    function renderProducts() {
+      const eventType = document.getElementById('c-tipo').value || 'grados_otros';
+      
+      // Salones
+      const gridVenues = document.getElementById('grid-venues');
+      if (gridVenues && products.venues && products.venues.length) {
+        gridVenues.innerHTML = '';
+        products.venues.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">${fmt(p.price)}</div><div class="product-desc">${p.description||''}</div>`;
+          card.onclick = () => {
+            const isSel = card.classList.contains('selected');
+            gridVenues.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+            if (isSel) {
+              selVenue = '';
+            } else {
+              selVenue = p.id;
+              card.classList.add('selected');
+            }
+            calcPrice();
+          };
+          gridVenues.appendChild(card);
+        });
+        document.getElementById('card-venues').style.display = 'block';
+      } else {
+        document.getElementById('card-venues').style.display = 'none';
+      }
+
+      // Adicionales
+      const gridServices = document.getElementById('grid-services');
+      const svcs = products.services?.[eventType] || [];
+      if (gridServices && svcs.length) {
+        gridServices.innerHTML = '';
+        svcs.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'product-card' + (selServices.includes(p.id) ? ' selected' : '');
+          card.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">${fmt(p.price)}</div><div class="product-desc">${p.description||''}</div>`;
+          card.onclick = () => {
+            if (selServices.includes(p.id)) {
+              selServices = selServices.filter(id => id !== p.id);
+              card.classList.remove('selected');
+            } else {
+              selServices.push(p.id);
+              card.classList.add('selected');
+            }
+            calcPrice();
+          };
+          gridServices.appendChild(card);
+        });
+        document.getElementById('card-services').style.display = 'block';
+      } else {
+        document.getElementById('card-services').style.display = 'none';
+      }
+    }
+
+    document.getElementById('c-tipo').onchange = () => {
+      selServices = [];
+      renderProducts();
       calcPrice();
     };
-    grid.appendChild(card);
-  });
-}
 
-function renderProducts() {
-  const eventType = document.getElementById('c-tipo').value || 'grados_otros';
-  makeGrid('grid-catering', products.catering, true, 'selCatering');
+    // Calcular precio y pintar el Resumen lateral (Idéntico a la SPA)
+    function calcPrice() {
+      if (!products) return;
 
-  if (products.venues?.length)      { makeGrid('grid-venues', products.venues, true, 'selVenue'); document.getElementById('card-venues').style.display=''; }
-  if (products.photography?.length) { makeGrid('grid-photography', products.photography, true, 'selPhoto'); document.getElementById('card-photography').style.display=''; }
-  if (products.decoration?.length)  { makeGrid('grid-decoration', products.decoration, true, 'selDeco'); document.getElementById('card-decoration').style.display=''; }
-  if (products.recreation?.length)  { makeGrid('grid-recreation', products.recreation, true, 'selRecreation'); document.getElementById('card-recreation').style.display=''; }
+      const guests = parseInt(document.getElementById('c-invitados').value) || 0;
+      const allProds = [
+        ...(products.catering || []),
+        ...(products.venues || []),
+        ...(products.photography || []),
+        ...(products.decoration || []),
+        ...(products.recreation || []),
+        ...Object.values(products.services || {}).flat()
+      ];
 
-  const svcs = products.services?.[eventType] || [];
-  if (svcs.length) { makeGrid('grid-services', svcs, false, null); document.getElementById('card-services').style.display=''; }
-}
+      const findProd = id => allProds.find(p => p.id === id);
+      const itemsList = document.getElementById('budget-items-list');
+      itemsList.innerHTML = '';
 
-document.getElementById('c-tipo').addEventListener('change', renderProducts);
+      let total = 0;
 
-// ── Calcular precio ──
-function calcPrice() {
-  if (!products) return 0;
-  const guests   = parseInt(document.getElementById('c-invitados').value) || 0;
-  const allProds = [...(products.catering||[]), ...(products.venues||[]), ...(products.photography||[]), ...(products.decoration||[]), ...(products.recreation||[]), ...Object.values(products.services||{}).flat()];
-  const findProd = id => allProds.find(p => p.id === id);
+      // 1. Invitados / Catering
+      if (guests > 0) {
+        const cat = findProd(selCatering);
+        if (cat) {
+          const cost = cat.price * guests;
+          total += cost;
+          itemsList.innerHTML += `<div class="budget-row"><span>🍽️ ${cat.name} (×${guests} pax)</span><strong>${fmt(cost)}</strong></div>`;
+        } else {
+          itemsList.innerHTML += `<div class="budget-row"><span>👥 Invitados</span><strong>${guests} Personas</strong></div>`;
+        }
+      }
 
-  let total = 0;
-  const cateringProd = findProd(selCatering);
-  if (cateringProd && guests > 0) {
-    total += cateringProd.price * guests;
-    document.getElementById('price-guests-row').style.display='flex';
-    document.getElementById('price-guests-label').textContent = `${cateringProd.name} × ${guests} personas`;
-    document.getElementById('price-guests-val').textContent = fmt(cateringProd.price * guests);
-  } else { document.getElementById('price-guests-row').style.display='none'; }
+      // 2. Salón
+      if (selVenue) {
+        const v = findProd(selVenue);
+        if (v) { total += v.price; itemsList.innerHTML += `<div class="budget-row"><span>🏛️ Salón: ${v.name}</span><strong>${fmt(v.price)}</strong></div>`; }
+      }
 
-  [selVenue, selPhoto, selDeco, selRecreation].forEach(id => { const p=findProd(id); if(p) total+=p.price; });
-  selServices.forEach(id => { const p=findProd(id); if(p) total+=p.price; });
+      // 3. Foto, Deco, Recreación
+      const pId = findProd(selPhoto); if (pId) { total += pId.price; itemsList.innerHTML += `<div class="budget-row"><span>📸 Fotografía: ${pId.name}</span><strong>${fmt(pId.price)}</strong></div>`; }
+      const dId = findProd(selDeco); if (dId) { total += dId.price; itemsList.innerHTML += `<div class="budget-row"><span>🌸 Decoración: ${dId.name}</span><strong>${fmt(dId.price)}</strong></div>`; }
+      const rId = findProd(selRecreation); if (rId) { total += rId.price; itemsList.innerHTML += `<div class="budget-row"><span>🎭 Recreación: ${rId.name}</span><strong>${fmt(rId.price)}</strong></div>`; }
 
-  document.getElementById('price-sub').textContent   = fmt(total);
-  document.getElementById('price-total').textContent = fmt(total);
-  return total;
-}
+      // 4. Servicios Adicionales
+      selServices.forEach(id => {
+        const s = findProd(id);
+        if (s) { total += s.price; itemsList.innerHTML += `<div class="budget-row"><span>✨ Adicional: ${s.name}</span><strong>${fmt(s.price)}</strong></div>`; }
+      });
 
-document.getElementById('c-invitados').addEventListener('input', calcPrice);
-
-// ── Navegación entre pasos ──
-function goStep(n) {
-  // Validar paso 1
-  if (n > 1) {
-    const nombre = document.getElementById('c-nombre').value.trim();
-    const email  = document.getElementById('c-email').value.trim();
-    const tel    = document.getElementById('c-tel').value.trim();
-    const tipo   = document.getElementById('c-tipo').value;
-    const fecha  = document.getElementById('c-fecha').value;
-    const guests = document.getElementById('c-invitados').value;
-    if (!nombre || !email || !tel || !tipo || !fecha || !guests) {
-      alert('Por favor completa todos los campos del evento antes de continuar.');
-      return;
+      document.getElementById('price-total').textContent = fmt(total);
+      return total;
     }
-  }
-  // Mostrar resumen en paso 3
-  if (n === 3) buildSummary();
-  document.getElementById('step-1').style.display = n===1?'':'none';
-  document.getElementById('step-2').style.display = n===2?'':'none';
-  document.getElementById('step-3').style.display = n===3?'':'none';
-  ['dot-1','dot-2','dot-3'].forEach((id,i) => {
-    document.getElementById(id).classList.toggle('active', i<n);
-  });
-  window.scrollTo({top:0,behavior:'smooth'});
-}
 
-// ── Resumen ──
-function buildSummary() {
-  const allProds = [...(products.catering||[]), ...(products.venues||[]), ...(products.photography||[]), ...(products.decoration||[]), ...(products.recreation||[]), ...Object.values(products.services||{}).flat()];
-  const findProd = id => allProds.find(p => p.id === id);
-  const tipo = { boda:'Boda', quinces:'Quinceañera', grados_otros:'Grado/Aniversario', comuniones:'Comunión', fiesta_infantil:'Fiesta Infantil', empresarial:'Empresarial' };
+    document.getElementById('c-invitados').oninput = calcPrice;
 
-  let html = `
-    <div style="display:grid;gap:0.5rem;font-size:0.85rem;">
-      <div class="price-row"><span style="color:var(--text2)">Nombre</span><strong>${document.getElementById('c-nombre').value}</strong></div>
-      <div class="price-row"><span style="color:var(--text2)">Evento</span><strong>${tipo[document.getElementById('c-tipo').value]||document.getElementById('c-tipo').value}</strong></div>
-      <div class="price-row"><span style="color:var(--text2)">Fecha</span><strong>${document.getElementById('c-fecha').value}</strong></div>
-      <div class="price-row"><span style="color:var(--text2)">Invitados</span><strong>${document.getElementById('c-invitados').value}</strong></div>
-  `;
-  if (selCatering) { const p=findProd(selCatering); if(p) html+=`<div class="price-row"><span style="color:var(--text2)">Catering</span><strong>${p.name}</strong></div>`; }
-  if (selVenue)    { const p=findProd(selVenue); if(p) html+=`<div class="price-row"><span style="color:var(--text2)">Salón</span><strong>${p.name}</strong></div>`; }
-  if (selPhoto)    { const p=findProd(selPhoto); if(p) html+=`<div class="price-row"><span style="color:var(--text2)">Fotografía</span><strong>${p.name}</strong></div>`; }
-  if (selDeco)     { const p=findProd(selDeco); if(p) html+=`<div class="price-row"><span style="color:var(--text2)">Decoración</span><strong>${p.name}</strong></div>`; }
-  if (selServices.length) {
-    selServices.forEach(id => { const p=findProd(id); if(p) html+=`<div class="price-row"><span style="color:var(--text2)">Adicional</span><strong>${p.name}</strong></div>`; });
-  }
-  html += '</div>';
-  document.getElementById('summary-content').innerHTML = html;
-  calcPrice();
-}
+    // Enviar solicitud de cotización
+    async function sendQuotation() {
+      const errorBox = document.getElementById('error-box');
+      const btn = document.getElementById('btn-send');
+      
+      const nombre = document.getElementById('c-nombre').value.trim();
+      const email = document.getElementById('c-email').value.trim();
+      const tel = document.getElementById('c-tel').value.trim();
+      const fecha = document.getElementById('c-fecha').value;
+      const guests = parseInt(document.getElementById('c-invitados').value) || 0;
+      const notes = document.getElementById('c-notes').value.trim();
+      const eventType = document.getElementById('c-tipo').value;
 
-// ── Enviar cotización ──
-async function sendQuotation() {
-  const errorBox = document.getElementById('error-box');
-  const btn = document.getElementById('btn-send');
-  errorBox.style.display = 'none';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-inline"></span>Enviando...';
+      if (!nombre || !email || !tel || !fecha || !guests) {
+        errorBox.textContent = 'Por favor completa todos los campos marcados con (*)';
+        errorBox.style.display = 'block';
+        return;
+      }
+      errorBox.style.display = 'none';
 
-  const allProds = [...(products.catering||[]), ...(products.venues||[]), ...(products.photography||[]), ...(products.decoration||[]), ...(products.recreation||[]), ...Object.values(products.services||{}).flat()];
-  const findProd = id => allProds.find(p => p.id === id);
-  const totalEstimado = calcPrice();
+      btn.disabled = true;
+      btn.textContent = '⏳ Enviando solicitud...';
 
-  const payload = {
-    clientName:  document.getElementById('c-nombre').value.trim(),
-    clientEmail: document.getElementById('c-email').value.trim(),
-    clientPhone: document.getElementById('c-tel').value.trim(),
-    eventType:   document.getElementById('c-tipo').value,
-    date:        document.getElementById('c-fecha').value,
-    guests:      parseInt(document.getElementById('c-invitados').value)||0,
-    notes:       document.getElementById('c-notas').value.trim(),
-    totalValue:  totalEstimado,
-    cateringId:  selCatering || null,
-    venueId:     selVenue || null,
-    photographyId: selPhoto || null,
-    decorationId:  selDeco || null,
-    recreationId:  selRecreation || null,
-    selectedServices: selServices
-  };
+      try {
+        const payload = {
+          clientName: nombre,
+          clientEmail: email,
+          clientPhone: tel,
+          eventType,
+          date: fecha,
+          guests,
+          notes,
+          totalValue: calcPrice(),
+          menu: selCatering ? findProdName(selCatering, 'catering') : null,
+          venueId: selVenue || null,
+          photographyId: selPhoto || null,
+          decorationId: selDeco || null,
+          recreationId: selRecreation || null,
+          selectedServices: selServices
+        };
 
-  try {
-    const res = await fetch(`/api/public/quotations?t=${TENANT}`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error||'Error al enviar');
+        const res = await fetch(`/api/public/quotations?t=${TENANT}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    // Mostrar éxito
-    document.getElementById('success-summary').innerHTML = `
-      <div class="summary-row"><span>Cliente</span><strong>${payload.clientName}</strong></div>
-      <div class="summary-row"><span>Evento</span><strong>${payload.eventType} — ${payload.date}</strong></div>
-      <div class="summary-row"><span>Personas</span><strong>${payload.guests}</strong></div>
-      <div class="summary-row"><span>Estimado</span><strong style="color:var(--gold)">${fmt(totalEstimado)}</strong></div>
-    `;
-    show('success-view');
-    window.scrollTo({top:0,behavior:'smooth'});
-  } catch(e) {
-    errorBox.textContent = e.message;
-    errorBox.style.display = 'block';
-    btn.disabled = false;
-    btn.innerHTML = '✉️ Enviar Solicitud';
-  }
-}
+        if (!res.ok) throw new Error('Error al guardar la solicitud en el servidor.');
 
-// Fecha mínima: mañana
-const minDate = new Date(); minDate.setDate(minDate.getDate()+1);
-document.getElementById('c-fecha').min = minDate.toISOString().split('T')[0];
+        // Rellenar resumen de éxito
+        const tNames = { boda: 'Boda', quinces: 'Quinceañera', grados_otros: 'Grados u Otros', comuniones: 'Primera Comunión', fiesta_infantil: 'Fiesta Infantil', empresarial: 'Empresarial' };
+        document.getElementById('success-summary').innerHTML = `
+          <div><span>Cliente:</span> <strong>${nombre}</strong></div>
+          <div><span>Evento:</span> <strong>${tNames[eventType]}</strong></div>
+          <div><span>Fecha:</span> <strong>${fecha}</strong></div>
+          <div><span>Invitados:</span> <strong>${guests} personas</strong></div>
+          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>${fmt(calcPrice())}</strong></div>
+        `;
 
-init();
+        show('success-view');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch(e) {
+        errorBox.textContent = e.message || 'Error de conexión. Inténtalo de nuevo.';
+        errorBox.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Solicitar Cotización Oficial';
+      }
+    }
 
-// Re-aplicar traducciones cuando el idioma cambia
-window.addEventListener('langchange', () => {
-  if (typeof applyTranslations === 'function') applyTranslations();
-  // Re-renderizar labels de los pasos y botones
-  const s1btn = document.querySelector('#step-1 .btn-primary');
-  const s2btn = document.querySelector('#step-2 .btn-primary');
-  const s2back = document.querySelector('#step-2 .btn-secondary');
-  const s3back = document.querySelector('#step-3 .btn-secondary');
-  if (s1btn) s1btn.textContent = window.i18n ? window.i18n.t('cotizar.next_services') : 'Continuar → Servicios';
-  if (s2btn) s2btn.textContent = window.i18n ? window.i18n.t('cotizar.next_confirm') : 'Continuar → Resumen';
-  if (s2back) s2back.textContent = window.i18n ? window.i18n.t('cotizar.back') : '← Atrás';
-  if (s3back) s3back.textContent = window.i18n ? window.i18n.t('cotizar.edit') : '← Editar';
-});
-</script>
+    function findProdName(id, type) {
+      if (!products || !products[type]) return null;
+      const found = products[type].find(p => p.id === id);
+      return found ? found.name : null;
+    }
+
+    // Inicializar
+    init();
+  </script>
 </body>
 </html>
