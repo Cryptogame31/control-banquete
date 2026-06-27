@@ -505,9 +505,14 @@
         </div>
       </div>
 
-      <button class="btn-primary" style="max-width: 300px;" onclick="location.reload()">
-        Realizar Otra Cotización
-      </button>
+      <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; max-width: 320px; margin: 0 auto;">
+        <button class="btn-primary" id="btn-download-pdf" onclick="downloadPDF()">
+          📥 Descargar PDF de Cotización
+        </button>
+        <button class="btn-primary" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-secondary); box-shadow: none;" onclick="location.reload()">
+          Realizar Otra Cotización
+        </button>
+      </div>
     </div>
 
   </div>
@@ -517,7 +522,8 @@
     const TENANT = params.get('t') || params.get('negocio') || params.get('id');
     let bizData = null, products = null;
     let selVenue = '', selCatering = '', selPhoto = '', selDeco = '', selRecreation = '';
-    let selServices = [];
+    let selServices = []; // guardará { id, qty }
+    let latestPayload = null;
 
     async function init() {
       if (!TENANT) { show('not-found-view'); return; }
@@ -619,25 +625,51 @@
         document.getElementById('card-venues').style.display = 'none';
       }
 
-      // Adicionales
+      // Adicionales (con soporte para cantidades +/- si allowMultiples es true)
       const gridServices = document.getElementById('grid-services');
       const svcs = products.services?.[eventType] || [];
       if (gridServices && svcs.length) {
         gridServices.innerHTML = '';
         svcs.forEach(p => {
           const card = document.createElement('div');
-          card.className = 'product-card' + (selServices.includes(p.id) ? ' selected' : '');
-          card.innerHTML = `<div class="product-name">${p.name}</div><div class="product-price">${fmt(p.price)}</div><div class="product-desc">${p.description||''}</div>`;
-          card.onclick = () => {
-            if (selServices.includes(p.id)) {
-              selServices = selServices.filter(id => id !== p.id);
-              card.classList.remove('selected');
-            } else {
-              selServices.push(p.id);
-              card.classList.add('selected');
-            }
-            calcPrice();
-          };
+          card.className = 'product-card';
+          card.setAttribute('data-id', p.id);
+          
+          const hasQty = p.allowMultiples === true || p.allowMultiples === 'true';
+          const qtyEntry = selServices.find(s => s.id === p.id);
+          const qty = qtyEntry ? qtyEntry.qty : 0;
+          
+          if (qty > 0) card.classList.add('selected');
+
+          if (hasQty) {
+            card.innerHTML = `
+              <div class="product-name">${p.name}</div>
+              <div class="product-price">+${fmt(p.price)}</div>
+              <div class="product-desc" style="margin-bottom: 0.5rem;">${p.description||''}</div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;" onclick="event.stopPropagation()">
+                <button type="button" onclick="changeQty('${p.id}', -1)" style="padding: 0.25rem 0.6rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 700;">-</button>
+                <span id="qty-label-${p.id}" style="font-size: 0.9rem; font-weight: 800; min-width: 1.25rem; text-align: center; color: var(--accent-gold);">${qty}</span>
+                <button type="button" onclick="changeQty('${p.id}', 1)" style="padding: 0.25rem 0.6rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text-primary); cursor: pointer; font-size: 0.85rem; font-weight: 700;">+</button>
+              </div>
+            `;
+          } else {
+            card.innerHTML = `
+              <div class="product-name">${p.name}</div>
+              <div class="product-price">+${fmt(p.price)}</div>
+              <div class="product-desc">${p.description||''}</div>
+            `;
+            card.onclick = () => {
+              const existingIdx = selServices.findIndex(s => s.id === p.id);
+              if (existingIdx >= 0) {
+                selServices.splice(existingIdx, 1);
+                card.classList.remove('selected');
+              } else {
+                selServices.push({ id: p.id, qty: 1 });
+                card.classList.add('selected');
+              }
+              calcPrice();
+            };
+          }
           gridServices.appendChild(card);
         });
         document.getElementById('card-services').style.display = 'block';
@@ -645,6 +677,32 @@
         document.getElementById('card-services').style.display = 'none';
       }
     }
+
+    // Cambiar cantidad de servicio adicional de forma reactiva
+    function changeQty(id, diff) {
+      let item = selServices.find(s => s.id === id);
+      if (!item) {
+        if (diff > 0) {
+          item = { id, qty: diff };
+          selServices.push(item);
+        }
+      } else {
+        item.qty += diff;
+        if (item.qty <= 0) {
+          selServices = selServices.filter(s => s.id !== id);
+          document.querySelector(`[data-id="${id}"]`)?.classList.remove('selected');
+        }
+      }
+      
+      const display = document.getElementById(`qty-label-${id}`);
+      if (display) display.textContent = item ? Math.max(0, item.qty) : 0;
+      
+      if (item && item.qty > 0) {
+        document.querySelector(`[data-id="${id}"]`)?.classList.add('selected');
+      }
+      calcPrice();
+    }
+    window.changeQty = changeQty;
 
     document.getElementById('c-tipo').onchange = () => {
       selServices = [];
@@ -695,10 +753,14 @@
       const dId = findProd(selDeco); if (dId) { total += dId.price; itemsList.innerHTML += `<div class="budget-row"><span>🌸 Decoración: ${dId.name}</span><strong>${fmt(dId.price)}</strong></div>`; }
       const rId = findProd(selRecreation); if (rId) { total += rId.price; itemsList.innerHTML += `<div class="budget-row"><span>🎭 Recreación: ${rId.name}</span><strong>${fmt(rId.price)}</strong></div>`; }
 
-      // 4. Servicios Adicionales
-      selServices.forEach(id => {
-        const s = findProd(id);
-        if (s) { total += s.price; itemsList.innerHTML += `<div class="budget-row"><span>✨ Adicional: ${s.name}</span><strong>${fmt(s.price)}</strong></div>`; }
+      // 4. Servicios Adicionales (multiplicado por cantidad)
+      selServices.forEach(entry => {
+        const s = findProd(entry.id);
+        if (s) {
+          const cost = s.price * entry.qty;
+          total += cost;
+          itemsList.innerHTML += `<div class="budget-row"><span>✨ Adicional: ${s.name} ${entry.qty > 1 ? `(×${entry.qty})` : ''}</span><strong>${fmt(cost)}</strong></div>`;
+        }
       });
 
       document.getElementById('price-total').textContent = fmt(total);
@@ -731,7 +793,10 @@
       btn.textContent = '⏳ Enviando solicitud...';
 
       try {
-        const payload = {
+        const totalEstimate = calcPrice();
+        
+        // Guardar payload para descarga de PDF
+        latestPayload = {
           clientName: nombre,
           clientEmail: email,
           clientPhone: tel,
@@ -739,7 +804,7 @@
           date: fecha,
           guests,
           notes,
-          totalValue: calcPrice(),
+          totalValue: totalEstimate,
           menu: selCatering ? findProdName(selCatering, 'catering') : null,
           venueId: selVenue || null,
           photographyId: selPhoto || null,
@@ -751,7 +816,7 @@
         const res = await fetch(`/api/public/quotations?t=${TENANT}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(latestPayload)
         });
 
         if (!res.ok) throw new Error('Error al guardar la solicitud en el servidor.');
@@ -763,7 +828,7 @@
           <div><span>Evento:</span> <strong>${tNames[eventType]}</strong></div>
           <div><span>Fecha:</span> <strong>${fecha}</strong></div>
           <div><span>Invitados:</span> <strong>${guests} personas</strong></div>
-          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>${fmt(calcPrice())}</strong></div>
+          <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:0.5rem;margin-top:0.5rem;color:var(--accent-gold);font-weight:700;"><span>Total Estimado:</span> <strong>${fmt(totalEstimate)}</strong></div>
         `;
 
         show('success-view');
@@ -775,6 +840,40 @@
         btn.textContent = 'Solicitar Cotización Oficial';
       }
     }
+
+    // Descargar PDF de cotización mediante el endpoint del backend
+    async function downloadPDF() {
+      if (!latestPayload) return;
+      const btn = document.getElementById('btn-download-pdf');
+      const oldText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '⏳ Generando PDF...';
+      
+      try {
+        const res = await fetch('/api/quotations/generate-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(latestPayload)
+        });
+        if (!res.ok) throw new Error('No se pudo procesar la solicitud de PDF.');
+        
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cotizacion_${latestPayload.clientName.replace(/\s+/g, '_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch(e) {
+        alert('No se pudo generar el PDF: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = oldText;
+      }
+    }
+    window.downloadPDF = downloadPDF;
 
     function findProdName(id, type) {
       if (!products || !products[type]) return null;
