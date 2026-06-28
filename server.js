@@ -946,6 +946,105 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // ==========================================
+// SUBSCRIPTION ENDPOINTS (Google Play)
+// ==========================================
+
+function getTrialStatus(user) {
+  if (!user) return { isActive: false, isTrial: false, daysLeft: 0, status: 'none', planName: 'Ninguno' };
+  
+  if (user.subscriptionStatus === 'active') {
+    const planNames = { monthly: 'Mensual', quarterly: 'Trimestral', annual: 'Anual', 'cb_monthly': 'Mensual', 'cb_quarterly': 'Trimestral', 'cb_yearly': 'Anual' };
+    return {
+      isActive: true,
+      isTrial: false,
+      daysLeft: 999,
+      status: 'active',
+      planName: planNames[user.subscriptionPlan] || user.subscriptionPlan
+    };
+  }
+  
+  const TRIAL_DAYS = parseInt(process.env.TRIAL_DAYS || '3');
+  const start = new Date(user.trialStartDate || user.createdAt);
+  const now = new Date();
+  const msPassed = now - start;
+  const daysPassed = Math.floor(msPassed / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.max(0, TRIAL_DAYS - daysPassed);
+  const isTrial = daysLeft > 0;
+  
+  return {
+    isActive: isTrial,
+    isTrial: true,
+    daysLeft,
+    status: isTrial ? 'trial' : 'expired',
+    planName: 'Prueba Gratuita'
+  };
+}
+
+app.get('/api/subscription/status', requireAuth, async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.uid } });
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    
+    const trialInfo = getTrialStatus(user);
+    res.json({
+      ...trialInfo,
+      email: user.email,
+      businessName: "Tu Negocio",
+      trialStartDate: user.trialStartDate || user.createdAt
+    });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/subscription/activate', requireAuth, async (req, res) => {
+  try {
+    const { plan, purchaseToken } = req.body;
+    
+    // VALIDACIÓN BÁSICA:
+    // En el futuro, usar la API de Google Play Developer para verificar el purchaseToken aquí.
+    if (!purchaseToken) return res.status(400).json({ error: 'Token de compra inválido' });
+
+    const now = new Date();
+    const expiry = new Date(now);
+    if (plan.includes('monthly') || plan === 'mensual') expiry.setMonth(expiry.getMonth() + 1);
+    else if (plan.includes('quarterly') || plan === 'trimestral') expiry.setMonth(expiry.getMonth() + 3);
+    else if (plan.includes('year') || plan.includes('annual') || plan === 'anual') expiry.setFullYear(expiry.getFullYear() + 1);
+    else expiry.setMonth(expiry.getMonth() + 1); // fallback
+
+    await prisma.user.update({
+      where: { id: req.user.uid },
+      data: {
+        subscriptionStatus: 'active',
+        subscriptionPlan: plan,
+        subscriptionExpiry: expiry
+      }
+    });
+
+    res.json({ success: true, plan, expiry: expiry.toISOString() });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/subscription/restore', requireAuth, async (req, res) => {
+  // TODO: Conectar con Google Play Developer API
+  res.json({ success: false, message: 'No se encontró una suscripción activa para restaurar' });
+});
+
+app.post('/api/subscription/cancel', requireAuth, async (req, res) => {
+  try {
+    await prisma.user.update({
+      where: { id: req.user.uid },
+      data: { subscriptionStatus: 'canceled' }
+    });
+    res.json({ success: true });
+  } catch(err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==========================================
 // INBOUND WEBHOOK N8N
 // ==========================================
 app.post('/api/webhooks/n8n', async (req, res) => {
