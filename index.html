@@ -39,7 +39,7 @@
   <meta name="apple-mobile-web-app-title" content="ControlBanquete">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   
-  <link rel="stylesheet" href="css/styles.css?v=2026_v2">
+  <link rel="stylesheet" href="css/styles.css?v=2026_v5">
 </head>
 <body>
   
@@ -1042,33 +1042,33 @@
         <div id="admin-users" class="tab-content active" style="display: block;">
           <div class="card" id="admin-users-card">
             <div class="flex-between" style="flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; align-items: center;">
-              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.5rem; margin: 0;">Usuarios y Clientes en la Plataforma</h3>
+              <h3 style="font-family: var(--font-title); color: var(--accent-gold); font-size: 1.5rem; margin: 0;" data-i18n="admin_users.title">Usuarios y Clientes en la Plataforma</h3>
               <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
-                <input type="text" id="admin-users-search" placeholder="Buscar usuario o correo..." style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 200px;">
+                <input type="text" id="admin-users-search" placeholder="Buscar usuario o correo..." data-i18n-ph="admin_users.search_ph" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 200px;">
                 <select id="admin-users-filter-role" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 160px;">
-                  <option value="all">Todos los Roles</option>
-                  <option value="superadmin">Superadministrador</option>
-                  <option value="cliente">Clientes</option>
-                  <option value="compras">Compras</option>
-                  <option value="cocina">Cocina</option>
-                  <option value="logistica">Logística</option>
-                  <option value="decoracion">Decoración</option>
-                  <option value="recreacion">Recreación</option>
+                  <option value="all" data-i18n="admin_users.filter_all">Todos los Roles</option>
+                  <option value="superadmin" data-i18n="admin_users.filter_superadmin">Superadministrador</option>
+                  <option value="cliente" data-i18n="admin_users.filter_cliente">Clientes</option>
+                  <option value="compras" data-i18n="admin_users.filter_compras">Compras</option>
+                  <option value="cocina" data-i18n="admin_users.filter_cocina">Cocina</option>
+                  <option value="logistica" data-i18n="admin_users.filter_logistica">Logística</option>
+                  <option value="decoracion" data-i18n="admin_users.filter_decoracion">Decoración</option>
+                  <option value="recreacion" data-i18n="admin_users.filter_recreacion">Recreación</option>
                 </select>
                 
                 <!-- Filtro de Fecha de Evento -->
                 <select id="admin-users-filter-date-mode" style="padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); width: 180px;">
-                  <option value="all">Todas las fechas</option>
-                  <option value="last30">Últimos 30 días</option>
-                  <option value="next30">Próximos 30 días</option>
-                  <option value="custom">Rango personalizado...</option>
+                  <option value="all" data-i18n="admin_users.date_all">Todas las fechas</option>
+                  <option value="last30" data-i18n="admin_users.date_last30">Últimos 30 días</option>
+                  <option value="next30" data-i18n="admin_users.date_next30">Próximos 30 días</option>
+                  <option value="custom" data-i18n="admin_users.date_custom">Rango personalizado...</option>
                 </select>
                 
                 <!-- Inputs de fecha de rango personalizado -->
                 <div id="admin-users-date-range-inputs" style="display: none; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                  <label for="admin-users-date-start" style="font-size: 0.8rem; color: var(--text-secondary);">Desde:</label>
+                  <label for="admin-users-date-start" style="font-size: 0.8rem; color: var(--text-secondary);" data-i18n="admin_users.from">Desde:</label>
                   <input type="date" id="admin-users-date-start" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
-                  <label for="admin-users-date-end" style="font-size: 0.8rem; color: var(--text-secondary);">Hasta:</label>
+                  <label for="admin-users-date-end" style="font-size: 0.8rem; color: var(--text-secondary);" data-i18n="admin_users.to">Hasta:</label>
                   <input type="date" id="admin-users-date-end" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary);">
                 </div>
               </div>
@@ -1079,12 +1079,12 @@
               <table>
                 <thead>
                   <tr>
-                    <th>Nombre</th>
-                    <th>Email</th>
-                    <th>Rol</th>
-                    <th>Teléfono</th>
-                    <th>Estado Foto</th>
-                    <th>Acciones</th>
+                    <th data-i18n="admin_users.th_name">Nombre</th>
+                    <th data-i18n="admin_users.th_email">Email</th>
+                    <th data-i18n="admin_users.th_role">Rol</th>
+                    <th data-i18n="admin_users.th_phone">Teléfono</th>
+                    <th data-i18n="admin_users.th_photo">Estado Foto</th>
+                    <th data-i18n="admin_users.th_actions">Acciones</th>
                   </tr>
                 </thead>
                 <tbody id="admin-users-list">
@@ -1905,8 +1905,8 @@
   </div>
 
   <!-- CORE SCRIPTS -->
-  <script src="js/i18n.js"></script>
-  <script type="module" src="js/app.js?v=2026_v3"></script>
+  <script src="js/i18n.js?v=2026_v5"></script>
+  <script type="module" src="js/app.js?v=2026_v5"></script>
 
 </body>
 </html>
