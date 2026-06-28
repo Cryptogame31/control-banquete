@@ -188,7 +188,11 @@ function initTheme() {
   updateThemeToggleButtons(savedTheme);
 }
 
-function toggleTheme() {
+function toggleTheme(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
   const isLight = document.body.classList.toggle('light-theme');
   const activeTheme = isLight ? 'light' : 'dark';
   localStorage.setItem('controlbanquete_theme', activeTheme);

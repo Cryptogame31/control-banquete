@@ -638,18 +638,18 @@
         </div>
       </section>
 
-      <!-- ========================================== -->
+    <!-- ========================================== -->
       <!-- VISTA: EMPLEADOS / ADMINISTRACIÓN -->
       <!-- ========================================== -->
       <section id="view-admin" class="view-section">
         <div class="page-header">
           <div>
-            <h2 class="page-title">Panel de <span>Administración</span></h2>
-            <p class="page-subtitle">Superadministración general de clientes, reservas, precios y base de datos.</p>
+            <h2 class="page-title" data-i18n="admin.title">Panel de Administración</h2>
+            <p class="page-subtitle" data-i18n="admin.subtitle">Superadministración general de clientes, reservas, precios y base de datos.</p>
           </div>
           <div class="flex-gap">
-            <button class="btn-primary" id="btn-admin-crear-usuario">+ Crear Usuario</button>
-            <button class="btn-accent" id="btn-admin-crear-evento">+ Crear Evento</button>
+            <button class="btn-primary" id="btn-admin-crear-usuario" data-i18n="admin.create_user">+ Crear Usuario</button>
+            <button class="btn-accent" id="btn-admin-crear-evento" data-i18n="admin.create_event">+ Crear Evento</button>
           </div>
         </div>
 
@@ -662,10 +662,10 @@
           gap: 1.5rem; flex-wrap: wrap;
         ">
           <div style="flex:1; min-width:240px;">
-            <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,207,75,0.7); margin-bottom:0.5rem;">
+            <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(255,207,75,0.7); margin-bottom:0.5rem;" data-i18n="admin.cotizador_link">
               🔗 Tu enlace de Cotizador Público
             </div>
-            <div style="font-size:0.82rem; color: var(--text-secondary); margin-bottom:0.65rem; line-height:1.5;">
+            <div style="font-size:0.82rem; color: var(--text-secondary); margin-bottom:0.65rem; line-height:1.5;" data-i18n="admin.cotizador_desc">
               Comparte este enlace con tus clientes. Ellos llenan el formulario y la cotización llega directamente a tu panel.
             </div>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
@@ -679,20 +679,20 @@
                 border:1px solid rgba(255,207,75,0.3); border-radius:8px;
                 color:var(--accent-gold); font-size:0.78rem; font-weight:600; cursor:pointer;
                 white-space:nowrap;
-              " id="btn-copy-link">📋 Copiar</button>
+              " id="btn-copy-link" data-i18n="admin.copy">📋 Copiar</button>
               <button onclick="openCotizadorPreview()" style="
                 padding:0.5rem 0.9rem; background:rgba(255,255,255,0.05);
                 border:1px solid rgba(255,255,255,0.1); border-radius:8px;
                 color:var(--text-secondary); font-size:0.78rem; cursor:pointer;
                 white-space:nowrap;
-              ">👁 Ver</button>
+              " data-i18n="admin.view">👁 Ver</button>
             </div>
           </div>
           <div style="min-width:200px;">
-            <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(136,136,170,0.8); margin-bottom:0.5rem;">
+            <div style="font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:rgba(136,136,170,0.8); margin-bottom:0.5rem;" data-i18n="admin.portal_link">
               🔐 Portal de Acceso Clientes
             </div>
-            <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.65rem; line-height:1.5;">
+            <div style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:0.65rem; line-height:1.5;" data-i18n="admin.portal_desc">
               Tus clientes ingresan aquí con las credenciales que tú les asignas.
             </div>
             <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
