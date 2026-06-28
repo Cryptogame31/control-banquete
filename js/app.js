@@ -764,31 +764,12 @@ function translateRole(role) {
 function setupEventListeners() {
   // Enlace a login quitado de la navegación del cotizador principal
 
-  const savedTheme = localStorage.getItem('controlbanquete_theme') || 'dark';
+  initTheme();
   const themeToggleBtn = document.getElementById('theme-toggle-btn');
   const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile-btn');
   
-  if (savedTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
-    updateThemeToggleButtons('light');
-  } else {
-    document.documentElement.removeAttribute('data-theme');
-    updateThemeToggleButtons('dark');
-  }
-
   if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      const activeTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      if (activeTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        localStorage.setItem('controlbanquete_theme', 'light');
-        updateThemeToggleButtons('light');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('controlbanquete_theme', 'dark');
-        updateThemeToggleButtons('dark');
-      }
-    });
+    themeToggleBtn.addEventListener('click', toggleTheme);
   }
   
   if (themeToggleMobileBtn) {

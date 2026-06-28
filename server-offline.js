@@ -173,9 +173,9 @@ app.post('/api/auth/register', async (req, res) => {
       password: hashedPassword,
       businessName: businessName || name,
       trialStartDate: new Date().toISOString(),
-      subscriptionStatus: 'active',
-      subscriptionPlan: 'annual',
-      subscriptionExpiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000 * 10).toISOString(), // 10 años de vigencia
+      subscriptionStatus: 'trial',
+      subscriptionPlan: null,
+      subscriptionExpiry: null,
       createdAt: new Date().toISOString()
     };
     memDB.users.push(user);
