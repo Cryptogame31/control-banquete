@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           const subStatus = await DB.getSubscriptionStatus();
           if (subStatus.status === 'expired') {
-            window.location.href = 'subscription.html';
+            window.location.href = '/subscription.html';
             return;
           }
           // Mostrar banner de trial si quedan ≤ 2 días
@@ -556,7 +556,7 @@ function setupRouting() {
       // Seguridad básica de roles
       const user = getCurrentUser();
       if (!user && targetId !== 'view-cotizar') {
-        window.location.href = 'login.html';
+        window.location.href = '/login.html';
       } else {
         navigateTo(targetId);
       }
