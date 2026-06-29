@@ -60,7 +60,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { dotfiles: 'allow' }));
 
 console.log("DATABASE_URL en Node:", process.env.DATABASE_URL ? "CONFIGURADA (Longitud: " + process.env.DATABASE_URL.length + ")" : "NO CONFIGURADA");
 const prisma = new PrismaClient({

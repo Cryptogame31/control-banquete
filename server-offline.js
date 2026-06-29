@@ -36,7 +36,7 @@ console.log("──────────────────────�
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { dotfiles: 'allow' }));
 
 console.log("=================================================");
 console.log("🚀 Control Banquete — Modo OFFLINE/DEMO Multi-Tenant");
