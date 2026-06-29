@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Iniciar Sesión - Control Banquete</title>
   <script src="js/i18n.js" defer></script>
+  <link rel="manifest" href="manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
+    }
+  </script>
   <meta name="description" content="Portal de inicio de sesión de Control Banquete para clientes, administradores y personal.">
   <link rel="stylesheet" href="css/styles.css">
   <style>
