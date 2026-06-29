@@ -31,16 +31,16 @@
   ],
   "screenshots": [
     {
-      "src": "icons/screenshot-mobile.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
+      "src": "icons/screenshot-mobile.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
       "form_factor": "narrow",
       "label": "Cotizador Móvil"
     },
     {
-      "src": "icons/screenshot-desktop.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
+      "src": "icons/screenshot-desktop.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
       "form_factor": "wide",
       "label": "Panel de Administración"
     }
