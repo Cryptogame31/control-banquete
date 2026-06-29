@@ -548,7 +548,7 @@
   </div>
 
   <script>
-    const t = (key) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key) : key;
+    const _t = (key) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key) : key;
 
     const params = new URLSearchParams(window.location.search);
     const TENANT = params.get('t') || params.get('negocio') || params.get('id');
@@ -647,10 +647,10 @@
         document.getElementById(descId).textContent = found ? found.description || '' : '';
       };
 
-      fillSelect('c-catering', products.catering || [], 'desc-catering', (v) => { selCatering = v; }, t('cotizar.no_catering') || 'Sin Alimentación (No incluye comida/bebida)');
-      fillSelect('c-photo', products.photography || [], 'desc-photo', (v) => { selPhoto = v; }, t('cotizar.no_photo') || 'Sin Fotografía');
-      fillSelect('c-deco', products.decoration || [], 'desc-deco', (v) => { selDeco = v; }, t('cotizar.no_deco') || 'Sin Decoración');
-      fillSelect('c-recreation', products.recreation || [], 'desc-recreation', (v) => { selRecreation = v; }, t('cotizar.no_recreation') || 'Sin Recreación');
+      fillSelect('c-catering', products.catering || [], 'desc-catering', (v) => { selCatering = v; }, _t('cotizar.no_catering') || 'Sin Alimentación (No incluye comida/bebida)');
+      fillSelect('c-photo', products.photography || [], 'desc-photo', (v) => { selPhoto = v; }, _t('cotizar.no_photo') || 'Sin Fotografía');
+      fillSelect('c-deco', products.decoration || [], 'desc-deco', (v) => { selDeco = v; }, _t('cotizar.no_deco') || 'Sin Decoración');
+      fillSelect('c-recreation', products.recreation || [], 'desc-recreation', (v) => { selRecreation = v; }, _t('cotizar.no_recreation') || 'Sin Recreación');
     }
 
     // Renderizar Salones y Adicionales (tarjetas interactivas)
@@ -673,7 +673,7 @@
             card.innerHTML = `
               <div class="product-name" style="text-decoration: line-through; color: var(--text-muted);">${p.name}</div>
               <div class="product-price" style="color: var(--text-muted);">${fmt(p.price)}</div>
-              <div class="product-desc" style="color: var(--danger); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">🔒 ${t('cotizar.occupied') || 'Reservado en esta fecha'}</div>
+              <div class="product-desc" style="color: var(--danger); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">🔒 ${_t('cotizar.occupied') || 'Reservado en esta fecha'}</div>
             `;
           } else {
             card.className = 'product-card' + (selVenue === p.id ? ' selected' : '');
@@ -681,7 +681,7 @@
               <div class="product-name">${p.name}</div>
               <div class="product-price">${fmt(p.price)}</div>
               <div class="product-desc">${p.description||''}</div>
-              <div class="product-desc" style="color: var(--success); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">✅ ${t('cotizar.available') || 'Disponible'}</div>
+              <div class="product-desc" style="color: var(--success); font-weight: 700; margin-top: 0.5rem; font-size: 0.8rem;">✅ ${_t('cotizar.available') || 'Disponible'}</div>
             `;
             card.onclick = () => {
               const isSel = card.classList.contains('selected');
@@ -938,47 +938,47 @@
       const itemsList = document.getElementById('budget-items-list');
       itemsList.innerHTML = `
         <div class="summary-row">
-          <span>${t('cotizar.summary_guests') || 'Invitados'}</span>
-          <span class="accent">${guests} ${t('cotizar.guests_label') || 'personas'}</span>
+          <span>${_t('cotizar.summary_guests') || 'Invitados'}</span>
+          <span class="accent">${guests} ${_t('cotizar.guests_label') || 'personas'}</span>
         </div>
         <div class="summary-row">
-          <span>${t('cotizar.waiters') || 'Meseros requeridos'} (${res.meseros})</span>
+          <span>${_t('cotizar.waiters') || 'Meseros requeridos'} (${res.meseros})</span>
           <span>$${res.costoMeseros.toLocaleString('es-CO')} COP</span>
         </div>
         <div class="summary-row" style="flex-direction:column; align-items:flex-start; gap:0.25rem; ${res.costoAlimentacion === 0 ? 'display:none;' : ''}">
           <div style="display:flex; justify-content:space-between; width:100%;">
-            <span>${t('cotizar.summary_catering') || 'Banquete'} (${res.selectedCateringPlanName})</span>
+            <span>${_t('cotizar.summary_catering') || 'Banquete'} (${res.selectedCateringPlanName})</span>
             <span>$${res.costoAlimentacion.toLocaleString('es-CO')} COP</span>
           </div>
           <span style="font-size:0.75rem; color:var(--text-secondary); line-height:1.2;">${res.descripcionAlimentacion}</span>
         </div>
         <div class="summary-row">
-          <span>${t('cotizar.summary_venue') || 'Salón'} (${res.venueName})</span>
+          <span>${_t('cotizar.summary_venue') || 'Salón'} (${res.venueName})</span>
           <span>$${res.venuePrice.toLocaleString('es-CO')} COP</span>
         </div>
         <div class="summary-row">
-          <span>${t('cotizar.summary_photo') || 'Fotografía'}</span>
+          <span>${_t('cotizar.summary_photo') || 'Fotografía'}</span>
           <span>$${res.photoPrice.toLocaleString('es-CO')} COP</span>
         </div>
         <div class="summary-row">
-          <span>${t('cotizar.summary_deco') || 'Decoración'}</span>
+          <span>${_t('cotizar.summary_deco') || 'Decoración'}</span>
           <span>$${res.decoPrice.toLocaleString('es-CO')} COP</span>
         </div>
         <div class="summary-row" style="${res.recreationPrice === 0 ? 'display:none;' : ''}">
-          <span>${(t('cotizar.recreation') || 'Recreación').replace('🎭 ', '')}</span>
+          <span>${(_t('cotizar.recreation') || 'Recreación').replace('🎭 ', '')}</span>
           <span>$${res.recreationPrice.toLocaleString('es-CO')} COP</span>
         </div>
         <div class="summary-row">
-          <span>${(t('cotizar.services') || 'Servicios adicionales').replace('✨ ', '')}</span>
+          <span>${(_t('cotizar.services') || 'Servicios adicionales').replace('✨ ', '')}</span>
           <span>$${res.servicesSum.toLocaleString('es-CO')} COP</span>
         </div>
         ${customChargesHtml}
         <div class="summary-row total">
-          <span>${t('cotizar.estimated') || 'TOTAL ESTIMADO'}</span>
+          <span>${_t('cotizar.estimated') || 'TOTAL ESTIMADO'}</span>
           <span id="price-total">$${res.total.toLocaleString('es-CO')} COP</span>
         </div>
         <p style="font-size:0.75rem; color:var(--text-muted); margin-top:1.5rem; text-align:center; line-height:1.2;">
-          ${t('cotizar.disclaimer') || '* Este es un presupuesto preliminar no vinculante. Los meseros se calculan automáticamente (1 mesero cada 35 invitados).'}
+          ${_t('cotizar.disclaimer') || '* Este es un presupuesto preliminar no vinculante. Los meseros se calculan automáticamente (1 mesero cada 35 invitados).'}
         </p>
       `;
 
