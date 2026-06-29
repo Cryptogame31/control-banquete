@@ -11,11 +11,13 @@ datasource db {
 
 model User {
   id        String   @id @default(cuid())
+  tenantId  String   @default("default")
   email     String   @unique
   password  String
   name      String
   role      String   @default("cliente")
   phone     String?
+  businessName String?
   subscriptionStatus String @default("trial")
   subscriptionPlan   String @default("none")
   subscriptionExpiry DateTime?
@@ -26,6 +28,7 @@ model User {
 
 model Quotation {
   id             String   @id @default(cuid())
+  tenantId       String   @default("default")
   clientName     String
   clientEmail    String
   clientPhone    String
@@ -52,6 +55,7 @@ model Quotation {
 
 model Event {
   id             String   @id @default(cuid())
+  tenantId       String   @default("default")
   clientName     String
   clientEmail    String
   clientPhone    String
@@ -95,6 +99,7 @@ model Event {
 
 model Product {
   id             String   @id @default(cuid())
+  tenantId       String   @default("default")
   category       String
   name           String
   description    String?
@@ -116,6 +121,7 @@ model Product {
 
 model Inventory {
   id             String   @id @default(cuid())
+  tenantId       String   @default("default")
   category       String
   name           String
   unit           String
@@ -129,6 +135,7 @@ model Inventory {
 
 model Recipe {
   id             String   @id @default(cuid())
+  tenantId       String   @default("default")
   productId      String
   supplies       Json?
   createdAt      DateTime @default(now())
@@ -136,7 +143,8 @@ model Recipe {
 }
 
 model Settings {
-  id             String   @id @default("global")
+  id             String   @id @default(cuid())
+  tenantId       String   @unique @default("default")
   companyName    String
   taxRate        Float    @default(0)
   currency       String   @default("COP")
@@ -146,22 +154,26 @@ model Settings {
 
 model Provider {
   id          String   @id @default(cuid())
-  name        String   @unique
+  tenantId    String   @default("default")
+  name        String
   phone       String?
   email       String?
   address     String?
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  @@unique([tenantId, name])
 }
 
 model Notification {
   id          String   @id @default(cuid())
+  tenantId    String   @default("default")
   title       String
   message     String
-  type        String   @default("info") // quote, payment, contract, inventory, info
+  type        String   @default("info")
   read        Boolean  @default(false)
-  role        String?  // null para todos, o 'superadmin', 'compras'
+  role        String?  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

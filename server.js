@@ -82,8 +82,7 @@ async function initializeDatabase() {
     // Configuración global
     let settings = await prisma.settings.findUnique({ where: { id: "global" } });
     if (!settings) {
-      await prisma.settings.create({
-        data: {
+      await prisma.settings.create({ data: { tenantId: req.user.tenantId, 
           id: "global",
           companyName: seedModule.seedSettings.businessName || "Control Banquete",
           baseValues: seedModule.seedSettings
@@ -115,16 +114,15 @@ async function initializeDatabase() {
     for (const plan of cateringPlans) {
       await prisma.product.upsert({
         where: { id: plan.id },
-        update: { price: plan.price, description: plan.description },
+        update: {  price: plan.price, description: plan.description  },
         create: plan
       });
     }
 
     // Configurar por defecto allowMultiples: true para licores/cervezas/gaseosas existentes
-    const multiProducts = await prisma.product.findMany({
-      where: {
+    const multiProducts = await prisma.product.findMany({ where: { tenantId: req.user.tenantId, 
         OR: [
-          { name: { contains: 'cerveza', mode: 'insensitive' } },
+          { name: { contains: 'cerveza', mode: 'insensitive'  } },
           { name: { contains: 'licor', mode: 'insensitive' } },
           { name: { contains: 'aguardiente', mode: 'insensitive' } },
           { name: { contains: 'ron', mode: 'insensitive' } },
@@ -211,6 +209,27 @@ function mapQuotationResponse(quotation) {
 }
 
 // ==========================================
+
+// ==========================================
+// MIDDLEWARE DE SEGURIDAD MULTI-TENANT
+// ==========================================
+function requireAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(401).json({ error: 'Falta el token de autorización' });
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
+    // Si es superadmin o empleado, siempre tendrán un tenantId en el token
+    if (!req.user.tenantId) {
+      req.user.tenantId = 'default';
+    }
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Token inválido o expirado' });
+  }
+}
+
 // ENDPOINTS DE API REST
 // ==========================================
 // 1. Configuración Dinámica
@@ -219,22 +238,21 @@ app.get('/api/config', (req, res) => {
 });
 
 // 2. Configuración Global (Settings)
-app.get('/api/settings', async (req, res) => {
+app.get('/api/settings', requireAuth, async (req, res) => {
   try {
-    const doc = await prisma.settings.findUnique({ where: { id: 'global' } });
+    const doc = await prisma.settings.findUnique({ where: { tenantId: req.user.tenantId } });
     return res.json(doc ? doc.baseValues : {});
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/api/settings', async (req, res) => {
+app.post('/api/settings', requireAuth, async (req, res) => {
   try {
     const data = req.body;
-    await prisma.settings.upsert({
-      where: { id: 'global' },
-      update: { baseValues: data, companyName: data.businessName || 'Control Banquete' },
-      create: { id: 'global', companyName: data.businessName || 'Control Banquete', baseValues: data }
+    await prisma.settings.upsert({ where: { tenantId: req.user.tenantId },
+      update: {  baseValues: data, companyName: data.businessName || 'Control Banquete'  },
+      create: { tenantId: req.user.tenantId,  tenantId: req.user.tenantId, companyName: data.businessName || 'Control Banquete', baseValues: data }
     });
     sendOutboundWebhook('settings.updated', data);
     return res.json(data);
@@ -244,9 +262,9 @@ app.post('/api/settings', async (req, res) => {
 });
 
 // 3. Catálogo de Productos y Tarifas
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', requireAuth, async (req, res) => {
   try {
-    const list = await prisma.product.findMany();
+    const list = await prisma.product.findMany({ where: { tenantId: req.user.tenantId,  tenantId: req.user.tenantId  } });
     // Ordenar por posición (de menor a mayor), y por nombre en caso de empate
     list.sort((a, b) => {
       const posA = a.position !== undefined && a.position !== null ? a.position : 999999;
@@ -288,7 +306,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', requireAuth, async (req, res) => {
   try {
     const p = req.body;
     const id = p.id || 'prod_' + Math.random().toString(36).substr(2, 9);
@@ -313,7 +331,7 @@ app.post('/api/products', async (req, res) => {
     const saved = await prisma.product.upsert({
       where: { id },
       update: data,
-      create: data
+      create: { ...data, tenantId: req.user.tenantId }
     });
     sendOutboundWebhook('product.saved', saved);
     return res.json(saved);
@@ -322,7 +340,7 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products/reorder', async (req, res) => {
+app.post('/api/products/reorder', requireAuth, async (req, res) => {
   try {
     const { orders } = req.body;
     if (!Array.isArray(orders)) {
@@ -342,7 +360,7 @@ app.post('/api/products/reorder', async (req, res) => {
   }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', requireAuth, async (req, res) => {
   try {
     await prisma.product.delete({ where: { id: req.params.id } });
     sendOutboundWebhook('product.deleted', { id: req.params.id });
@@ -353,7 +371,7 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // 3.5. Proveedores (CRUD)
-app.get('/api/providers', async (req, res) => {
+app.get('/api/providers', requireAuth, async (req, res) => {
   try {
     const list = await prisma.provider.findMany({ orderBy: { name: 'asc' } });
     return res.json(list);
@@ -362,7 +380,7 @@ app.get('/api/providers', async (req, res) => {
   }
 });
 
-app.post('/api/providers', async (req, res) => {
+app.post('/api/providers', requireAuth, async (req, res) => {
   try {
     const p = req.body;
     const id = p.id || 'prov_' + Math.random().toString(36).substr(2, 9);
@@ -378,7 +396,7 @@ app.post('/api/providers', async (req, res) => {
     const saved = await prisma.provider.upsert({
       where: { id },
       update: data,
-      create: data
+      create: { ...data, tenantId: req.user.tenantId }
     });
     return res.json(saved);
   } catch (err) {
@@ -386,7 +404,7 @@ app.post('/api/providers', async (req, res) => {
   }
 });
 
-app.delete('/api/providers/:id', async (req, res) => {
+app.delete('/api/providers/:id', requireAuth, async (req, res) => {
   try {
     await prisma.provider.delete({ where: { id: req.params.id } });
     return res.json({ success: true });
@@ -396,7 +414,7 @@ app.delete('/api/providers/:id', async (req, res) => {
 });
 
 // 3.6. Notificaciones
-app.get('/api/notifications', async (req, res) => {
+app.get('/api/notifications', requireAuth, async (req, res) => {
   try {
     const list = await prisma.notification.findMany({
       orderBy: { createdAt: 'desc' },
@@ -408,7 +426,7 @@ app.get('/api/notifications', async (req, res) => {
   }
 });
 
-app.post('/api/notifications/read', async (req, res) => {
+app.post('/api/notifications/read', requireAuth, async (req, res) => {
   try {
     const { id } = req.body;
     await prisma.notification.update({
@@ -421,7 +439,7 @@ app.post('/api/notifications/read', async (req, res) => {
   }
 });
 
-app.post('/api/notifications/read-all', async (req, res) => {
+app.post('/api/notifications/read-all', requireAuth, async (req, res) => {
   try {
     await prisma.notification.updateMany({
       where: { read: false },
@@ -434,7 +452,7 @@ app.post('/api/notifications/read-all', async (req, res) => {
 });
 
 // 4. Eventos
-app.get('/api/events', async (req, res) => {
+app.get('/api/events', requireAuth, async (req, res) => {
   try {
     const list = await prisma.event.findMany({ orderBy: { createdAt: 'desc' } });
     const mapped = list.map(mapEventResponse);
@@ -444,7 +462,7 @@ app.get('/api/events', async (req, res) => {
   }
 });
 
-app.post('/api/events', async (req, res) => {
+app.post('/api/events', requireAuth, async (req, res) => {
   try {
     const event = req.body;
     const id = event.id || 'e_' + Math.random().toString(36).substr(2, 9);
@@ -494,7 +512,7 @@ app.post('/api/events', async (req, res) => {
     const saved = await prisma.event.upsert({
       where: { id },
       update: data,
-      create: data
+      create: { ...data, tenantId: req.user.tenantId }
     });
     sendOutboundWebhook('event.created', saved);
     return res.json(mapEventResponse(saved));
@@ -503,7 +521,7 @@ app.post('/api/events', async (req, res) => {
   }
 });
 
-app.put('/api/events/:id', async (req, res) => {
+app.put('/api/events/:id', requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const updateData = req.body;
@@ -576,8 +594,7 @@ app.put('/api/events/:id', async (req, res) => {
       const newPaymentsCount = (updateData.payments || []).length;
       if (newPaymentsCount > oldPaymentsCount) {
         const newPayment = updateData.payments[newPaymentsCount - 1];
-        await prisma.notification.create({
-          data: {
+        await prisma.notification.create({ data: { tenantId: req.user.tenantId, 
             title: "Abono Registrado",
             message: `Se registró un pago de $${newPayment.amount.toLocaleString()} COP para el evento de ${existing.clientName}.`,
             type: "payment",
@@ -589,8 +606,7 @@ app.put('/api/events/:id', async (req, res) => {
 
     if (updateData.contractSigned === true && existing.status !== 'contrato_firmado') {
       sendOutboundWebhook('contract.signed', saved);
-      await prisma.notification.create({
-        data: {
+      await prisma.notification.create({ data: { tenantId: req.user.tenantId, 
           title: "Contrato Firmado",
           message: `El cliente ${saved.clientName} ha firmado el contrato digital de su evento.`,
           type: "contract",
@@ -607,7 +623,7 @@ app.put('/api/events/:id', async (req, res) => {
 });
 
 // 5. Cotizaciones
-app.get('/api/quotations', async (req, res) => {
+app.get('/api/quotations', requireAuth, async (req, res) => {
   try {
     const list = await prisma.quotation.findMany({ orderBy: { createdAt: 'desc' } });
     const mapped = list.map(mapQuotationResponse);
@@ -617,7 +633,7 @@ app.get('/api/quotations', async (req, res) => {
   }
 });
 
-app.post('/api/quotations', async (req, res) => {
+app.post('/api/quotations', requireAuth, async (req, res) => {
   try {
     const q = req.body;
     const id = q.id || 'q_' + Math.random().toString(36).substr(2, 9);
@@ -647,12 +663,11 @@ app.post('/api/quotations', async (req, res) => {
     const saved = await prisma.quotation.upsert({
       where: { id },
       update: data,
-      create: data
+      create: { ...data, tenantId: req.user.tenantId }
     });
     sendOutboundWebhook('quotation.created', saved);
 
-    await prisma.notification.create({
-      data: {
+    await prisma.notification.create({ data: { tenantId: req.user.tenantId, 
         title: "Nueva Cotización Recibida",
         message: `El cliente ${saved.clientName} ha enviado una solicitud para ${saved.eventType} en ${saved.date}.`,
         type: "quote",
@@ -666,7 +681,7 @@ app.post('/api/quotations', async (req, res) => {
   }
 });
 
-app.put('/api/quotations/:id', async (req, res) => {
+app.put('/api/quotations/:id', requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const q = req.body;
@@ -710,7 +725,7 @@ app.put('/api/quotations/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/quotations/:id', async (req, res) => {
+app.delete('/api/quotations/:id', requireAuth, async (req, res) => {
   try {
     await prisma.quotation.delete({ where: { id: req.params.id } });
     sendOutboundWebhook('quotation.deleted', { id: req.params.id });
@@ -721,9 +736,9 @@ app.delete('/api/quotations/:id', async (req, res) => {
 });
 
 // 6. Recetario
-app.get('/api/recipes', async (req, res) => {
+app.get('/api/recipes', requireAuth, async (req, res) => {
   try {
-    const list = await prisma.recipe.findMany();
+    const list = await prisma.recipe.findMany({ where: { tenantId: req.user.tenantId,  tenantId: req.user.tenantId  } });
     const mapped = list.map(item => {
       const supplies = item.supplies || {};
       return {
@@ -742,7 +757,7 @@ app.get('/api/recipes', async (req, res) => {
   }
 });
 
-app.post('/api/recipes', async (req, res) => {
+app.post('/api/recipes', requireAuth, async (req, res) => {
   try {
     const r = req.body;
     const id = r.id || 'rec_' + Math.random().toString(36).substr(2, 9);
@@ -757,11 +772,11 @@ app.post('/api/recipes', async (req, res) => {
 
     const saved = await prisma.recipe.upsert({
       where: { id },
-      update: { 
+      update: {  
         productId: r.productId || 'unknown', 
         supplies: suppliesData 
-      },
-      create: { 
+       },
+      create: { tenantId: req.user.tenantId,  
         id, 
         productId: r.productId || 'unknown', 
         supplies: suppliesData 
@@ -782,7 +797,7 @@ app.post('/api/recipes', async (req, res) => {
   }
 });
 
-app.delete('/api/recipes/:id', async (req, res) => {
+app.delete('/api/recipes/:id', requireAuth, async (req, res) => {
   try {
     await prisma.recipe.delete({ where: { id: req.params.id } });
     return res.json({ success: true });
@@ -792,9 +807,9 @@ app.delete('/api/recipes/:id', async (req, res) => {
 });
 
 // 7. Inventario
-app.get('/api/inventory', async (req, res) => {
+app.get('/api/inventory', requireAuth, async (req, res) => {
   try {
-    const list = await prisma.inventory.findMany();
+    const list = await prisma.inventory.findMany({ where: { tenantId: req.user.tenantId,  tenantId: req.user.tenantId  } });
     const mapped = list.map(item => ({
       ...item,
       quantity: item.stock
@@ -805,7 +820,7 @@ app.get('/api/inventory', async (req, res) => {
   }
 });
 
-app.post('/api/inventory', async (req, res) => {
+app.post('/api/inventory', requireAuth, async (req, res) => {
   try {
     const i = req.body;
     const id = i.id || 'inv_' + Math.random().toString(36).substr(2, 9);
@@ -822,12 +837,11 @@ app.post('/api/inventory', async (req, res) => {
     const saved = await prisma.inventory.upsert({
       where: { id },
       update: data,
-      create: data
+      create: { ...data, tenantId: req.user.tenantId }
     });
 
     if (saved.stock < saved.minStock) {
-      await prisma.notification.create({
-        data: {
+      await prisma.notification.create({ data: { tenantId: req.user.tenantId, 
           title: "Inventario Bajo",
           message: `El insumo ${saved.name} se encuentra por debajo del stock mínimo (${saved.stock} / ${saved.minStock} ${saved.unit}).`,
           type: "inventory",
@@ -847,7 +861,7 @@ app.post('/api/inventory', async (req, res) => {
   }
 });
 
-app.delete('/api/inventory/:id', async (req, res) => {
+app.delete('/api/inventory/:id', requireAuth, async (req, res) => {
   try {
     await prisma.inventory.delete({ where: { id: req.params.id } });
     return res.json({ success: true });
@@ -857,7 +871,7 @@ app.delete('/api/inventory/:id', async (req, res) => {
 });
 
 // 8. Usuarios y Autenticación JWT
-app.get('/api/users', async (req, res) => {
+app.get('/api/users', requireAuth, async (req, res) => {
   try {
     const list = await prisma.user.findMany({
       select: { id: true, email: true, name: true, role: true, phone: true }
@@ -870,7 +884,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-app.post('/api/users', async (req, res) => {
+app.post('/api/users', requireAuth, async (req, res) => {
   try {
     const u = req.body;
     let uid = u.uid || u.id;
@@ -910,7 +924,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-app.delete('/api/users/:uid', async (req, res) => {
+app.delete('/api/users/:uid', requireAuth, async (req, res) => {
   try {
     await prisma.user.delete({ where: { id: req.params.uid } });
     sendOutboundWebhook('user.deleted', { uid: req.params.uid });
@@ -921,6 +935,56 @@ app.delete('/api/users/:uid', async (req, res) => {
 });
 
 // Login Endpoint
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, name, businessName, phone } = req.body;
+    
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) return res.status(400).json({ error: 'El email ya está en uso' });
+
+    // Generar tenantId único para el nuevo negocio
+    const tenantId = 't_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        tenantId,
+        email,
+        password: hashedPassword,
+        name,
+        businessName,
+        phone,
+        role: 'superadmin',
+        subscriptionStatus: 'trial',
+        trialStartDate: new Date()
+      }
+    });
+
+    // Crear Settings base para el tenant
+    await prisma.settings.create({
+      data: {
+        tenantId,
+        companyName: businessName || 'Mi Negocio',
+        baseValues: { businessName, defaultLanguage: 'es' }
+      }
+    });
+
+    const token = jwt.sign(
+      { uid: user.id, email: user.email, role: user.role, name: user.name, tenantId: user.tenantId },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    return res.json({
+      token,
+      user: { uid: user.id, email: user.email, role: user.role, name: user.name, tenantId: user.tenantId }
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -931,14 +995,14 @@ app.post('/api/auth/login', async (req, res) => {
     if (!valid) return res.status(401).json({ error: 'Credenciales inválidas' });
 
     const token = jwt.sign(
-      { uid: user.id, email: user.email, role: user.role, name: user.name },
+      { uid: user.id, email: user.email, role: user.role, name: user.name, tenantId: user.tenantId },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
     return res.json({
       token,
-      user: { uid: user.id, email: user.email, role: user.role, name: user.name }
+      user: { uid: user.id, email: user.email, role: user.role, name: user.name, tenantId: user.tenantId }
     });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -1045,6 +1109,124 @@ app.post('/api/subscription/cancel', requireAuth, async (req, res) => {
 });
 
 // ==========================================
+
+// ==========================================
+// RUTAS PÚBLICAS (COTIZADOR SAAS)
+// ==========================================
+app.get('/api/public/business', async (req, res) => {
+  const tenantId = req.query.t || 'default';
+  try {
+    const settings = await prisma.settings.findUnique({ where: { tenantId } });
+    if (!settings) return res.status(404).json({ error: 'Negocio no encontrado' });
+    
+    // Obtener info del dueño
+    const owner = await prisma.user.findFirst({ where: { tenantId, role: 'superadmin' } });
+    
+    res.json({
+      tenantId,
+      businessName: settings.companyName || owner?.businessName || 'Control Banquete',
+      phone: owner?.phone || '',
+      email: owner?.email || '',
+      settings: settings.baseValues || {}
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/public/products', async (req, res) => {
+  const tenantId = req.query.t || 'default';
+  try {
+    const list = await prisma.product.findMany({
+      where: { tenantId, active: true },
+      orderBy: [ { position: 'asc' }, { name: 'asc' } ]
+    });
+    
+    const structured = {
+      venues: [], photography: [], decoration: [], catering: [], recreation: [],
+      services: { boda: [], grados_otros: [], comuniones: [], quinces: [], fiesta_infantil: [], empresarial: [] },
+      coctel: [], arroz: [], carne: [], ensalada: [], postre: [], liquido: [], torta: [], pasabocas: []
+    };
+
+    list.forEach(p => {
+      if (p.category === 'venue') structured.venues.push(p);
+      else if (p.category === 'photography') structured.photography.push(p);
+      else if (p.category === 'decoration') structured.decoration.push(p);
+      else if (p.category === 'catering') structured.catering.push(p);
+      else if (p.category === 'recreation') structured.recreation.push(p);
+      else if (p.category === 'service' && p.eventType) {
+        const evts = p.eventType === 'todos'
+          ? ['boda','quinces','comuniones','grados_otros','fiesta_infantil','empresarial']
+          : p.eventType.split(',').map(x => x.trim().toLowerCase());
+        evts.forEach(evt => { if (!structured.services[evt]) structured.services[evt] = []; structured.services[evt].push(p); });
+      } else if (structured[p.category]) structured[p.category].push(p);
+    });
+
+    res.json(structured);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/public/availability', async (req, res) => {
+  const tenantId = req.query.t || 'default';
+  const date = req.query.date;
+  if (!date) return res.status(400).json({ error: 'Falta parámetro date' });
+  try {
+    const events = await prisma.event.findMany({
+      where: { tenantId, date, status: { not: 'cancelado' } }
+    });
+    const bookedVenueIds = events.map(e => e.venueId).filter(Boolean);
+    res.json({ bookedVenueIds });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/public/quotations', async (req, res) => {
+  const tenantId = req.query.t || 'default';
+  const q = req.body;
+  try {
+    const item = await prisma.quotation.create({
+      data: {
+        tenantId,
+        clientName: q.clientName || 'Sin Nombre', 
+        clientEmail: q.clientEmail || '',
+        clientPhone: q.clientPhone || '', 
+        eventType: q.eventType || 'grados_otros',
+        date: q.date || new Date().toISOString().substring(0, 10),
+        guests: parseInt(q.guests) || 0, 
+        totalValue: parseFloat(q.totalValue) || 0,
+        discount: 0, 
+        discountLabel: '', 
+        status: 'nueva',
+        notes: q.notes || 'Solicitud desde el cotizador público.',
+        menu: q.menu || null, 
+        extraServices: q.selectedServices || [],
+        venueId: q.venueId || null, 
+        photographyId: q.photographyId || null,
+        decorationId: q.decorationId || null, 
+        cateringId: q.cateringId || null,
+        recreationId: q.recreationId || null
+      }
+    });
+
+    await prisma.notification.create({
+      data: {
+        tenantId,
+        title: '🎉 Nueva Cotización Recibida',
+        message: `${item.clientName} solicita cotización para ${item.eventType} el ${item.date} (${item.guests} personas). Total estimado: ${item.totalValue.toLocaleString('es-CO')} COP`,
+        type: 'quote',
+        role: 'superadmin'
+      }
+    });
+
+    res.json({ success: true, id: item.id, message: '¡Cotización enviada!' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // INBOUND WEBHOOK N8N
 // ==========================================
 app.post('/api/webhooks/n8n', async (req, res) => {
@@ -1121,8 +1303,7 @@ app.post('/api/webhooks/n8n', async (req, res) => {
           recreationId: q.recreationId || null
         };
         const saved = await prisma.quotation.create({ data });
-        await prisma.notification.create({
-          data: {
+        await prisma.notification.create({ data: { tenantId: req.user.tenantId, 
             title: "Nueva Cotización Recibida (Webhook)",
             message: `El cliente ${saved.clientName} ha enviado una solicitud para ${saved.eventType} en ${saved.date}.`,
             type: "quote",
@@ -1175,7 +1356,7 @@ async function calculateQuotationDetails(data) {
   // 1. Obtener configuraciones de base de datos
   let settingsObj = { costoMesero: 110000, costoAlimentacion: 36000, descripcionAlimentacion: '' };
   try {
-    const sett = await prisma.settings.findUnique({ where: { id: 'global' } });
+    const sett = await prisma.settings.findUnique({ where: { tenantId: req.user.tenantId } });
     if (sett && sett.baseValues) {
       settingsObj = { ...settingsObj, ...sett.baseValues };
     }
@@ -1187,7 +1368,7 @@ async function calculateQuotationDetails(data) {
   // 2. Obtener productos de base de datos
   let allProducts = { venues: [], photography: [], decoration: [], catering: [], recreation: [], services: {}, flat: [] };
   try {
-    const list = await prisma.product.findMany();
+    const list = await prisma.product.findMany({ where: { tenantId: req.user.tenantId,  tenantId: req.user.tenantId  } });
     allProducts.flat = list;
     list.forEach(p => {
       if (p.category === 'venue') allProducts.venues.push(p);
@@ -1652,7 +1833,7 @@ function drawPDFQuote(doc, details, rawData) {
 }
 
 // Ruta POST para generar PDF y devolverlo como archivo binario
-app.post('/api/quotations/generate-pdf', async (req, res) => {
+app.post('/api/quotations/generate-pdf', requireAuth, async (req, res) => {
   try {
     let rawData = req.body;
     
