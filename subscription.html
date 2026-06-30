@@ -411,9 +411,21 @@
         }
 
       } else {
-        // Fallback: simulación para desarrollo/web
+        // Fallback: bloquear simulación en producción, permitir solo en localhost
+        const isDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        
+        if (!isDev) {
+          alert(
+            `🛒 COMPRA EN LA WEB\n\n` +
+            `Para adquirir la suscripción "${PLAN_NAMES[plan]}", realiza el pago directamente desde la aplicación móvil oficial instalada en tu dispositivo Android.\n\n` +
+            `Si deseas pagar mediante transferencia o pasarela web, ponte en contacto con nuestro equipo escribiendo a soporte@controlbanquete.app.`
+          );
+          return;
+        }
+
+        // Modo simulación de desarrollo (solo en localhost)
         const confirmed = confirm(
-          `🧪 MODO DESARROLLO\n\nEn la app de Android esto abrirá Google Play Billing.\n\n` +
+          `🧪 MODO DESARROLLO (Localhost)\n\nEn la app de Android esto abrirá Google Play Billing.\n\n` +
           `Plan seleccionado: ${PLAN_NAMES[plan]}\n\n¿Simular activación para continuar probando?`
         );
         if (!confirmed) return;
@@ -432,7 +444,7 @@
 
           if (activateData.success) {
             alert(`✅ Suscripción "${PLAN_NAMES[plan]}" activada (modo desarrollo).`);
-            window.location.href = 'index.html';
+            window.location.href = '/index.html';
           }
         } catch (err) {
           overlay.classList.remove('show');

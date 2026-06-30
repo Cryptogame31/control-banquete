@@ -232,6 +232,14 @@ app.get('/api/subscription/status', requireAuth, (req, res) => {
 // Activar suscripción (token de Google Play Billing)
 app.post('/api/subscription/activate', requireAuth, (req, res) => {
   const { plan, purchaseToken } = req.body; // plan: 'monthly'|'quarterly'|'annual'
+  
+  if (!purchaseToken) return res.status(400).json({ error: 'Token de compra inválido' });
+
+  // Bloquear tokens de simulación/desarrollo en producción
+  if (purchaseToken.startsWith('dev_token_') && process.env.NODE_ENV === 'production') {
+    return res.status(403).json({ error: 'El modo desarrollo no está permitido en producción' });
+  }
+
   const superadmin = memDB.users.find(u => u.tenantId === req.tenantId && u.role === 'superadmin');
   if (!superadmin) return res.status(404).json({ error: 'Tenant no encontrado' });
 
