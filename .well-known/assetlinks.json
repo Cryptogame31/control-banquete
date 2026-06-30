@@ -7,7 +7,8 @@
       "namespace": "android_app",
       "package_name": "cloud.expandete.controlbanquete.twa",
       "sha256_cert_fingerprints": [
-        "60:F2:86:30:95:F4:63:7C:36:AD:81:B4:1B:81:5C:FC:D4:7D:83:EC:6C:27:C0:5C:C0:B0:E1:61:87:BE:DA:FA"
+        "60:F2:86:30:95:F4:63:7C:36:AD:81:B4:1B:81:5C:FC:D4:7D:83:EC:6C:27:C0:5C:C0:B0:E1:61:87:BE:DA:FA",
+        "2A:71:5E:83:4D:43:33:22:C0:D7:63:04:D2:82:60:E1:E2:36:5E:F3:91:43:21:3F:40:78:C5:89:9A:8A:23:54"
       ]
     }
   }
