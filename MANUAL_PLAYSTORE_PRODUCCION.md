@@ -42,6 +42,19 @@ Tu proyecto utiliza la tecnología **TWA (Trusted Web Activity)** a través de B
    bubblewrap init --manifest=https://TU_DOMINIO.easypanel.host/manifest.json
    ```
    *(Sigue las instrucciones del asistente, presiona Enter para usar los valores por defecto. Cuando te pida crear una "Keystore" o llave de firma, dile que Sí (Yes) y anota la contraseña en un lugar muy seguro).*
+   
+   > [!WARNING]
+   > **CRÍTICO PARA PAGOS:** Durante el asistente de `bubblewrap init`, cuando te pregunte **"Include support for Play Billing? (y/N)"**, debes responder obligatoriamente **`Y` (Sí)**. 
+   > Si ya inicializaste el proyecto sin esta opción, debes abrir el archivo `twa-manifest.json` en tu carpeta del compilador y asegurarte de tener:
+   > ```json
+   > "features": {
+   >   "playBilling": {
+   >     "enabled": true
+   >   }
+   > }
+   > ```
+   > Luego ejecuta `bubblewrap update` antes de compilar. Si no habilitas esto, la app se compilará sin las librerías nativas de pago y lanzará el error **`clientAppUnavailable`** en el celular.
+
 
 5. Compila la aplicación:
    ```bash
