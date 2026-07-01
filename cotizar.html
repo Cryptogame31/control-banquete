@@ -634,6 +634,24 @@
         document.getElementById('biz-name').textContent = bizData.businessName;
         document.getElementById('success-biz').textContent = bizData.businessName;
 
+        // Configurar los tipos de evento dinámicos
+        const eventTypes = (bizData.settings && bizData.settings.eventTypes) || ["boda", "quinces", "grados_otros", "comuniones", "fiesta_infantil", "empresarial"];
+        const cTipo = document.getElementById('c-tipo');
+        if (cTipo && eventTypes) {
+          const typeNames = {
+            boda: 'Boda',
+            quinces: 'Quinceañera',
+            grados_otros: 'Grado / Aniversario',
+            comuniones: 'Comunión / Confirmación',
+            fiesta_infantil: 'Fiesta Infantil',
+            empresarial: 'Evento Empresarial'
+          };
+          cTipo.innerHTML = eventTypes.map(t => {
+            const label = typeNames[t] || t;
+            return `<option value="${t}">${label}</option>`;
+          }).join('');
+        }
+
         setupSelectors();
         renderProducts();
         

@@ -25,6 +25,7 @@ let countdownInterval = null;
 let photoCountdownInterval = null;
 let systemSettings = null;
 let settingsAvailableColors = [];
+let settingsAvailableEventTypes = [];
 
 // ==========================================
 // INICIALIZACIÓN
@@ -334,6 +335,8 @@ async function loadCommonData() {
       allProviders = [];
     }
     systemSettings = await DB.getSettings();
+    settingsAvailableEventTypes = systemSettings.eventTypes || ["boda", "quinces", "grados_otros", "comuniones", "fiesta_infantil", "empresarial"];
+    populateEventTypesUI();
     applyDynamicTheme({
       palette: systemSettings.themePalette,
       font: systemSettings.themeFont,
@@ -1128,6 +1131,29 @@ function setupEventListeners() {
     });
   }
 
+  const addEventTypeBtn = document.getElementById('btn-setting-add-event-type');
+  if (addEventTypeBtn) {
+    addEventTypeBtn.addEventListener('click', () => {
+      const input = document.getElementById('setting-new-event-type');
+      const typeVal = input.value.trim();
+      if (typeVal && !settingsAvailableEventTypes.includes(typeVal)) {
+        settingsAvailableEventTypes.push(typeVal);
+        renderEventTypeChips(settingsAvailableEventTypes);
+        input.value = '';
+      }
+    });
+  }
+
+  const newEventTypeInput = document.getElementById('setting-new-event-type');
+  if (newEventTypeInput) {
+    newEventTypeInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (addEventTypeBtn) addEventTypeBtn.click();
+      }
+    });
+  }
+
   const catalogFilter = document.getElementById('admin-catalog-filter');
   if (catalogFilter) {
     catalogFilter.addEventListener('change', renderAdminProducts);
@@ -1149,24 +1175,28 @@ function setupEventListeners() {
   });
 
   // Manejo interactivo de los checkboxes de tipo de evento en el modal de productos
-  const pEvtTodos = document.getElementById('p-evt-todos');
-  if (pEvtTodos) {
-    pEvtTodos.addEventListener('change', (e) => {
-      if (e.target.checked) {
-        // Desmarcar todos los individuales
-        document.querySelectorAll('.p-evt-single').forEach(cb => cb.checked = false);
-      }
-    });
-  }
+  window.setupProductEventCheckboxesBehavior = function() {
+    const pEvtTodos = document.getElementById('p-evt-todos');
+    if (pEvtTodos) {
+      pEvtTodos.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // Desmarcar todos los individuales
+          document.querySelectorAll('.p-evt-single').forEach(cb => cb.checked = false);
+        }
+      });
+    }
 
-  document.querySelectorAll('.p-evt-single').forEach(cb => {
-    cb.addEventListener('change', (e) => {
-      if (e.target.checked && pEvtTodos) {
-        // Si se marca un tipo de evento individual, desmarcar "Todos"
-        pEvtTodos.checked = false;
-      }
+    document.querySelectorAll('.p-evt-single').forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        if (e.target.checked && pEvtTodos) {
+          // Si se marca un tipo de evento individual, desmarcar "Todos"
+          pEvtTodos.checked = false;
+        }
+      });
     });
-  });
+  };
+
+  setupProductEventCheckboxesBehavior();
 
   const addProdInsumoBtn = document.getElementById('btn-prod-agregar-insumo');
   if (addProdInsumoBtn) {
@@ -3165,6 +3195,10 @@ async function renderAdminProducts() {
   settingsAvailableColors = baseSettings.availableColors || ["Blanco", "Dorado", "Plateado", "Azul Rey", "Rojo Pasión", "Verde Esmeralda", "Rosa Pastel"];
   renderColorChips(settingsAvailableColors);
 
+  settingsAvailableEventTypes = baseSettings.eventTypes || ["boda", "quinces", "grados_otros", "comuniones", "fiesta_infantil", "empresarial"];
+  renderEventTypeChips(settingsAvailableEventTypes);
+  populateEventTypesUI();
+
   const photoInstructionsEl = document.getElementById('setting-photo-instructions');
   if (photoInstructionsEl) {
     photoInstructionsEl.value = baseSettings.photoInstructions || '';
@@ -3530,6 +3564,7 @@ async function saveBaseSettings(e) {
     businessLogoUrl,
     contractText,
     availableColors: settingsAvailableColors,
+    eventTypes: settingsAvailableEventTypes,
     themePalette,
     themeFont,
     themeFontSize,
@@ -3588,6 +3623,86 @@ window.removeColorSetting = (idx) => {
   settingsAvailableColors.splice(idx, 1);
   renderColorChips(settingsAvailableColors);
 };
+
+function renderEventTypeChips(types) {
+  const container = document.getElementById('settings-event-types-container');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  if (!types || types.length === 0) {
+    container.innerHTML = '<span style="font-size:0.8rem; color:var(--text-secondary); font-style:italic;">No hay tipos de evento configurados.</span>';
+    return;
+  }
+  
+  types.forEach((t, idx) => {
+    const chip = document.createElement('span');
+    chip.className = 'color-chip';
+    chip.style.display = 'inline-flex';
+    chip.style.alignItems = 'center';
+    chip.style.gap = '0.3rem';
+    chip.style.padding = '0.25rem 0.6rem';
+    chip.style.background = 'rgba(212, 175, 55, 0.15)';
+    chip.style.border = '1px solid rgba(212, 175, 55, 0.3)';
+    chip.style.borderRadius = '16px';
+    chip.style.color = 'var(--accent-gold)';
+    chip.style.fontSize = '0.8rem';
+    chip.style.fontWeight = '500';
+    
+    chip.innerHTML = `
+      ${translateEventType(t)}
+      <span style="cursor:pointer; font-weight:700; color:var(--text-secondary); margin-left:0.2rem;" onclick="removeEventTypeSetting(${idx})">&times;</span>
+    `;
+    container.appendChild(chip);
+  });
+}
+
+window.removeEventTypeSetting = (idx) => {
+  settingsAvailableEventTypes.splice(idx, 1);
+  renderEventTypeChips(settingsAvailableEventTypes);
+};
+
+function populateEventTypesUI() {
+  const types = settingsAvailableEventTypes || [];
+  
+  // 1. Selector cot-tipo (Crear cotización manual)
+  const cotTipo = document.getElementById('cot-tipo');
+  if (cotTipo) {
+    cotTipo.innerHTML = types.map(t => `<option value="${t}">${translateEventType(t)}</option>`).join('');
+  }
+  
+  // 2. Selector ev-tipo (Crear evento)
+  const evTipo = document.getElementById('ev-tipo');
+  if (evTipo) {
+    evTipo.innerHTML = types.map(t => `<option value="${t}">${translateEventType(t)}</option>`).join('');
+  }
+  
+  // 3. Filtro admin-quotes-filter-event-type
+  const filterSelect = document.getElementById('admin-quotes-filter-event-type');
+  if (filterSelect) {
+    filterSelect.innerHTML = `<option value="all">Todos</option>` + 
+      types.map(t => `<option value="${t}">${translateEventType(t)}</option>`).join('');
+  }
+  
+  // 4. Checklist p-event-type-checklist (en el modal de producto)
+  const checklist = document.getElementById('p-event-type-checklist');
+  if (checklist) {
+    checklist.innerHTML = `
+      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0; cursor: pointer;">
+        <input type="checkbox" id="p-evt-todos" value="todos" class="p-evt-checkbox">
+        <strong>Mostrar en todos los eventos</strong>
+      </label>
+      <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 0.25rem 0;">
+    ` + types.map(t => `
+      <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: normal; margin: 0; cursor: pointer;">
+        <input type="checkbox" value="${t}" class="p-evt-checkbox p-evt-single"> ${translateEventType(t)}
+      </label>
+    `).join('');
+    
+    if (typeof setupProductEventCheckboxesBehavior === 'function') {
+      setupProductEventCheckboxesBehavior();
+    }
+  }
+}
 
 function addCustomSettingRow(label = '', value = '', type = 'fixed') {
   const container = document.getElementById('settings-custom-container');
@@ -3671,31 +3786,33 @@ function setupAdminLinks() {
 
   const cotInput    = document.getElementById('cotizador-link-input');
   const portalInput = document.getElementById('portal-link-input');
-  if (cotInput)    cotInput.value    = cotizadorLink;
-  if (portalInput) portalInput.value = portalLink;
+  if (cotInput)    cotInput.textContent    = cotizadorLink;
+  if (portalInput) portalInput.textContent = portalLink;
 }
 
 function copyCotizadorLink() {
   const input = document.getElementById('cotizador-link-input');
   if (!input) return;
-  navigator.clipboard.writeText(input.value).then(() => {
+  const linkText = input.textContent || input.innerText;
+  navigator.clipboard.writeText(linkText).then(() => {
     const btn = document.getElementById('btn-copy-link');
     if (btn) { btn.textContent = '✓ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
-  }).catch(() => { input.select(); document.execCommand('copy'); });
+  });
 }
 
 function copyPortalLink() {
   const input = document.getElementById('portal-link-input');
   if (!input) return;
-  navigator.clipboard.writeText(input.value).then(() => {
+  const linkText = input.textContent || input.innerText;
+  navigator.clipboard.writeText(linkText).then(() => {
     const btn = document.getElementById('btn-copy-portal');
     if (btn) { btn.textContent = '✓ Copiado!'; setTimeout(() => { btn.textContent = '📋 Copiar'; }, 2000); }
-  }).catch(() => { input.select(); document.execCommand('copy'); });
+  });
 }
 
 function openCotizadorPreview() {
   const input = document.getElementById('cotizador-link-input');
-  if (input && input.value !== 'Cargando...') window.open(input.value, '_blank');
+  if (input && input.textContent !== 'Cargando...') window.open(input.textContent, '_blank');
 }
 
 // Exponer globalmente para que funcionen los onClicks del HTML

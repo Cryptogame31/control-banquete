@@ -678,11 +678,13 @@
               Comparte este enlace con tus clientes. Ellos llenan el formulario y la cotización llega directamente a tu panel.
             </div>
             <div style="display:flex; flex-direction:column; gap:0.5rem;">
-              <input id="cotizador-link-input" readonly style="
-                width:100%; box-sizing:border-box; padding:0.55rem 0.75rem; font-size:0.8rem;
-                background:rgba(0,0,0,0.2); border:1px solid rgba(255,207,75,0.2);
-                border-radius:8px; color:var(--accent-gold); outline:none; cursor:pointer;
-              " value="Cargando..." onclick="this.select()">
+              <div id="cotizador-link-input" style="
+                width:100%; box-sizing:border-box; padding:0.6rem 0.8rem; font-size:0.8rem;
+                background:rgba(0,0,0,0.2); border:1px solid rgba(255,207,75,0.25);
+                border-radius:8px; color:var(--accent-gold); word-break:break-all;
+                white-space:pre-wrap; cursor:pointer; font-family:monospace; line-height:1.4;
+                user-select:all;
+              ">Cargando...</div>
               <div style="display:flex; gap:0.5rem;">
                 <button onclick="copyCotizadorLink()" style="
                   flex:1; padding:0.55rem; background:rgba(255,207,75,0.15);
@@ -707,11 +709,13 @@
               Tus clientes ingresan aquí con las credenciales que tú les asignas.
             </div>
             <div style="display:flex; flex-direction:column; gap:0.5rem;">
-              <input id="portal-link-input" readonly style="
-                width:100%; box-sizing:border-box; padding:0.55rem 0.75rem; font-size:0.8rem;
-                background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1);
-                border-radius:8px; color:var(--text-secondary); outline:none; cursor:pointer;
-              " value="Cargando..." onclick="this.select()">
+              <div id="portal-link-input" style="
+                width:100%; box-sizing:border-box; padding:0.6rem 0.8rem; font-size:0.8rem;
+                background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.15);
+                border-radius:8px; color:var(--text-secondary); word-break:break-all;
+                white-space:pre-wrap; cursor:pointer; font-family:monospace; line-height:1.4;
+                user-select:all;
+              ">Cargando...</div>
               <button onclick="copyPortalLink()" style="
                 width:100%; padding:0.55rem; background:rgba(255,255,255,0.05);
                 border:1px solid rgba(255,255,255,0.1); border-radius:8px;
@@ -984,6 +988,19 @@
                   <div style="display: flex; gap: 0.5rem;">
                     <input type="text" id="setting-new-color" placeholder="Ej: Azul Rey, Oro, Verde..." style="flex-grow: 1; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
                     <button type="button" class="btn-primary" id="btn-setting-add-color" style="padding: 0.45rem 1rem; font-size: 0.85rem; height: 34px;">Agregar</button>
+                  </div>
+                </div>
+
+                <!-- Configuración de Tipos de Evento -->
+                <div style="margin-bottom: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1.2rem;">
+                  <h4 style="color: var(--accent-gold); font-size: 1rem; margin: 0 0 0.5rem 0; font-family: var(--font-title);">Tipos de Evento Disponibles</h4>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.8rem;">Define los tipos de evento que los clientes y tú podrán escoger en cotizaciones y reservas.</p>
+                  <div id="settings-event-types-container" style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.8rem;">
+                    <!-- Chips de tipos de evento inyectados por JS -->
+                  </div>
+                  <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="setting-new-event-type" placeholder="Ej: Cumpleaños, Bautizo, Lanzamiento..." style="flex-grow: 1; box-sizing: border-box; padding: 0.45rem; font-size: 0.85rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-family: inherit;">
+                    <button type="button" class="btn-primary" id="btn-setting-add-event-type" style="padding: 0.45rem 1rem; font-size: 0.85rem; height: 34px;">Agregar</button>
                   </div>
                 </div>
 
