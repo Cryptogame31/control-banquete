@@ -167,9 +167,10 @@ function showTrialBanner(daysLeft) {
   }
   banner.innerHTML = `
     <span>⏳ <strong>${daysLeft} día${daysLeft !== 1 ? 's' : ''}</strong> restante${daysLeft !== 1 ? 's' : ''} de prueba gratuita</span>
-    <a href="subscription.html" style="background: #ffcf4b; color: #0a0a0f; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 100px; text-decoration: none; font-size: 0.78rem; white-space: nowrap;">
+    <a href="/subscription.html" style="background: #ffcf4b; color: #0a0a0f; font-weight: 700; padding: 0.25rem 0.75rem; border-radius: 100px; text-decoration: none; font-size: 0.78rem; white-space: nowrap;">
       Ver planes →
     </a>
+    <span onclick="this.parentElement.remove(); document.body.style.paddingTop = '';" style="cursor: pointer; padding: 0 0.5rem; font-size: 1rem; color: rgba(255,207,75,0.6); user-select: none;">✕</span>
   `;
 }
 

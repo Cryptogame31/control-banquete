@@ -130,12 +130,20 @@ function requireAuth(req, res, next) {
 
 function getTrialStatus(user) {
   const now = new Date();
+  
+  if (user.subscriptionStatus === 'expired') {
+    return { status: 'expired', daysLeft: 0, plan: null };
+  }
+  if (user.subscriptionStatus === 'cancelled' || user.subscriptionStatus === 'canceled') {
+    return { status: 'cancelled', daysLeft: 0, plan: null };
+  }
+
   const trialStart = new Date(user.trialStartDate || user.createdAt || now);
   const trialEnd = new Date(trialStart);
   // Usar dias de prueba del usuario si fue sobrescritos, de lo contrario usar config global
   const days = (user.customTrialDays !== undefined && user.customTrialDays !== null)
     ? user.customTrialDays
-    : globalConfig.trialDays;
+    : (globalConfig && globalConfig.trialDays !== undefined ? globalConfig.trialDays : 3);
   trialEnd.setDate(trialEnd.getDate() + days);
   const msLeft = trialEnd - now;
   const daysLeft = Math.max(0, Math.ceil(msLeft / (1000 * 60 * 60 * 24)));
@@ -919,21 +927,24 @@ app.put('/api/admin/tenants/:tenantId/subscription', requireUltraAdmin, (req, re
   const user = memDB.users.find(u => u.tenantId === tenantId && u.role === 'superadmin');
   if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
 
+  const now = new Date();
   if (status) user.subscriptionStatus = status;
-  if (plan) user.subscriptionPlan = plan;
+  if (plan !== undefined) user.subscriptionPlan = plan;
 
   if (expiryDate) {
     user.subscriptionExpiry = new Date(expiryDate).toISOString();
+  } else if (req.body.hasOwnProperty('expiryDate') && req.body.expiryDate === null) {
+    user.subscriptionExpiry = null;
   } else if (extendDays && parseInt(extendDays) > 0) {
     const base = user.subscriptionExpiry ? new Date(user.subscriptionExpiry) : new Date();
     base.setDate(base.getDate() + parseInt(extendDays));
     user.subscriptionExpiry = base.toISOString();
-  } else if (status === 'active' && plan && !user.subscriptionExpiry) {
-    const now = new Date();
-    if (plan === 'monthly')   now.setMonth(now.getMonth() + 1);
-    if (plan === 'quarterly') now.setMonth(now.getMonth() + 3);
-    if (plan === 'annual')    now.setFullYear(now.getFullYear() + 1);
-    user.subscriptionExpiry = now.toISOString();
+  } else if (status === 'active' && plan && (!user.subscriptionExpiry || new Date(user.subscriptionExpiry) <= now)) {
+    const expiry = new Date(now);
+    if (plan === 'monthly')   expiry.setMonth(expiry.getMonth() + 1);
+    if (plan === 'quarterly') expiry.setMonth(expiry.getMonth() + 3);
+    if (plan === 'annual')    expiry.setFullYear(expiry.getFullYear() + 1);
+    user.subscriptionExpiry = expiry.toISOString();
   }
 
   res.json({ success: true, tenantId, subscriptionStatus: user.subscriptionStatus, subscriptionPlan: user.subscriptionPlan, subscriptionExpiry: user.subscriptionExpiry });

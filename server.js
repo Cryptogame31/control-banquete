@@ -1013,8 +1013,21 @@ app.post('/api/auth/login', async (req, res) => {
 // SUBSCRIPTION ENDPOINTS (Google Play)
 // ==========================================
 
+let globalConfig = {
+  trialDays: parseInt(process.env.TRIAL_DAYS || '3'),
+  supportEmail: 'soporte@controlbanquete.app',
+  plansEnabled: true
+};
+
 function getTrialStatus(user) {
   if (!user) return { isActive: false, isTrial: false, daysLeft: 0, status: 'none', planName: 'Ninguno' };
+  
+  if (user.subscriptionStatus === 'expired') {
+    return { status: 'expired', daysLeft: 0, plan: null };
+  }
+  if (user.subscriptionStatus === 'cancelled' || user.subscriptionStatus === 'canceled') {
+    return { status: 'cancelled', daysLeft: 0, plan: null };
+  }
   
   if (user.subscriptionStatus === 'active') {
     const planNames = { monthly: 'Mensual', quarterly: 'Trimestral', annual: 'Anual', 'cb_monthly': 'Mensual', 'cb_quarterly': 'Trimestral', 'cb_yearly': 'Anual' };
@@ -1027,7 +1040,7 @@ function getTrialStatus(user) {
     };
   }
   
-  const TRIAL_DAYS = parseInt(process.env.TRIAL_DAYS || '3');
+  const TRIAL_DAYS = parseInt(user.customTrialDays != null ? user.customTrialDays : globalConfig.trialDays);
   const start = new Date(user.trialStartDate || user.createdAt);
   const now = new Date();
   const msPassed = now - start;
@@ -1912,6 +1925,246 @@ app.post('/api/quotations/generate-pdf', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Error generando PDF en el servidor:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// ==========================================
+// PANEL ULTRA-ADMIN (POSTGRESQL / PRISMA)
+// ==========================================
+
+const ULTRA_ADMIN_EMAIL = process.env.ULTRA_ADMIN_EMAIL || 'ultra@controlbanquete.com';
+const ULTRA_ADMIN_PASSWORD = process.env.ULTRA_ADMIN_PASSWORD || 'UltraAdmin2026!';
+
+app.post('/api/auth/ultraadmin', async (req, res) => {
+  const { email, password } = req.body;
+  if (email !== ULTRA_ADMIN_EMAIL || password !== ULTRA_ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Credenciales inválidas' });
+  }
+  const token = jwt.sign({ uid: 'ultra', email, role: 'ultraadmin' }, JWT_SECRET, { expiresIn: '8h' });
+  return res.json({ token, user: { uid: 'ultra', email, role: 'ultraadmin', name: 'Ultra Admin' } });
+});
+
+function requireUltraAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(403).json({ error: 'Acceso denegado' });
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (payload.role !== 'ultraadmin') return res.status(403).json({ error: 'Acceso denegado' });
+    req.user = payload;
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: 'Acceso denegado' });
+  }
+}
+
+// Listado de tenants
+app.get('/api/admin/tenants', requireUltraAdmin, async (req, res) => {
+  try {
+    const superadmins = await prisma.user.findMany({
+      where: { role: 'superadmin' }
+    });
+
+    const data = await Promise.all(superadmins.map(async (user) => {
+      const usersCount = await prisma.user.count({ where: { tenantId: user.tenantId } });
+      const eventsCount = await prisma.event.count({ where: { tenantId: user.tenantId } });
+      const trialInfo = getTrialStatus(user);
+
+      return {
+        tenantId: user.tenantId,
+        email: user.email,
+        name: user.name,
+        businessName: user.businessName || 'Sin Nombre',
+        createdAt: user.createdAt.toISOString(),
+        subscriptionStatus: trialInfo.status,
+        subscriptionPlan: user.subscriptionPlan || '',
+        subscriptionExpiry: user.subscriptionExpiry ? user.subscriptionExpiry.toISOString() : null,
+        customTrialDays: user.customTrialDays,
+        trialStartDate: user.trialStartDate ? user.trialStartDate.toISOString() : null,
+        daysLeft: trialInfo.daysLeft,
+        usersCount,
+        eventsCount
+      };
+    }));
+
+    const stats = {
+      total: data.length,
+      active: data.filter(d => d.subscriptionStatus === 'active').length,
+      trial: data.filter(d => d.subscriptionStatus === 'trial').length,
+      expired: data.filter(d => d.subscriptionStatus === 'expired').length,
+      cancelled: data.filter(d => d.subscriptionStatus === 'cancelled').length,
+      revenue: {
+        monthly: data.filter(d => d.subscriptionStatus === 'active' && d.subscriptionPlan === 'monthly').length * 10,
+        quarterly: data.filter(d => d.subscriptionStatus === 'active' && d.subscriptionPlan === 'quarterly').length * 35,
+        annual: data.filter(d => d.subscriptionStatus === 'active' && d.subscriptionPlan === 'annual').length * 95
+      }
+    };
+    stats.revenue.total = stats.revenue.monthly + stats.revenue.quarterly + stats.revenue.annual;
+
+    res.json({ tenants: data, stats });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Modificar suscripción de un tenant
+app.put('/api/admin/tenants/:tenantId/subscription', requireUltraAdmin, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const { plan, status, expiryDate, extendDays } = req.body;
+    const user = await prisma.user.findFirst({
+      where: { tenantId, role: 'superadmin' }
+    });
+    if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+    const updates = {};
+    if (status) updates.subscriptionStatus = status;
+    if (plan !== undefined) updates.subscriptionPlan = plan;
+
+    const now = new Date();
+    if (expiryDate) {
+      updates.subscriptionExpiry = new Date(expiryDate);
+    } else if (req.body.hasOwnProperty('expiryDate') && req.body.expiryDate === null) {
+      updates.subscriptionExpiry = null;
+    } else if (extendDays && parseInt(extendDays) > 0) {
+      const base = user.subscriptionExpiry ? new Date(user.subscriptionExpiry) : new Date();
+      base.setDate(base.getDate() + parseInt(extendDays));
+      updates.subscriptionExpiry = base;
+    } else if (status === 'active' && plan && (!user.subscriptionExpiry || new Date(user.subscriptionExpiry) <= now)) {
+      const expiry = new Date(now);
+      if (plan === 'monthly')   expiry.setMonth(expiry.getMonth() + 1);
+      if (plan === 'quarterly') expiry.setMonth(expiry.getMonth() + 3);
+      if (plan === 'annual')    expiry.setFullYear(expiry.getFullYear() + 1);
+      updates.subscriptionExpiry = expiry;
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: updates
+    });
+
+    res.json({
+      success: true,
+      tenantId,
+      subscriptionStatus: updatedUser.subscriptionStatus,
+      subscriptionPlan: updatedUser.subscriptionPlan,
+      subscriptionExpiry: updatedUser.subscriptionExpiry ? updatedUser.subscriptionExpiry.toISOString() : null
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Crear suscripción nueva manualmente
+app.post('/api/admin/tenants/:tenantId/subscription', requireUltraAdmin, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const { plan } = req.body;
+    const user = await prisma.user.findFirst({
+      where: { tenantId, role: 'superadmin' }
+    });
+    if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+    const now = new Date();
+    const expiry = new Date(now);
+    if (plan === 'monthly')   expiry.setMonth(expiry.getMonth() + 1);
+    if (plan === 'quarterly') expiry.setMonth(expiry.getMonth() + 3);
+    if (plan === 'annual')    expiry.setFullYear(expiry.getFullYear() + 1);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        subscriptionStatus: 'active',
+        subscriptionPlan: plan,
+        subscriptionExpiry: expiry
+      }
+    });
+
+    res.json({ success: true, plan, expiry: expiry.toISOString() });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Eliminar tenant y todos sus datos
+app.delete('/api/admin/tenants/:tenantId', requireUltraAdmin, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const exists = await prisma.user.findFirst({
+      where: { tenantId, role: 'superadmin' }
+    });
+    if (!exists) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+    await prisma.$transaction([
+      prisma.user.deleteMany({ where: { tenantId } }),
+      prisma.product.deleteMany({ where: { tenantId } }),
+      prisma.event.deleteMany({ where: { tenantId } }),
+      prisma.quotation.deleteMany({ where: { tenantId } }),
+      prisma.provider.deleteMany({ where: { tenantId } }),
+      prisma.recipe.deleteMany({ where: { tenantId } }),
+      prisma.inventory.deleteMany({ where: { tenantId } }),
+      prisma.notification.deleteMany({ where: { tenantId } }),
+      prisma.settings.deleteMany({ where: { tenantId } })
+    ]);
+
+    res.json({ success: true, message: 'Tenant y todos sus datos eliminados.' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Config global
+app.get('/api/admin/config', requireUltraAdmin, (req, res) => {
+  res.json({ ...globalConfig });
+});
+
+app.put('/api/admin/config', requireUltraAdmin, (req, res) => {
+  const { trialDays, supportEmail, plansEnabled } = req.body;
+  if (trialDays !== undefined) {
+    const d = parseInt(trialDays);
+    if (isNaN(d) || d < 0 || d > 365) return res.status(400).json({ error: 'trialDays debe ser entre 0 y 365' });
+    globalConfig.trialDays = d;
+  }
+  if (supportEmail !== undefined) globalConfig.supportEmail = supportEmail;
+  if (plansEnabled !== undefined) globalConfig.plansEnabled = !!plansEnabled;
+  res.json({ success: true, config: { ...globalConfig } });
+});
+
+// Días de prueba personalizados por tenant
+app.put('/api/admin/tenants/:tenantId/trial', requireUltraAdmin, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const { trialDays, resetTrialDate } = req.body;
+    const user = await prisma.user.findFirst({
+      where: { tenantId, role: 'superadmin' }
+    });
+    if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+    const updates = {};
+    if (trialDays !== undefined) {
+      const d = parseInt(trialDays);
+      if (isNaN(d) || d < 0 || d > 365) return res.status(400).json({ error: 'trialDays debe ser entre 0 y 365' });
+      updates.customTrialDays = d;
+    }
+    if (resetTrialDate) {
+      updates.trialStartDate = new Date();
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: user.id },
+      data: updates
+    });
+
+    res.json({
+      success: true,
+      tenantId,
+      customTrialDays: updatedUser.customTrialDays,
+      trialStartDate: updatedUser.trialStartDate ? updatedUser.trialStartDate.toISOString() : null
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

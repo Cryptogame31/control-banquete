@@ -267,14 +267,16 @@
           <label for="reg-password">Contraseña</label>
           <div class="input-wrap">
             <span class="input-icon">🔒</span>
-            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6">
+            <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required autocomplete="new-password" minlength="6" style="padding-right: 2.5rem;">
+            <span class="toggle-password" onclick="togglePasswordVisibility('reg-password', this)" style="position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; font-size: 1.1rem; color: rgba(255,255,255,0.4);">👁️</span>
           </div>
         </div>
         <div class="form-group">
           <label for="reg-confirm">Confirmar Contraseña</label>
           <div class="input-wrap">
             <span class="input-icon">🔒</span>
-            <input type="password" id="reg-confirm" placeholder="Repite tu contraseña" required autocomplete="new-password">
+            <input type="password" id="reg-confirm" placeholder="Repite tu contraseña" required autocomplete="new-password" style="padding-right: 2.5rem;">
+            <span class="toggle-password" onclick="togglePasswordVisibility('reg-confirm', this)" style="position: absolute; right: 0.9rem; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; font-size: 1.1rem; color: rgba(255,255,255,0.4);">👁️</span>
           </div>
         </div>
 
@@ -286,6 +288,9 @@
 
       <div class="link-login">
         ¿Ya tienes cuenta? <a href="login.html">Iniciar sesión</a>
+      </div>
+      <div style="text-align: center; margin-top: 0.75rem;">
+        <a href="subscription.html" style="font-size: 0.85rem; color: var(--gold); text-decoration: none; font-weight: 600;">💎 Ver Planes de Suscripción</a>
       </div>
 
       <div class="divider"></div>
@@ -380,6 +385,18 @@
         btnText.textContent = window.i18n ? window.i18n.t('reg.submit') : 'Empezar prueba gratuita →';
       }
     });
+
+    // Helper para mostrar/ocultar contraseña
+    window.togglePasswordVisibility = function(inputId, element) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        element.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        element.textContent = '👁️';
+      }
+    };
   </script>
 </body>
 </html>
