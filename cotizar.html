@@ -88,6 +88,34 @@
     }
     @media (max-width: 900px) {
       .grid-2-1 { grid-template-columns: 1fr; }
+      #mobile-sticky-bar { display: flex !important; }
+      .page-wrapper {
+        padding: 1.5rem 0.75rem 5.5rem; /* Espaciado extra abajo para la barra flotante */
+      }
+      .biz-header {
+        margin-bottom: 1.75rem;
+      }
+      .biz-name {
+        font-size: 1.75rem;
+      }
+      .card {
+        padding: 1.25rem 1rem;
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 1.2rem;
+        margin-bottom: 1.25rem;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .products-selector-grid {
+        grid-template-columns: 1fr;
+      }
+      .budget-card {
+        padding: 1.25rem 1rem;
+      }
     }
 
     /* CARDS */
@@ -547,6 +575,29 @@
 
   </div>
 
+  <!-- Barra flotante móvil para total y acceso rápido al resumen -->
+  <div id="mobile-sticky-bar" style="
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(11, 13, 22, 0.95);
+    border-top: 1px solid rgba(255, 207, 75, 0.25);
+    padding: 0.75rem 1rem;
+    display: none; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  ">
+    <div>
+      <div style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">Total Estimado</div>
+      <div id="mobile-total-val" style="font-size: 1.15rem; font-weight: 800; color: var(--accent-gold);">$0 COP</div>
+    </div>
+    <button onclick="scrollToBudget()" style="
+      background: linear-gradient(135deg, #ffcf4b, #f59e0b);
+      border: none; border-radius: 8px; color: #050609;
+      padding: 0.55rem 1.1rem; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      box-shadow: 0 4px 10px rgba(255, 207, 75, 0.25);
+    ">Ver Resumen ↓</button>
+  </div>
+
   <script>
     const _t = (key) => (window.i18n && typeof window.i18n.t === 'function') ? window.i18n.t(key) : key;
 
@@ -603,6 +654,15 @@
       document.getElementById('not-found-view').style.display = id === 'not-found-view' ? 'block' : 'none';
       document.getElementById('main-view').style.display = id === 'main-view' ? 'block' : 'none';
       document.getElementById('success-view').style.display = id === 'success-view' ? 'block' : 'none';
+      
+      const stickyBar = document.getElementById('mobile-sticky-bar');
+      if (stickyBar) {
+        if (id === 'main-view') {
+          stickyBar.style.setProperty('display', '', 'important');
+        } else {
+          stickyBar.style.setProperty('display', 'none', 'important');
+        }
+      }
     }
 
     function fmt(n) { return '$' + Math.round(n).toLocaleString('es-CO') + ' COP'; }
@@ -981,6 +1041,12 @@
           ${_t('cotizar.disclaimer') || '* Este es un presupuesto preliminar no vinculante. Los meseros se calculan automáticamente (1 mesero cada 35 invitados).'}
         </p>
       `;
+
+      // Actualizar total flotante móvil
+      const mobileTotalVal = document.getElementById('mobile-total-val');
+      if (mobileTotalVal) {
+        mobileTotalVal.textContent = `$${res.total.toLocaleString('es-CO')} COP`;
+      }
 
       return res;
     }
@@ -1364,6 +1430,11 @@
         calcPrice();
       }
     });
+
+    window.scrollToBudget = function() {
+      const el = document.querySelector('.sticky-summary');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    };
 
     // Inicializar
     init();
