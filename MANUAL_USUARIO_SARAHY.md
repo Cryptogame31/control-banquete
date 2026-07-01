@@ -1,103 +1,141 @@
-# 📖 MANUAL DE USUARIO
-# 🏰 Casa de Banquetes Sarahy — Sistema de Gestión Integral
+# 📖 MANUAL DE USUARIO COMPLETO
+# 🏰 Control Banquete — Sistema de Gestión Integral de Eventos (SaaS)
 
-Este manual explica detalladamente el funcionamiento de la aplicación desde la perspectiva del usuario final. Describe cómo cada rol (Superadministrador, Clientes y Equipos de Trabajo) interactúa con la plataforma.
-
----
-
-## 🔑 1. INGRESO Y LOGIN
-1. Abre tu navegador y dirígete a la dirección del sistema (en local: `http://localhost:8080/?demo=false` o el dominio web de producción).
-2. Se presentará la pantalla de inicio de sesión de color azul pizarra oscuro con detalles dorados.
-3. Introduce tu correo electrónico y tu contraseña y presiona **Iniciar Sesión**.
-4. Dependiendo del rol asignado a tu cuenta, el sistema te redirigirá a tu panel de control personalizado.
+Este manual explica detalladamente y paso a paso el funcionamiento de la aplicación **Control Banquete**. Está diseñado para que cualquier persona, sin importar sus conocimientos técnicos, pueda entender cómo usar la plataforma, cuáles son sus ventajas en cada sección y cómo aprovechar sus funciones.
 
 ---
 
-## 👑 2. PANEL DE SUPER ADMINISTRADOR (SUPERADMIN)
-El Superadministrador tiene acceso absoluto a todas las herramientas del sistema organizadas en pestañas en la parte superior.
+## 🔑 1. INGRESO, LOGIN Y REGISTRO
 
-### 📊 A. Dashboard
-* Muestra el número de cotizaciones pendientes de revisión.
-* Presenta el **Calendario Mensual** de eventos programados. Al hacer clic sobre cualquier día o celda del calendario, se abre el modal para agendar un evento en esa fecha específica.
+### A. Registro de un Nuevo Negocio (Casas de Banquetes)
+Si eres dueño de un negocio de eventos y quieres empezar a usar la plataforma, sigue estos pasos:
+1. Abre tu navegador y dirígete a la página de registro (`/register.html`).
+2. **Ventaja:** Verás una interfaz premium con un botón destacado: **"💎 Ver Planes de Suscripción"**. Te aconsejamos hacer clic allí para ver las tarifas (Trimestral o Anual) antes de registrarte.
+3. Rellena los campos: nombre de tu empresa, correo de contacto y tu contraseña.
+4. **👁️ Conmutador de Contraseña (Ojo Emoji):** Junto a la contraseña verás un emoji de ojo (`👁️`). Si lo presionas, cambiará a (`🙈`) y mostrará el texto que escribiste. **Ventaja:** Te ayuda a ver si cometiste un error al digitar tu contraseña sin tener que borrarla y volverla a escribir.
+5. Al final verás la aceptación de los **Términos de Servicio** y **Políticas de Privacidad**. Al hacer clic en ellos, se abrirán instantáneamente en la misma pantalla sin sacarte de la aplicación. Para regresar, solo pulsa el botón **"← Volver"**.
+6. Haz clic en **"Registrarse"** y tu cuenta de administrador quedará creada con **7 días de prueba gratis**.
+
+### B. Inicio de Sesión (Login)
+1. Ve a la página de ingreso (`/login.html`).
+2. Escribe tu correo electrónico y contraseña. Puedes pulsar el emoji de ojo (`👁️`/`🙈`) para verificar que esté bien escrita.
+3. **¿Olvidaste tu contraseña?:** Si pierdes tu contraseña, verás un enlace en la parte inferior que dice *¿Olvidaste tu contraseña?*. Haz clic allí para abrir una ventana de ayuda rápida que te guiará para contactar al soporte técnico de la plataforma.
+4. Presiona **Iniciar Sesión** para entrar a tu panel.
+
+### C. Banner Informativo de Días de Prueba
+* Al entrar al panel, si tu negocio está en periodo de prueba, verás un banner dorado en la parte superior avisándote cuántos días de prueba te quedan.
+* **Ventaja (Botón de Cerrar `✕`):** Si el banner te molesta o se superpone con la traducción automática de tu navegador, puedes hacer clic en la pequeña `✕` a la derecha del banner para ocultarlo de inmediato durante tu sesión.
+
+---
+
+## 👑 2. PANEL DE SUPER ADMINISTRADOR (DUEÑO DEL NEGOCIO)
+El Superadministrador es el dueño de la casa de banquetes. Su panel tiene acceso a todas las herramientas organizadas en pestañas superiores.
+
+### 📊 A. Dashboard (Tablero Principal)
+* **Indicadores Rápidos:** Muestra de un vistazo cuántas cotizaciones nuevas tienes pendientes de revisar.
+* **Calendario Mensual Interactivo:** Aquí puedes ver de forma visual todos los eventos agendados del mes.
+  * **Cómo usarlo:** Si quieres programar un evento en un día libre, simplemente haz clic sobre el cuadro de ese día en el calendario. Se abrirá automáticamente el modal para crear un evento en esa fecha con todos los datos prellenados.
 
 ### 📄 B. Cotizaciones de Clientes
-Muestra la lista de cotizaciones que los clientes han realizado en línea desde el cotizador público.
-* **Ver / Editar Cotización**: Abre los detalles. Permite modificar invitados, salón o servicios.
-* **Aplicar Descuento**: Introduce un descuento (fijo en COP o en porcentaje) y escribe una etiqueta descriptiva (ej. *"Descuento por Temporada"*). El total neto se recalculará automáticamente.
-* **Descargar PDF**: Genera y descarga en tu PC la propuesta formal del evento con diseño corporativo premium.
-* **Convertir en Evento**: Cuando el cliente confirma el evento y se recibe el abono inicial, presiona este botón. La cotización se guardará como un **Evento Agendado** en el calendario.
+Aquí llegan las solicitudes que tus clientes completaron en línea desde el **Cotizador Público**.
+* **Filtro por Tipo de Evento:** Usa el menú desplegable de filtro para ver rápidamente solo las bodas, solo los quinces, etc.
+* **Ver / Editar Cotización:** Abre la cotización y ajusta la cantidad de invitados o añade/quita platos y servicios si el cliente te lo pide por teléfono.
+* **Aplicar Descuento Inteligente:** Puedes ingresar un descuento (ej: $100.000 COP o el 10%) escribiendo una etiqueta descriptiva (ej: *"Descuento de Novios"*). El sistema calculará el total neto al instante.
+* **Descargar PDF:** Genera una propuesta formal en PDF con diseño de alta costura corporativa listo para enviar.
+* **Convertir en Evento:** Si el cliente aprueba el presupuesto y te da el abono inicial, presiona **"Convertir en Evento"**. Esto quitará la cotización de esta pestaña y la colocará en tu calendario como un evento oficial.
 
-### 🗓️ C. Gestión de Eventos (Calendario y Modal de Evento)
-Esta sección contiene la agenda viva de celebraciones. Al hacer clic en un evento o presionar **+ Crear Evento**, se abre un modal completo que permite configurar:
-1. **Información General**: Cliente propietario (con buscador en tiempo real para localizarlo rápidamente), tipo de fiesta (*Boda, Quinces, Grados, Fiesta Infantil, Empresarial*), fecha, hora e invitados.
-2. **Conceptos del Catálogo**: 
-   * **Plan de Alimentación (Catering)**: Selecciona el menú de alimentación (o *"Sin Alimentación"* si no incluye comida).
-   * **Plan de Fotografía**, **Estilo de Decoración** y **Paquete Recreativo**.
-3. **Control Financiero (Abonos)**: 
-   * Registra los abonos que realiza el cliente especificando fecha, tipo de pago (*Abono Inicial, Saldo, Extra*) y monto.
-   * El sistema calcula automáticamente el total pagado y el saldo pendiente.
-4. **Citas y Ensayos**: Programa fechas de visitas técnicas, degustación de platos o ensayos generales. El cliente las verá en su portal.
-5. **Cronograma del Día (Timeline)**: Establece las actividades por horas (ej: *"18:00 - Llegada de invitados"*).
-6. **Servicios Adicionales**: Marca los servicios extra contratados (meseros extra, licores, sonido, etc.).
-7. **Fotografía**: Registra el enlace de Google Drive con las fotos finales y revisa la selección enviada por el cliente.
+### 🗓️ C. Gestión de Eventos (La Ficha del Evento)
+Al hacer clic sobre un evento en tu calendario, se abrirá un modal con siete pestañas operativas:
+1. **Información General:** Elige el cliente (puedes buscarlo escribiendo su nombre en el buscador rápido), define la fecha, hora, tipo de evento y la cantidad de invitados.
+2. **Conceptos del Catálogo:** Elige los paquetes contratados (Menú de catering, paquete fotográfico, decoración y recreación).
+3. **Control Financiero (Abonos):** Registra cada pago que te haga el cliente (abono inicial, cuotas extras). El sistema sumará todo y te dirá exactamente cuánto te ha pagado y cuál es el **saldo pendiente**.
+4. **Citas y Ensayos:** Registra fechas importantes (ej: *"Degustación de Platos: 15 de Julio"*). El cliente las verá en su portal para que no las olvide.
+5. **Cronograma del Día (Timeline):** Define la agenda del evento por horas (ej: *"19:00 - Entrada de Novios"*, *"20:30 - Cena"*).
+6. **Servicios Adicionales:** Marca licores o meseros extras contratados para el evento.
+7. **Fotografía:** Registra el enlace de la carpeta de Drive con las fotos del evento y gestiona la entrega.
 
 ### 🛍️ D. Catálogo de Servicios y Tarifas
-Aquí se gestiona el inventario de conceptos comercializados.
-* **Crear / Editar Producto**: Agrega salones, paquetes de fotografía, estilos de decoración, servicios adicionales o platos individuales para el menú.
-* **Múltiples Unidades (`allowMultiples`)**: Marca la casilla *"Permitir solicitar múltiples unidades"* para aquellos elementos (como botellas de licor o cajas de cerveza) donde el cliente requiera cotizar cantidades en vez de un sí/no simple.
-* **Gestiones y Compras**: Asocia tareas operativas (ej. *"Contratar mariachis"*) o insumos de compra (ej. *"Comprar 5kg de lomo"*) a un servicio. Estas se cargarán automáticamente al checklist operativo cuando se confirme un evento con dicho servicio.
-* **Priorización de Productos (Subir / Bajar)**: 
-  * Para organizar cómo aparecen las opciones en el cotizador, haz clic en las flechas **▲ (Subir)** o **▼ (Bajar)** en la fila del producto.
-  * El catálogo se reordenará y guardará la prioridad de forma permanente.
+Aquí administras todo lo que vendes (salones, platos, fotografía, decoración).
+* **Multiunidades (`allowMultiples`):** Si creas un producto como *"Cajas de Cerveza"* o *"Botellas de Whisky"*, activa la casilla *"Permitir solicitar múltiples unidades"*. Esto habilitará un selector de cantidades en lugar de un botón de sí/no.
+* **Insumos y Gestiones Asociadas:** A cada plato o servicio le puedes asociar ingredientes (ej: *"200g de Carne"* a un filete) y tareas logísticas (ej: *"Comprar hielo"* al servicio de barra). Cuando se confirme un evento con ese plato, la lista de compras y de tareas de tu equipo se generará sola.
+* **Organizador de Catálogo (Subir/Bajar):** Puedes elegir en qué orden ven tus clientes las opciones. Solo haz clic en las flechas **▲ (Subir)** o **▼ (Bajar)** en cada producto para reordenar la lista permanentemente.
 
 ### 🛠️ E. Valores de Operación (Configuración Global)
-* Modifica los costos fijos base (como el valor base de mesero o alimentación base por persona).
-* Configura los números de WhatsApp que recibirán las notificaciones de cotizaciones y selecciones de fotos.
-* Modifica la lista global de colores disponibles para mantelería.
-* Edita el clausulado del **Contrato Legal** que firman los clientes.
+Esta pestaña te permite definir las reglas base de tu negocio:
+* **Costos Base:** Define el costo base por mesero y el valor de comida por persona.
+* **Tipos de Evento Dinámicos:**
+  * **Cómo usarlo:** Verás una sección llamada **"Tipos de Evento Disponibles"** con fichas (chips) doradas. Puedes borrar los existentes haciendo clic en la `✕` o agregar nuevos (ej: *Bautizos*, *Lanzamientos*) en el campo de texto y presionando **"Agregar"**.
+  * **Ventaja:** Al agregar o quitar tipos de evento aquí, estos se actualizarán solos en todos los formularios, filtros de tu panel, catálogo de productos y en el cotizador público que ven tus clientes. No tienes que tocar código.
+* **Colores de Mantelería:** Agrega o quita los tonos de mantelería que ofreces a tus clientes.
+* **Contrato Legal:** Redacta las cláusulas legales y condiciones del servicio. Tus clientes verán este texto y lo firmarán digitalmente en su portal.
 
 ### 🚚 F. Panel de Operación / Equipos
-Consolida el trabajo logístico y de abastecimiento de todos los eventos próximos:
-* **Logística (Gestiones)**: Checklist interactivo de tareas agrupadas por evento y área (Cocina, Logística, Compras, etc.). Cuenta con un buscador en vivo y filtros por estado (*Pendientes / Realizadas*).
-* **Compras**: Consolidado de todos los insumos necesarios para los banquetes activos. Puedes filtrar por evento o insumo, marcar los artículos como comprados y guardarlos. Al guardar, el sistema te preguntará si deseas cargar las existencias directamente al **Inventario**.
-* **Inventario**: Consulta y edición manual del stock de insumos físicos de la empresa.
+Es el centro de control para tus trabajadores:
+* **Logística (Gestiones):** Lista interactiva de tareas pendientes por evento. Puedes filtrarlas por área (Cocina, Compras, etc.) o estado y buscarlas con el buscador en vivo.
+* **Compras:** Consolidado de compras de insumos para los banquetes de la semana. Puedes marcar lo que vas comprando.
+  * **Ventaja:** Al guardar las compras realizadas, el sistema te preguntará si deseas cargar estos ingredientes directamente al **Inventario**.
+* **Inventario:** Muestra tu stock real de insumos físicos para evitar compras innecesarias.
 
 ---
 
-## 👤 3. PORTAL DEL CLIENTE (NOVIOS / QUINCEAÑERA)
-El cliente cuenta con un portal interactivo optimizado para móviles y computadores, estructurado en tres pestañas:
+## 👤 3. PORTAL DEL CLIENTE (TUS NOVIOS O ANFITRIONES)
+Cuando creas un evento, le das acceso a tu cliente con su correo y contraseña. Su portal es 100% amigable y tiene tres pestañas:
 
 ### 🏠 A. Mi Reserva
-* **Cuenta Regresiva**: Contador en tiempo real con los días y horas que faltan para el evento.
-* **Estado de Cuenta**: Resumen gráfico del valor total, abonos realizados y saldo pendiente de pago.
-* **Contrato de Servicio**: Panel donde el cliente puede leer el contrato legal redactado por el administrador y **firmarlo digitalmente** con una pantalla táctil o mouse. Una vez firmado, queda grabado como soporte.
-* **Citas Programadas**: Cronograma de reuniones agendadas por la administración.
+* **Cuenta Regresiva:** Un reloj visual que muestra los días, horas y minutos exactos que faltan para su gran día.
+* **Estado de Cuenta:** Un resumen gráfico muy claro de cuánto cuesta su evento, cuánto ha pagado y cuánto debe.
+* **Contrato Firmado:** Muestra el contrato redactado por el administrador. El cliente puede **firmar digitalmente con su dedo** en la pantalla del celular. Una vez firmado, el contrato se bloquea y queda como soporte oficial.
+* **Citas:** Muestra las citas de planeación agendadas.
 
-### 🍽️ B. Selección de Menú
-* Permite al cliente diseñar su banquete seleccionando la entrada, plato principal, postre, líquido, etc., de las opciones permitidas para su tipo de evento.
-* **Color de Mantelería**: Si el administrador lo habilitó, el cliente verá una cuadrícula de colores disponibles y podrá seleccionar su combinación.
-  * *Regla*: Solo se permiten realizar **2 cambios** de selección y esta opción se bloquea automáticamente **10 días antes** del evento por razones de logística.
+### 🍽️ B. Selección de Menú y Mantelería
+* **Menú del Evento:** El cliente selecciona su plato principal, entrada, postre y bebidas de la lista permitida para su evento.
+* **Mantelería:** Visualiza una paleta con los colores configurados por el administrador para seleccionar el tono de su mantelería.
+  * **Regla de Bloqueo:** El sistema permite al cliente cambiar de opinión un máximo de **2 veces** y bloquea la selección automáticamente **10 días antes** del evento para asegurar que el negocio pueda comprar/alquilar los insumos a tiempo.
 
 ### 📸 C. Módulo de Fotografía
-Se activa automáticamente **10 días después** de que el evento pasa a estado *"realizado"*.
-* **Descarga de Fotos**: Botón directo para acceder a la carpeta de Google Drive configurada por el administrador.
-* **Selección de Favoritas**: El cliente puede escribir los códigos o números de sus fotos favoritas en el cuadro de texto.
-* Al hacer clic en **Enviar Selección**, se abrirá su WhatsApp con un mensaje pre-formateado dirigido al administrador y al fotógrafo con su listado final.
+Se activa solo **10 días después** de haber pasado el evento.
+* **Enlace Drive:** Un botón directo para que el cliente descargue sus fotos.
+* **Selección de Favoritas:** El cliente escribe el nombre o número de sus fotos preferidas. Al hacer clic en **"Enviar Selección"**, se le abrirá WhatsApp con el listado listo para enviar a la administración y al fotógrafo.
 
 ---
 
-## 🛒 4. PORTALES OPERATIVOS (EQUIPOS DE TRABAJO)
-Los miembros del equipo (*Cocina, Logística, Compras*) inician sesión y acceden a una vista simplificada enfocada en sus tareas:
-
-* **Cocina (Chef)**:
-  * Visualiza los platos y catering contratados para los eventos próximos.
-  * El sistema calcula y escala automáticamente los ingredientes de las recetas multiplicándolos por la cantidad exacta de invitados del evento, generando una hoja de producción al instante.
-* **Logística**:
-  * Consulta las fechas, salones, horas y el cronograma de actividades de cada evento.
-  * Marca las gestiones de montaje y logística a su cargo como completadas.
-* **Compras**:
-  * Consulta el consolidado de insumos requeridos.
-  * Registra las compras realizadas marcándolas en el checklist para actualizar las existencias.
+## 🛒 4. PORTALES OPERATIVOS (TUS EQUIPOS DE TRABAJO)
+Tus empleados tienen vistas simplificadas según su rol para evitar confusiones:
+* **Vista de Cocina (Chef):**
+  * Ve los platos seleccionados para el banquete.
+  * **Ventaja:** El sistema calcula de forma automática y multiplica las porciones de la receta por los invitados del evento, dándole al Chef la lista de ingredientes exacta a preparar de inmediato.
+* **Vista de Logística:**
+  * Ve el cronograma por horas de las actividades del evento y marca las tareas del salón como completadas.
+* **Vista de Compras:**
+  * Consulta el checklist de ingredientes que faltan comprar en el mercado para los eventos programados.
 
 ---
-*Manual de Usuario generado para v16 — Casa de Banquetes Sarahy*
+
+## 💎 5. PLANES DE SUSCRIPCIÓN (SaaS)
+Si tu negocio requiere planes para seguir funcionando después del periodo de prueba, la gestión se realiza en la ventana `/subscription.html`:
+* **Planes Disponibles:** Puedes seleccionar el **Plan Trimestral ($28 USD)** o el **Plan Anual ($95 USD)**.
+* **Pagos Seguros:** Los pagos son procesados por Google Play Store (en la App móvil) o la pasarela configurada.
+* **Restaurar Compra:** Si desinstalas la app o cambias de celular, haz clic en **"↩ Restaurar compra anterior"** para recuperar tu licencia activa en segundos sin pagar dos veces.
+* **Cancelación de Suscripción:** Puedes presionar el botón rojo **"❌ Cancelar mi suscripción"** en cualquier momento si deseas dejar de usar el servicio.
+
+---
+
+## 🛡️ 6. PANEL DE ULTRA ADMINISTRADOR (SaaS CENTRAL)
+Este es el panel exclusivo del **dueño de la plataforma SaaS** (ubicado en `/ultraadmin`) para gestionar a todos los banquetes (tenants) registrados en el sistema:
+1. **Listado de Clientes (Banqueteros):** Monitorea en tiempo real todas las casas de banquetes que usan tu software, su correo, fecha de registro y estado de su suscripción.
+2. **Control de Periodo de Prueba y Expiración:**
+   * Puedes ver cuántos días de prueba le quedan a cada negocio.
+   * **Días de Prueba Personalizados (`customTrialDays`):** Puedes ingresar una cantidad personalizada de días de prueba para un banquete específico (ej: darle 15 o 30 días en lugar de los 7 estándar).
+   * **Vencer/Activar Planes:** Permite forzar la expiración de un negocio si no ha pagado, o activar su plan manualmente.
+3. **Restablecer Contraseñas de Administradores:**
+   * **Cómo usarlo:** Si el dueño de una casa de banquetes no puede entrar y tiene problemas con su correo, ve a su fila en el listado, ingresa la nueva contraseña en el campo correspondiente y presiona **"Restablecer Contraseña"**.
+   * **Ventaja:** Le darás una nueva clave de acceso de inmediato sin tener que modificar la base de datos a mano o requerir soporte técnico avanzado.
+
+---
+
+## 🌐 7. EL COTIZADOR PÚBLICO MÓVIL (EXPERIENCIA DEL CLIENTE)
+Cuando tus clientes abren tu cotizador público desde su celular para planear su evento:
+* **Relleno Responsivo Móvil:** La pantalla se reestructura de forma inteligente en una sola columna vertical. **Ventaja:** Evita cortes horizontales o que los campos de texto queden fuera de la pantalla. Todo se lee perfectamente.
+* **Barra de Presupuesto Flotante (Sticky Bottom Bar):**
+  * En la parte inferior del celular verás una barra negra fija con el **Total Estimado** en tiempo real.
+  * Cuenta con el botón **"Ver Resumen ↓"**. Al presionarlo, la pantalla se deslizará de manera suave hacia abajo para mostrarle al cliente el desglose final y el botón para enviar su cotización, facilitando la conversión de prospectos a clientes reales.
