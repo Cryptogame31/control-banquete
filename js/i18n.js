@@ -946,7 +946,7 @@ function injectLangStyles() {
 
     /* Floating lang switcher para páginas públicas */
     #lang-switcher-float {
-      position: fixed; top: 1rem; right: 1rem; z-index: 9999;
+      position: absolute; top: 1rem; right: 1rem; z-index: 9999;
     }
   `;
   document.head.appendChild(style);
