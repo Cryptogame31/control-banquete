@@ -2168,6 +2168,32 @@ app.put('/api/admin/tenants/:tenantId/trial', requireUltraAdmin, async (req, res
   }
 });
 
+// Restablecer contraseña del superadmin de un tenant (ultra-admin)
+app.put('/api/admin/tenants/:tenantId/password', requireUltraAdmin, async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    const { password } = req.body;
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: { tenantId, role: 'superadmin' }
+    });
+    if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword }
+    });
+
+    res.json({ success: true, message: 'Contraseña restablecida con éxito' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Arrancar Servidor
 app.listen(PORT, async () => {
   console.log(`=================================================`);

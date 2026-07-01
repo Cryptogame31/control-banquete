@@ -1047,6 +1047,22 @@ app.put('/api/admin/tenants/:tenantId/trial', requireUltraAdmin, (req, res) => {
   res.json({ success: true, tenantId, customTrialDays: user.customTrialDays, trialStatus: trial });
 });
 
+// Restablecer contraseña del superadmin de un tenant (ultra-admin)
+app.put('/api/admin/tenants/:tenantId/password', requireUltraAdmin, async (req, res) => {
+  const { tenantId } = req.params;
+  const { password } = req.body;
+  if (!password || password.length < 6) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+  }
+  const user = memDB.users.find(u => u.tenantId === tenantId && u.role === 'superadmin');
+  if (!user) return res.status(404).json({ error: 'Tenant no encontrado' });
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  PG.upsert('users', user.tenantId, user.id, user);
+  res.json({ success: true, message: 'Contraseña restablecida con éxito' });
+});
+
 // Rutas páginas legales y ultra-admin
 app.get('/ultraadmin', (req, res) => res.sendFile(path.join(__dirname, 'ultraadmin.html')));
 app.get('/legal', (req, res) => res.sendFile(path.join(__dirname, 'legal.html')));

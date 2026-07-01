@@ -465,6 +465,15 @@
         <input type="checkbox" id="edit-reset-trial" style="width:16px;height:16px;"> Reiniciar fecha de inicio de prueba (desde hoy)
       </label>
     </div>
+    <hr style="border:none;border-top:1px solid var(--border2);margin:1.25rem 0;">
+    <div style="font-size:0.82rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;">🔑 Restablecer Contraseña</div>
+    <div class="form-group">
+      <label class="form-label">Nueva contraseña para el Administrador</label>
+      <div style="display:flex;gap:0.5rem;">
+        <input class="form-input" type="text" id="edit-new-password" placeholder="Mínimo 6 caracteres" style="flex:1;">
+        <button class="btn btn-blue" onclick="resetTenantPassword()" style="padding:0 1rem;font-size:0.85rem;white-space:nowrap;background:rgba(59,130,246,0.12);color:var(--blue);border:1px solid rgba(59,130,246,0.3);border-radius:8px;cursor:pointer;font-weight:600;">Establecer</button>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Cancelar</button>
       <button class="btn btn-red" onclick="saveEdit()">💾 Guardar cambios</button>
@@ -686,7 +695,24 @@
     document.getElementById('edit-extend').value = '';
     document.getElementById('edit-trial-days').value = t.customTrialDays != null ? t.customTrialDays : '';
     document.getElementById('edit-reset-trial').checked = false;
+    document.getElementById('edit-new-password').value = '';
     document.getElementById('modal-edit').classList.add('open');
+  }
+
+  async function resetTenantPassword() {
+    const tenantId = document.getElementById('edit-tenantId').value;
+    const password = document.getElementById('edit-new-password').value.trim();
+    if (!password || password.length < 6) {
+      toast('❌ La contraseña debe tener al menos 6 caracteres', true);
+      return;
+    }
+    try {
+      await api('PUT', `/api/admin/tenants/${tenantId}/password`, { password });
+      document.getElementById('edit-new-password').value = '';
+      toast('✅ Contraseña restablecida con éxito');
+    } catch(e) {
+      toast('❌ ' + e.message, true);
+    }
   }
 
   async function saveEdit() {
