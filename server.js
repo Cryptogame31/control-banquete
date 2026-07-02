@@ -1085,6 +1085,56 @@ app.post('/api/subscription/activate', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'El modo desarrollo no está permitido en producción' });
     }
 
+    // Si existe el archivo de credenciales de Google Play, validar y confirmar la compra en producción
+    const fs = require('fs');
+    const keyPath = path.join(__dirname, 'google-play-key.json');
+    if (fs.existsSync(keyPath) && !purchaseToken.startsWith('dev_token_')) {
+      try {
+        const { google } = require('googleapis');
+        const auth = new google.auth.GoogleAuth({
+          keyFile: keyPath,
+          scopes: ['https://www.googleapis.com/auth/androidpublisher']
+        });
+        const playClient = google.androidpublisher({
+          version: 'v3',
+          auth: auth
+        });
+        
+        const planSkus = {
+          monthly: 'com.controlbanquete.monthly',
+          quarterly: 'com.controlbanquete.quarterly',
+          annual: 'com.controlbanquete.annual',
+          cb_monthly: 'cb_monthly',
+          cb_quarterly: 'cb_quarterly',
+          cb_yearly: 'cb_yearly'
+        };
+        const subscriptionId = planSkus[plan] || plan;
+        const packageName = 'cloud.expandete.controlbanquete.twa';
+
+        // 1. Obtener detalles de la compra para verificar su estado
+        const getRes = await playClient.purchases.subscriptions.get({
+          packageName,
+          subscriptionId,
+          token: purchaseToken
+        });
+
+        // 2. Acknowledgear la suscripción si no ha sido reconocida (evita reembolsos automáticos tras 3 días)
+        if (getRes.data.acknowledgementState === 0) { // 0 = Aún no reconocida
+          await playClient.purchases.subscriptions.acknowledge({
+            packageName,
+            subscriptionId,
+            token: purchaseToken,
+            requestBody: {
+              developerPayload: `user_${req.user.uid}`
+            }
+          });
+        }
+      } catch (googlePlayError) {
+        console.error('[Google Play API Error]:', googlePlayError);
+        return res.status(400).json({ error: 'Error al verificar la compra con Google Play: ' + googlePlayError.message });
+      }
+    }
+
     const now = new Date();
     const expiry = new Date(now);
     if (plan.includes('monthly') || plan === 'mensual') expiry.setMonth(expiry.getMonth() + 1);

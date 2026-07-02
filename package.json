@@ -22,7 +22,8 @@
     "pdfkit": "^0.19.1",
     "pg": "^8.11.3",
     "prisma": "^5.0.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "googleapis": "^140.0.0"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
